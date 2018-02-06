@@ -56,3 +56,5 @@ freeline/
 freeline_project_description.json
 
 *.txt
+*/key.xml
+TRing/app/src/main/res/values/key.xml
