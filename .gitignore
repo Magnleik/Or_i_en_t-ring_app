@@ -35,6 +35,7 @@ captures/
 
 # Intellij
 *.iml
+TRing/.idea/
 TRing/.idea/workspace.xml
 TRing/.idea/tasks.xml
 TRing/.idea/gradle.xml
