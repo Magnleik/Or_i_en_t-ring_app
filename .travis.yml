@@ -7,6 +7,7 @@ android:
     - tools
     - build-tools-25.0.2
     - android-25
+    - sys-img-armeabi-v7a-android-25
 
 notifications:
   email: false
@@ -15,6 +16,7 @@ branches:
   only:
     - master
     - dev
+    - choffa/travis
 
 before_script:
   - cd TRing
