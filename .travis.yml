@@ -16,7 +16,6 @@ branches:
   only:
     - master
     - dev
-    - choffa/travis
 
 before_script:
   - cd TRing
