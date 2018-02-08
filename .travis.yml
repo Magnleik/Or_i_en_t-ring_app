@@ -11,6 +11,9 @@ android:
 notifications:
   - email: false
 
+before_script:
+  - "cd TRing"
+
 env:
   global:
     # MAPS_API_KEY
