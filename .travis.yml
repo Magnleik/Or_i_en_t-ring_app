@@ -10,6 +10,12 @@ android:
 
 notifications:
   email: false
+
+branches:
+  only:
+    - master
+    - dev
+
 before_script:
   - cd TRing
 
