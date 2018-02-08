@@ -1,15 +1,18 @@
 language: android
+
 android:
-- components:
-  - tools
-  - platform-tools
-  - tools
-  - build-tools-25.0.2
-  - android-25
+  components:
+    - tools
+    - platform-tools
+    - tools
+    - build-tools-25.0.2
+    - android-25
+
 notifications:
-- email: false
+  email: false
 before_script:
-- cd TRing
+  - cd TRing
+
 env:
   global:
   # MapsApiKey
