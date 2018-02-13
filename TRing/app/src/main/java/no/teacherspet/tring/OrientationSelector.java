@@ -17,12 +17,12 @@ public class OrientationSelector extends AppCompatActivity {
     }
 
     public void goToOrientationList (View v){
-        Intent intent = new Intent(OrientationSelector.this, MapsActivity.class);
+        Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
         startActivity(intent);
     }
 
     public void createEvent (View v){
-        Intent intent = new Intent(OrientationSelector.this, MapsActivity.class);
+        Intent intent = new Intent(OrientationSelector.this, CreateOEvent.class);
         startActivity(intent);
     }
 
