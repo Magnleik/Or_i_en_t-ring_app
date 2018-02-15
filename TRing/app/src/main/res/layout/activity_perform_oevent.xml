@@ -6,4 +6,27 @@
     android:layout_height="match_parent"
     tools:context="no.teacherspet.tring.PerformOEvent">
 
+    <fragment
+        android:id="@+id/map_used_in_event"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="294dp"
+        android:layout_height="321dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context="no.teacherspet.tring.MapsActivity" />
+
+    <Button
+        android:id="@+id/show_position_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="Vis min posisjon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_used_in_event"
+        android:onClick="showPosition"/>
 </android.support.constraint.ConstraintLayout>
