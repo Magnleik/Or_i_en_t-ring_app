@@ -8,8 +8,8 @@ import java.util.List;
 
 public class NetworkManager {
 
-    static NetworkManager nm;
-    static String URL = "URL GOES HERE";
+    static private NetworkManager nm;
+    static private String URL = "URL GOES HERE";
 
     private NetworkManager(){
     }
@@ -32,10 +32,10 @@ public class NetworkManager {
 
     /**
      * Finds all points within a circle with radius maxDist from the given location
-     * @param latitude
-     * @param longitude
-     * @param maxDist
-     * @return
+     * @param latitude The latitude of given position
+     * @param longitude The longitude of given position
+     * @param maxDist The radius of search
+     * @return A List of Points within the given circle
      */
     public List<Point> getPointsNearby(double latitude, double longitude, double maxDist){
         return null;
@@ -43,8 +43,8 @@ public class NetworkManager {
 
     /**
      * Finds all points associated with an Event. First element will always be the starting Point
-     * @param event
-     * @return
+     * @param event The Event from which you want all points.
+     * @return A List of Points associated with the given event in the database, first point is the starting point
      */
     public List<Point> getPointsFromEvent(Event event){
         return null;
@@ -52,8 +52,8 @@ public class NetworkManager {
 
     /**
      * Updates the existing event if it exists in the database, will otherwise create it and return the event with its updated information.
-     * @param event
-     * @return
+     * @param event The Event you wish to update in the database
+     * @return Returns the updated event
      */
     public Event updateEvent(Event event){
         return null;
@@ -61,10 +61,10 @@ public class NetworkManager {
 
     /**
      * Finds and returns all events with starting location within a radius maxDist from the given location
-     * @param latitude
-     * @param longitude
-     * @param maxDist
-     * @return
+     * @param latitude The latitude of given position
+     * @param longitude The longitude of given position
+     * @param maxDist The radius of search
+     * @return Returns all events starting within the given circle
      */
     public List<Event> getNearbyEvents(double latitude, double longitude, double maxDist){
         return null;
@@ -72,8 +72,8 @@ public class NetworkManager {
 
     /**
      * Returns the event with the given ID if it exists, null otherwise.
-     * @param id
-     * @return
+     * @param id The ID of the Event you wish to have returned.
+     * @return Returns the Event with the given ID.
      */
     public Event getEventById(int id){
         return null;
