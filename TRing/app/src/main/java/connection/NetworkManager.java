@@ -58,4 +58,26 @@ public class NetworkManager {
     public Event updateEvent(Event event){
         return null;
     }
+
+    /**
+     * Finds and returns all events with starting location within a radius maxDist from the given location
+     * @param latitude
+     * @param longitude
+     * @param maxDist
+     * @return
+     */
+    public List<Event> getNearbyEvents(double latitude, double longitude, double maxDist){
+        return null;
+    }
+
+    /**
+     * Returns the event with the given ID if it exists, null otherwise.
+     * @param id
+     * @return
+     */
+    public Event getEventById(int id){
+        return null;
+    }
+
+
 }
