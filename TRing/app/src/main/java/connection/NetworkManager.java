@@ -1,6 +1,14 @@
 package connection;
 
+import java.io.IOException;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Eirik on 15-Feb-18.
@@ -9,9 +17,14 @@ import java.util.List;
 public class NetworkManager {
 
     static private NetworkManager nm;
-    static private String URL = "URL GOES HERE";
+    static private String URL = "http://10.22.18.122";
+    OkHttpClient.Builder httpClient;
+    Client client;
+    Retrofit.Builder builder;
+    Retrofit retrofit;
 
     private NetworkManager(){
+        init();
     }
 
     public static NetworkManager getInstance(){
@@ -20,6 +33,69 @@ public class NetworkManager {
         }
 
         return nm;
+    }
+
+    private void init(){
+
+        httpClient = new OkHttpClient.Builder();
+        builder = new Retrofit.Builder()
+                    .baseUrl(URL)
+                    .addConverterFactory(
+                            GsonConverterFactory.create()
+                    );
+
+        retrofit =
+                builder
+                    .client(
+                            httpClient.build()
+                    )
+                    .build();
+
+        client = retrofit.create(Client.class);
+
+        //Just here for testing:
+        connectionStringTest();
+        connectionPointTest();
+    }
+
+    private void connectionPointTest(){
+
+        Call<Point> call =
+                client.getPointByID(100);
+
+        call.enqueue(new Callback<Point>() {
+            @Override
+            public void onResponse(Call<Point> call, Response<Point> response) {
+                Point point = response.body();
+                System.out.println("We have a point!");
+                System.out.println("It's ID is: " + point.getId());
+            }
+
+            @Override
+            public void onFailure(Call<Point> call, Throwable t) {
+                System.out.println("Point test has crashed and burned");
+            }
+        });
+
+    }
+
+    private void connectionStringTest(){
+
+        Call<List<String>> call =
+                client.getTestStrings();
+
+        call.enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                System.out.println("Call Test successful, strings: " + response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                System.out.println("Call Test failed");
+            }
+        });
+
     }
 
     /**
