@@ -22,7 +22,7 @@ public class StartupMenu extends AppCompatActivity{
 
 
     public void orientering(View v){
-        Intent intent = new Intent(StartupMenu.this,MapsActivity.class);
+        Intent intent = new Intent(StartupMenu.this,OrientationSelector.class);
         startActivity(intent);
     }
 }
