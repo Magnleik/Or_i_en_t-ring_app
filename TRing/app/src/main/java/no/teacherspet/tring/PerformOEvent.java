@@ -1,6 +1,7 @@
 package no.teacherspet.tring;
 
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,17 +18,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PerformOEvent extends FragmentActivity implements GoogleMap.OnMyLocationButtonClickListener, OnMapReadyCallback {
+public class PerformOEvent extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
-    private int countDown = 5;
-    private int secondsLeft;
-    private Timer timer;
 
 
     @Override
@@ -62,49 +62,31 @@ public class PerformOEvent extends FragmentActivity implements GoogleMap.OnMyLoc
         mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
     }
 
-    public void showPosition(View v) {
+
+
+    public void showLocationButtonPressed(View v) {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-            mMap.setOnMyLocationButtonClickListener(this);
-            this.reset();
-        }
-    }
-
-    public void hidePosition(View v) {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(false);
-            mMap.setOnMyLocationButtonClickListener(this);
-        }
-    }
-
-
-    public void reset() {
-        timer = new Timer();
-        secondsLeft = countDown;
-        // Decrease seconds left every 1 second.
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                secondsLeft--;
-                if (secondsLeft == 0) {
-                    timer.cancel();
+            Task getLocation = mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        double longitude = location.getLongitude();
+                        double latitude = location.getLatitude();
+                        LatLng latlng = new LatLng(longitude, latitude);
+                        mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
+                        // Logic to handle location object
+                    }
                 }
-            }
-        }, 0, 1000);
-        //Kall hidePosition
+            });
+        }
     }
 
 
 
-    @Override
-    public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false;
-    }
+
+
 
 
 }

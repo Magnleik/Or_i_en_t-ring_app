@@ -28,5 +28,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map_used_in_event"
-        android:onClick="showPosition"/>
+        android:onClick="showLocationButtonPressed"/>
 </android.support.constraint.ConstraintLayout>
