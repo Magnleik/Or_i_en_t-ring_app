@@ -2,6 +2,7 @@ package no.teacherspet.tring;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -28,6 +30,7 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
+    private int positionViewed = 0;
 
 
     @Override
@@ -64,6 +67,8 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
 
 
 
+
+
     public void showLocationButtonPressed(View v) {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -72,14 +77,39 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
                 public void onSuccess(Location location) {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
+
+                        //Oppretter og viser en markor der hvor bruker er
                         double longitude = location.getLongitude();
                         double latitude = location.getLatitude();
-                        LatLng latlng = new LatLng(longitude, latitude);
-                        mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
-                        // Logic to handle location object
+                        LatLng latlng = new LatLng(latitude, longitude);
+                        final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
+                        //Zoomer til posisjon
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 12));
+                        positionViewed++;
+
+
+                        //Markor fjernes etter 5 sekund
+                        CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+                            int sek = 5;
+                            @Override
+                            public void onTick(long l) {
+                                sek--;
+                                Toast.makeText(getApplicationContext(), "Dette er " + positionViewed + ".gang posisjonen vises, markor fjernes om " + sek+  " sekunder" , Toast.LENGTH_SHORT).show();
+
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                posisjonsmarkor.remove();
+
+                            }
+                        }.start();
                     }
                 }
             });
+        } else {
+            Toast.makeText(getApplicationContext(), "Du må gi appen tilgang til bruk av GPS." , Toast.LENGTH_LONG).show();
+
         }
     }
 
