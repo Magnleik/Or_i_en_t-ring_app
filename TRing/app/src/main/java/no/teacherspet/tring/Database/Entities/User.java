@@ -1,6 +1,5 @@
 package no.teacherspet.tring.Database.Entities;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
@@ -10,33 +9,25 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "user")
 public class User {
 
-    public User(/*int userID,*/ boolean personalProfile, String firstName, String lastName) {
-//        this.userID = userID;
+    public User(/*int id,*/ boolean personalProfile, String firstName, String lastName) {
+//        this.id = id;
         this.personalProfile = personalProfile;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "user_id")
-    private int userID;
+    private int id;
 
-    @ColumnInfo(name = "personal_profile")
     private boolean personalProfile;
-
-    @ColumnInfo(name = "first_name")
     private String firstName;
-
-    @ColumnInfo(name = "last_name")
     private String lastName;
 
-
-    public int getUserID() {
-        return userID;
+    public int getId() {
+        return id;
     }
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean isPersonalProfile(){
@@ -60,10 +51,9 @@ public class User {
         this.lastName = lastName;
     }
 
-    /*
     public String fullName() {
         return firstName + " " + lastName;
     }
-    */
+
 
 }

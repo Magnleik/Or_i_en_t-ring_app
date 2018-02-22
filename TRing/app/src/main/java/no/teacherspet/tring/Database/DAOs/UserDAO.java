@@ -1,8 +1,10 @@
 package no.teacherspet.tring.Database.DAOs;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
@@ -16,20 +18,20 @@ import no.teacherspet.tring.Database.Entities.User;
 @Dao
 public interface UserDAO {
 
-    @Query("SELECT * FROM User")
-    List<User> getAll();
+    @Query("SELECT * FROM user")
+    LiveData<List<User>> getAll();
 
-    @Query("SELECT * FROM user WHERE personal_profile LIKE 0")
-    List<User> getAllOtherUsers();
+    @Query("SELECT * FROM user WHERE personalProfile LIKE 0")
+    LiveData<List<User>> getOtherUsers();
 
-    @Query("SELECT * FROM user WHERE user_id LIKE :UserID")
-    User findById(int UserID);
+    @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
+    LiveData<User> getPersonalUser();
 
-    @Query("SELECT * FROM user WHERE personal_profile LIKE 1")
-    User getPersonalProfile();
+    @Query("SELECT * FROM user WHERE id LIKE :id")
+    LiveData<User> findById(int id);
 
-    @Insert
-    void insert(User... users);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long[] insert(User... users);
 
     @Update
     void update(User... users);
