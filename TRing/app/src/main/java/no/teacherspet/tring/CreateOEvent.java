@@ -1,12 +1,16 @@
 package no.teacherspet.tring;
 
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -14,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
@@ -21,6 +26,8 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
+    private FusedLocationProviderClient lm;
+    LatLng position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +40,9 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map_under_creation);
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
+        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+            lm = LocationServices.getFusedLocationProviderClient(this);
+        }
     }
 
 
@@ -48,10 +58,29 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            position = new LatLng(10.416136, 10.405297);
+            mMap.addMarker(new MarkerOptions().position(position).title("Gløs<3"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,15));
+        }
+        else{
+            lm.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if(location!=null){
+                        position = new LatLng(location.getLatitude(),location.getLongitude());
+                    }
+                    else{
+                        position = new LatLng(10.416136, 10.405297);
+                    }
+                    mMap.addMarker(new MarkerOptions().position(position).title("Gløs<3"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,15));
+                }
+            });
+        }
         // Add a marker in Sydney and move the camera
-        LatLng gløs = new LatLng(63.416136, 10.405297);
-        mMap.addMarker(new MarkerOptions().position(gløs).title("Gløs<3"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
     }
 
     public void createPoints(View v) {
