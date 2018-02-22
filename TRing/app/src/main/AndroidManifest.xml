@@ -42,7 +42,9 @@
         </activity>
         <activity android:name=".OrientationSelector" />
         <activity android:name=".CreateOEvent" />
-        <activity android:name=".PerformOEvent"></activity>
+        <activity android:name=".PerformOEvent" />
+        <activity android:name=".PopupPointDesc" android:theme="@style/AppTheme.PopupTheme">
+        </activity>
     </application>
 
 </manifest>

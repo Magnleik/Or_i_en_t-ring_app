@@ -1,5 +1,6 @@
 package no.teacherspet.tring;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -91,6 +92,8 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng latLng) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latLng).title("Punkt " + (arrayListWithCoords.size()+1)));
                 arrayListWithCoords.add(Point);
+                Intent intent = new Intent(CreateOEvent.this,PopupPointDesc.class);
+                startActivity(intent);
                 // Sjekk at punkt blir registrert
                 // Toast.makeText(getApplicationContext(), "" + arrayListWithCoords.get(arrayListWithCoords.size() -1) , Toast.LENGTH_LONG).show();
 
@@ -121,10 +124,7 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
         mMap.clear();
         //Add startpoint om man vil lage ny rute?
         mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
-
     }
-
-
 
 
 }
