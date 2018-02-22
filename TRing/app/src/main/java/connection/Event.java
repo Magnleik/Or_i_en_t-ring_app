@@ -1,64 +1,74 @@
 package connection;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Eirik on 15-Feb-18.
  */
 
-public abstract class Event {
+public class Event {
 
-    protected final int id;
-    /**
-     * The list of all the POSTS, not the starting location. The starting location CAN be a post, but will then be specified in the startPoint variable
-     */
-    protected ArrayList<Point> posts;
-    protected Point startPoint;
-    protected float minDistance;
-    protected String avgTime;
+    @SerializedName("features")
+    private ArrayList<Point> points;
+    private Map<String, Object> properties;
+    private int id = -1;
 
 
     /**
      * Constructor for use when creating an Event object from a saved instance in the database
      * @param id Server generated ID for an Event
-     * @param posts The different posts added to the event
-     * @param startPoint The starting location, Point element
+     * @param points The different Points added to the event. The first point will be counted as the starting position
      * @param minDistance The calculated minimum distance between points
      * @param avgTime The average time of this event
      */
-    public Event(int id, ArrayList<Point> posts, Point startPoint, float minDistance, String avgTime){
+    public Event(int id, ArrayList<Point> points, double minDistance, String avgTime){
         this.id = id;
-        this.posts = posts;
-        this.startPoint = startPoint;
-        this.minDistance = minDistance;
-        this.avgTime = avgTime;
+        this.points = points;
+        properties.put("dist", minDistance);
+        properties.put("avg_time", avgTime);
     }
 
     /**
      * Basic constructor to use when creating an O-Event from the app - no fields will be instantiated
      */
-    public Event(){
-        this(-1, new ArrayList<Point>(), null, -1, "NaN");
-    }
+    public Event(){}
 
 
     /**
-     * Add a post to this event
+     * Add a post to this event, duplicated Points will not be added.
      * @param post The Point to be added
      */
     public void addPost(Point post){
-        if(!posts.contains(post))
-          posts.add(post);
+
+        if(points == null){ //Instantiate the array.
+            points = new ArrayList<>();
+            points.add(null); //Add a placeholder location for the starting position;
+        }
+
+        if(!points.contains(post))
+          points.add(post);
     }
 
     /**
-     * Add a list of points
+     * Add a list of posts, duplicated Points will not be added (Event will never have more than one instance of each Point)
      * @param posts A list of points to be added, list can be of any type extending Collection
      */
     public void addPosts(Collection<Point> posts){
-        posts.addAll(posts);
+
+        if(points == null){ //Instantiate the array.
+            points = new ArrayList<>();
+            points.add(null); //Add a placeholder location for the starting position;
+        }
+
+        for (Point p : posts) {
+            if(!points.contains(p))
+                points.add(p);
+        }
     }
 
     /**
@@ -66,34 +76,49 @@ public abstract class Event {
      * @param post Point to be removed
      */
     public void removePost(Point post){
-        posts.remove(post);
+        points.remove(post);
     }
 
     /**
-     * Remove all posts from this event
+     * Remove all posts from this event, starting position will persist.
      */
     public void clearPosts(){
-        posts.clear();
+        Point startPoint = points.get(0);
+        points.clear();
+        points.add(startPoint);
     }
 
     public Point getStartPoint() {
-        return startPoint;
+        if (points == null){
+            return null;
+        }
+        return points.get(0);
     }
 
     public void setStartPoint(Point startPoint) {
-        this.startPoint = startPoint;
+
+        if(points == null){ //Instantiate the array.
+            points = new ArrayList<>();
+            points.add(null); //Add a placeholder location for the starting position;
+        }
+
+        points.set(0, startPoint);
     }
 
-    public float getMinDistance() {
-        return minDistance;
+    public int getId(){
+        return this.id;
+    }
+
+    public double getMinDistance() {
+        return (double) properties.get("dist");
     }
 
     /**
      * Can be used if there is a wish to calculate the minimum distance before sending the event to the server and receiving it back.
      * @param minDistance Distance in meters
      */
-    public void setMinDistance(float minDistance) {
-        this.minDistance = minDistance;
+    public void setMinDistance(double minDistance) {
+        properties.put("dist", minDistance);
     }
 
     /**
@@ -101,14 +126,24 @@ public abstract class Event {
      * @return Returns the avgTime as a string in format hh:mm:ss
      */
     public String getAvgTime() {
-        return avgTime;
+        return (String) properties.get("avg_time");
     }
 
     /**
-     * Sets the average time, any edits will NOT be reflected on the server. Can be used to change the shown text. avgTime is per default set to "NaN"
-     * @param avgTime The time in hh:mm:ss
+     * Adds any property to this Event. DO NOT set ID, minDistance or avgTime through this method. Will most likely NOT be saved on the server, though it will be sent.
+     * @param key The property name, i.e. "event_title". Use lowercase letters and underscores.
+     * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
      */
-    public void setAvgTime(String avgTime) {
-        this.avgTime = avgTime;
+    public void addProperty(String key, Object value){
+        properties.put(key,value);
+    }
+
+    /**
+     * Retrieve a property value saved with the key. DO NOT use this to get ID, minDistance or avgTime.
+     * @param key A String key used to save a property.
+     * @return The object saved as a property
+     */
+    public Object getProperty(String key){
+        return properties.get(key);
     }
 }

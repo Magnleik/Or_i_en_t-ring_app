@@ -1,6 +1,8 @@
 package connection;
 
 import android.support.annotation.NonNull;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,6 +24,7 @@ public class Point {
     public Point(@NonNull double latitude,@NonNull double longitude, String description){
         geometry = new Geometry();
         geometry.coordinates = new double[]{latitude,longitude};
+        properties = new HashMap<>();
         properties.put("description",description);
     }
 
@@ -60,6 +63,24 @@ public class Point {
 
     public void setDescription(String description) {
         properties.put("description", description);
+    }
+
+    /**
+     * Adds any property to this Point. DO NOT set ID, coordinates or description through this method. Will most likely NOT be saved on the server, though it will be sent.
+     * @param key The property name, i.e. "point_title". Use lowercase letters and underscores.
+     * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
+     */
+    public void addProperty(String key, Object value){
+        properties.put(key,value);
+    }
+
+    /**
+     * Retrieve a property value saved with the key. DO NOT use this to get ID, coordinates or description.
+     * @param key A String key used to save a property.
+     * @return The object saved as a property
+     */
+    public Object getProperty(String key){
+        return properties.get(key);
     }
 
     private class Geometry{
