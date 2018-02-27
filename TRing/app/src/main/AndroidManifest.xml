@@ -45,7 +45,7 @@
         <activity android:name=".OrientationSelector" />
         <activity android:name=".PopupPointDesc" android:theme="@style/AppTheme.PopupTheme">
         <activity android:name=".CreateOEvent"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
+            />
         <activity android:name=".PerformOEvent"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
