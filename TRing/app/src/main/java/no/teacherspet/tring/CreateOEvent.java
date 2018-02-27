@@ -28,7 +28,8 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
     private FusedLocationProviderClient lm;
-    LatLng position;
+    private LatLng position;
+    private MarkerInfo mi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,16 +91,37 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             public void onMapClick(LatLng latLng) {
-                Marker Point = mMap.addMarker(new MarkerOptions().position(latLng).title("Punkt " + (arrayListWithCoords.size()+1)));
-                arrayListWithCoords.add(Point);
+                //Marker Point = mMap.addMarker(new MarkerOptions().position(latLng).title("Punkt " + (arrayListWithCoords.size()+1)));
+                //arrayListWithCoords.add(Point);
+                mi = new MarkerInfo();
+                mi.setPosition(latLng);
                 Intent intent = new Intent(CreateOEvent.this,PopupPointDesc.class);
-                startActivity(intent);
+                startActivityForResult(intent,1);
                 // Sjekk at punkt blir registrert
                 // Toast.makeText(getApplicationContext(), "" + arrayListWithCoords.get(arrayListWithCoords.size() -1) , Toast.LENGTH_LONG).show();
 
             }
         });
 
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(data!=null) {
+            String name = data.getStringExtra("MarkerName");
+            if (requestCode == 1) {
+                if (resultCode == RESULT_OK) {
+                    if (name != null) {
+                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title(name));
+                        arrayListWithCoords.add(point);
+                    } else {
+                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title("Punkt " + (arrayListWithCoords.size() + 1)));
+                        arrayListWithCoords.add(point);
+                    }
+
+                }
+            }
+        }
     }
 
     public void deleteLastPoint(View v) {
@@ -125,6 +147,5 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
         //Add startpoint om man vil lage ny rute?
         mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
     }
-
 
 }
