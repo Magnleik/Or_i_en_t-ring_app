@@ -4,7 +4,7 @@
 
     <Button
         android:id="@+id/create_point_btn"
-        android:onClick="completePoint"
+        android:onClick="onOkClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -16,6 +16,7 @@
         android:id="@+id/cancel_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="onCancelClick"
         android:layout_alignEnd="@+id/set_point_name"
         android:layout_alignTop="@+id/create_point_btn"
         android:text="@android:string/cancel" />
