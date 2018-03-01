@@ -2,15 +2,17 @@ package no.teacherspet.tring;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.Serializable;
-
 /**
  * Created by magnus on 27.02.2018.
  */
 
-public class MarkerInfo implements Serializable{
+public class MarkerInfo {
     private String markerName;
     private LatLng position;
+    public MarkerInfo(String markerName, LatLng position){
+        setPosition(position);
+        setMarkerName(markerName);
+    }
     public void setMarkerName(String name){
         markerName=name;
     }
