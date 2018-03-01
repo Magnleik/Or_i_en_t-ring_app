@@ -9,15 +9,17 @@
     <EditText
         android:id="@+id/create_event_name"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Løypenavn"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/map_under_creation"
+        app:layout_constraintBottom_toTopOf="@+id/add_point_btn"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
@@ -25,55 +27,49 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="356dp"
         android:layout_height="360dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_event_name"
+        app:layout_constraintStart_toEndOf="@+id/create_event_name"
+        app:layout_constraintTop_toTopOf="parent"
         tools:context="no.teacherspet.tring.MapsActivity" />
 
     <Button
         android:id="@+id/add_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="12dp"
         android:onClick="createPoints"
         android:text="Legg til punkter"
-        app:layout_constraintEnd_toStartOf="@+id/delete_last_point_btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/delete_last_point_btn" />
+        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
         android:id="@+id/done_creating_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="28dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
         android:onClick="saveEvent"
         android:text="Ferdig"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/delete_last_point_btn"
-        app:layout_constraintTop_toTopOf="@+id/delete_last_point_btn" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/delete_last_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="12dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:onClick="deleteLastPoint"
         android:text="Slett forrige"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/done_creating_btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/add_point_btn"
-        app:layout_constraintTop_toBottomOf="@+id/map_under_creation" />
+        app:layout_constraintBottom_toTopOf="@+id/done_creating_btn"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

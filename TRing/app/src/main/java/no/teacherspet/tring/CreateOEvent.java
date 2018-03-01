@@ -27,6 +27,7 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
+    private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
     private MarkerInfo mi;
@@ -42,8 +43,11 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map_under_creation);
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
-        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this);
+            if (savedInstanceState != null) {
+                latLngArrayList = savedInstanceState.getParcelableArrayList("points");
+            }
         }
     }
 
@@ -83,6 +87,16 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
             });
         }
         // Add a marker in Sydney and move the camera
+        LatLng gløs = new LatLng(63.416136, 10.405297);
+        mMap.addMarker(new MarkerOptions().position(gløs).title("Gløs<3"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
+        if ((latLngArrayList.size()>0) && (arrayListWithCoords.size() == 0)) {
+            for (LatLng latlgn : latLngArrayList) {
+                Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
+                arrayListWithCoords.add(Point);
+                this.createPoints(findViewById(R.id.map_under_creation));
+            }
+        }
     }
 
     public void createPoints(View v) {
@@ -133,9 +147,9 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void saveEvent(View v) {
-        EditText eventTitleField = (EditText)findViewById(R.id.create_event_name);
+        EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         String eventTitle = eventTitleField.getText().toString();
-        Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size()+  " punkt registrert" , Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         ArrayList<Marker> finalList = arrayListWithCoords;
 
         //LAGRE
@@ -147,5 +161,21 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
         //Add startpoint om man vil lage ny rute?
         mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
     }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (latLngArrayList.size() != arrayListWithCoords.size()) {
+            latLngArrayList.clear();
+            for (Marker marker : arrayListWithCoords) {
+                latLngArrayList.add(marker.getPosition());
+            }
+        }
+
+        outState.putParcelableArrayList("points", latLngArrayList);
+
+        // Save the state of item position
+    }
+
 
 }
