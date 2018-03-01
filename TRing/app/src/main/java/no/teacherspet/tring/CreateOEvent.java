@@ -94,10 +94,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
-        // Add a marker in Sydney and move the camera
-        LatLng gløs = new LatLng(63.416136, 10.405297);
-        mMap.addMarker(new MarkerOptions().position(gløs).title("Gløs<3"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
+
         if ((latLngArrayList.size()>0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlgn : latLngArrayList) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
