@@ -1,5 +1,6 @@
 package connection;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -19,11 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetworkManager {
 
     static private NetworkManager nm;
-    static private String URL = "http://10.22.17.21";
-    OkHttpClient.Builder httpClient;
-    Client client;
-    Retrofit.Builder builder;
-    Retrofit retrofit;
+    private Client client;
 
     private NetworkManager(){
         init();
@@ -39,28 +36,41 @@ public class NetworkManager {
 
     private void init(){
 
-        httpClient = new OkHttpClient.Builder();
-        builder = new Retrofit.Builder()
-                    .baseUrl(URL)
-                    .addConverterFactory(
-                            GsonConverterFactory.create()
-                    );
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        String URL = "http://10.22.18.2";
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl(URL)
+                .addConverterFactory(
+                        GsonConverterFactory.create()
+                );
 
-        retrofit =
-                builder
-                    .client(
-                            httpClient.build()
-                    )
-                    .build();
+        Retrofit retrofit = builder
+                .client(
+                        httpClient.build()
+                )
+                .build();
 
         client = retrofit.create(Client.class);
 
         //Just here for testing:
+        /*
         connectionStringTest();
         connectionPointTest();
         connectionEventTest();
         sendPointTest();
-        sendEventTest();
+        sendEventTest(new ICallbackAdapter<Event>() {
+            @Override
+            public void onResponse(Event object) {
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+        */
+        //System.out.println("From the init, we get a event ID of: " + event.getId());
     }
 
     private void connectionPointTest(){
@@ -79,7 +89,7 @@ public class NetworkManager {
             @Override
             public void onFailure(Call<Point> call, Throwable t) {
                 System.out.println("Point test has crashed and burned");
-                Log.d("ERROR: ", t.getMessage());
+                Log.e("NETWORK", t.getMessage(), t);
             }
         });
 
@@ -101,7 +111,7 @@ public class NetworkManager {
             @Override
             public void onFailure(Call<Event> call, Throwable t) {
                 System.out.println("Event test has crashed and burned");
-                Log.d("ERROR: ", t.getMessage());
+                Log.e("NETWORK", t.getMessage(), t);
             }
         });
 
@@ -121,7 +131,7 @@ public class NetworkManager {
             @Override
             public void onFailure(Call<List<String>> call, Throwable t) {
                 System.out.println("Call Test failed");
-                Log.d("ERROR: ", t.getMessage());
+                Log.e("NETWORK", t.getMessage(), t);
             }
         });
 
@@ -143,13 +153,13 @@ public class NetworkManager {
             @Override
             public void onFailure(Call<Point> call, Throwable t) {
                 System.out.println("Call not sent");
-                Log.d("sendPointTest_ERROR", t.getMessage());
+                Log.e("NETWORK", t.getMessage(), t);
             }
         });
 
     }
 
-    private void sendEventTest(){
+    private void sendEventTest(final ICallbackAdapter<Event> callback){
 
         Point testPoint1 =  new Point(10.324, 20.420, "This is a test point");
         Point testPoint2 = new Point(123.321, 12.123, "Test point #2");
@@ -167,6 +177,7 @@ public class NetworkManager {
             public void onResponse(Call<Event> call, Response<Event> response) {
                 Event resp = response.body();
                 System.out.println("Call sent");
+                callback.onResponse(resp);
             }
 
             @Override
@@ -175,31 +186,37 @@ public class NetworkManager {
                 Log.d("sendEventTest_ERROR", t.getMessage());
             }
         });
-
     }
 
     /**
      * Adds a point to the database, not affiliated with an Event
      * @param point The Point to be added
-     * @return Returns the Point from the database, with updated ID.
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets a Point
      */
-    public Point addPoint(Point point){
-        Point result = null;
+    public void addPoint(Point point, final ICallbackAdapter<Point> callback){
         Call<Point> call = client.addPoint(point);
 
         call.enqueue(new Callback<Point>() {
             @Override
-            public void onResponse(Call<Point> call, Response<Point> response) {
-                Log.i("addPoint_SUCCESS", "addPoint successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<Point> call, @NonNull Response<Point> response) {
+
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "addPoint got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "addPoint successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+
             }
 
             @Override
-            public void onFailure(Call<Point> call, Throwable t) {
-                Log.e("addPoint_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<Point> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
-
-        return result;
     }
 
     /**
@@ -207,36 +224,41 @@ public class NetworkManager {
      * @param latitude The latitude of given position
      * @param longitude The longitude of given position
      * @param maxDist The radius of search
-     * @return A List of Points within the given circle
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets an ArrayList of Points within the given circle
      */
-    public ArrayList<Point> getPointsNearby(double latitude, double longitude, double maxDist){
+    public void getPointsNearby(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Point>> callback){
 
         ArrayList<Point> result = new ArrayList<>();
         Call<List<Point>> call = client.getNearbyPoints(latitude,longitude,maxDist);
 
         call.enqueue(new Callback<List<Point>>() {
             @Override
-            public void onResponse(Call<List<Point>> call, Response<List<Point>> response) {
-                Log.i("getPointsNearby_SUCCESS", "getPointsNearby successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "getPointsNearby got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "getPointsNearby successfull with response: " + response.toString());
+                }
+
+                callback.onResponse((ArrayList<Point>) response.body());
             }
 
             @Override
-            public void onFailure(Call<List<Point>> call, Throwable t) {
-                Log.e("getPointsNearby_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<List<Point>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
-
-
-        return result;
 
     }
 
     /**
      * Updates the existing event if it exists in the database, and returns the updated Event.
      * @param event The Event you wish to update in the database
-     * @return Returns the updated event
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the updated event
      */
-    public Event updateEvent(Event event){
+    public void updateEvent(Event event, final ICallbackAdapter<Event> callback){
 
         if(event.getId()<0){
             throw new IllegalArgumentException("Cannot update an Event with ID < 0, as this will not be an event in the database");
@@ -247,43 +269,55 @@ public class NetworkManager {
 
         call.enqueue(new Callback<Event>() {
             @Override
-            public void onResponse(Call<Event> call, Response<Event> response) {
-                Log.i("updateEvent_SUCCESS", "updateEvent successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "updateEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "updateEvent successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
             }
 
             @Override
-            public void onFailure(Call<Event> call, Throwable t) {
-                Log.e("updateEvent_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
 
-
-        return result;
     }
 
 
     /**
      * ADDS an Event to the database, will not update existing events. Ignores set ID.
      * @param event The Event to add to the database
-     * @return Returns the same Event, with updated information from the database - including its generated ID.
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the same Event, with updated information from the database - including its generated ID.
      */
-    public Event addEvent(Event event){
-        Event result = null;
+    public void addEvent(Event event, final ICallbackAdapter<Event> callback){
         Call<Event> call = client.addEvent(event);
 
         call.enqueue(new Callback<Event>() {
             @Override
-            public void onResponse(Call<Event> call, Response<Event> response) {
-                Log.i("addEvent_SUCCESS", "addEvent successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "addEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "addEvent successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
             }
 
             @Override
-            public void onFailure(Call<Event> call, Throwable t) {
-                Log.e("addEvent_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
 
-        return result;
     }
 
     /**
@@ -291,50 +325,63 @@ public class NetworkManager {
      * @param latitude The latitude of given position
      * @param longitude The longitude of given position
      * @param maxDist The radius of search
-     * @return Returns all events starting within the given circle
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets all events starting within the given circle
      */
-    public ArrayList<Event> getNearbyEvents(double latitude, double longitude, double maxDist){
+    public void getNearbyEvents(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Event>> callback){
         ArrayList result = null;
         Call<List<Event>> call = client.getNearbyEvents(latitude,longitude,maxDist);
 
         call.enqueue(new Callback<List<Event>>() {
             @Override
-            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
-                Log.i("getNearbyEvents_SUCCESS", "getNearbyEvents successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "getNearbyEvents got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "getNearbyEvents successfull with response: " + response.toString());
+                }
+
+                callback.onResponse((ArrayList<Event>) response.body());
             }
 
             @Override
-            public void onFailure(Call<List<Event>> call, Throwable t) {
-                Log.e("getNearbyEvents_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
 
-        return result;
     }
 
     /**
      * Returns the event with the given ID if it exists, null otherwise.
      * @param id The ID of the Event you wish to have returned.
-     * @return Returns the Event with the given ID.
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the Event with the given ID.
      */
-    public Event getEventById(int id){
+    public void getEventById(int id, final ICallbackAdapter<Event> callback){
         Event result = null;
         Call<Event> call = client.getEventById(id);
 
         call.enqueue(new Callback<Event>() {
             @Override
-            public void onResponse(Call<Event> call, Response<Event> response) {
-                Log.i("getEventById_SUCCESS", "getEventById successfull with response: "+ response.toString());
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "getEventById got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "getEventById successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
             }
 
             @Override
-            public void onFailure(Call<Event> call, Throwable t) {
-                Log.e("getEventById_ERROR", t.getMessage(), t);
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
             }
         });
 
-        return result;
     }
-
 
 }
