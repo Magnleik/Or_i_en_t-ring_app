@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -127,19 +128,7 @@ public class Event {
     public String getAvgTime() {
         return (String) properties.get("avg_time");
     }
-
-    public int getNumPoints(){
-        if(points!=null){
-            return points.size();
-        }
-        else{
-            return 0;
-        }
-    }
-
-    public ArrayList<Point> getPoints(){
-        return points;
-    }
+    
 
     /**
      * Adds any property to this Event. DO NOT set ID, minDistance or avgTime through this method. Will most likely NOT be saved on the server, though it will be sent.
@@ -147,6 +136,9 @@ public class Event {
      * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
      */
     public void addProperty(String key, Object value){
+        if(properties==null){
+            properties=new HashMap<>();
+        }
         properties.put(key,value);
     }
 

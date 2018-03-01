@@ -25,6 +25,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
+import connection.Event;
+import connection.Point;
+
 public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -96,9 +99,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             });
         }
         // Add a marker in Sydney and move the camera
-        LatLng gløs = new LatLng(63.416136, 10.405297);
-        mMap.addMarker(new MarkerOptions().position(gløs).title("Gløs<3"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
         if ((latLngArrayList.size()>0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlgn : latLngArrayList) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
@@ -116,8 +116,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapClick(LatLng latLng) {
                 //Marker Point = mMap.addMarker(new MarkerOptions().position(latLng).title("Punkt " + (arrayListWithCoords.size()+1)));
                 //arrayListWithCoords.add(Point);
-                mi = new MarkerInfo();
-                mi.setPosition(latLng);
+                position = latLng;
                 Intent intent = new Intent(CreateOEvent.this,PopupPointDesc.class);
                 startActivityForResult(intent,1);
                 // Sjekk at punkt blir registrert
@@ -135,10 +134,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     if (name != null) {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title(name));
+                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name));
                         arrayListWithCoords.add(point);
                     } else {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title("Punkt " + (arrayListWithCoords.size() + 1)));
+                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title("Punkt " + (arrayListWithCoords.size() + 1)));
                         arrayListWithCoords.add(point);
                     }
 
@@ -157,10 +156,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
+        Event event = new Event();
         String eventTitle = eventTitleField.getText().toString();
+        event.addProperty("event_name",eventTitle);
+        for(Marker marker:arrayListWithCoords){
+            event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
+        }
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
-        ArrayList<Marker> finalList = arrayListWithCoords;
-
         //LAGRE
         //Reset
 
