@@ -72,6 +72,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             position = new LatLng(10.416136, 10.405297);
             mMap.addMarker(new MarkerOptions().position(position).title("Gløs<3"));
