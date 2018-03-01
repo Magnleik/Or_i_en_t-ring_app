@@ -1,0 +1,29 @@
+language: android
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - tools
+    - build-tools-26.0.2
+    - android-21
+    - sys-img-armeabi-v7a-android-21
+
+notifications:
+  email: false
+
+branches:
+  only:
+    - master
+    - dev
+
+before_script:
+  - cd TRing
+  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+
+env:
+  global:
+  # MapsApiKey
+  - secure: rSLN9iHtgAXkIgoeZTv57UMf/GtbdN8pTZOhyGhs9vEs+nbz2B40u4ZF2EJM4kiccLcOEvUJdFJlFjcrt+carN/0wFG7ZFaSlw2Tfj5PP8eeKNoDycyHtqepRyGzrrUGkeL/bmenQ5ST5rbh/mhFJkKDP8rOLjUGQUvyp+HSEQ3GOCeERVWqrj0uEFm527FzAmQII4yx4W3b5ujqIlFtFaUh0N0gh67Yg+69gj+VtPgsk+j9zwnlnIHsQhGqYrLqp9tmNcW9FtB0E3sNoDJvtqnM4ywzm6WXzjAMTboCeQBxuJRNv3JvxkqZZUq5kQu2PVl7IFaA0wf42/QggjfysoafqFQaxZRbIFcu9UCTLDvYba9Zv78l0PAKc/r5Z2Uf824ojraMKQgoTDdZFgeZR5PCqE0QmfRpAUN29nWI8jeWMvSvTz6dZ2P10+0Y/z0RCPQ4u8UGAx5YRyhbC3cbNkpsJoa5UTKTFOmVSdOi2DMiFRQUnLgIbiNIDQAntQBRdQlj3Bb851DJKc3sX7gzVKdGVI8+CDZa1fiNTvhH38HlUpcwjD1P6jPAR4quCJyWG1hZjd/ek7zjweQ/QI3hwa/hwOmcCDmb9fkDujp9nf1ZxG2XbH7t7DhLriLX+OvJ5DNB/yTgUtXzZBlhC7RcG4cI0t9zxCz/eVXK6p9pFhE=

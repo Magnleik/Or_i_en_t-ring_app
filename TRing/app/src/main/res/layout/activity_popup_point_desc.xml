@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/create_point_btn"
+        android:onClick="onOkClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/set_point_name"
+        android:layout_marginBottom="17dp"
+        android:text="@string/create" />
+
+    <Button
+        android:id="@+id/cancel_point_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onCancelClick"
+        android:layout_alignEnd="@+id/set_point_name"
+        android:layout_alignTop="@+id/create_point_btn"
+        android:text="@android:string/cancel" />
+
+    <EditText
+        android:id="@+id/set_point_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/create_point_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="38dp"
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="textPersonName" />
+</RelativeLayout>
