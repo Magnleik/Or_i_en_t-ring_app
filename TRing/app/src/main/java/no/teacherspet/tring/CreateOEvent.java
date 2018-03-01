@@ -3,9 +3,6 @@ package no.teacherspet.tring;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Parcelable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -30,9 +27,6 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
-    private FusedLocationProviderClient lm;
-    private LatLng position;
-    private MarkerInfo mi;
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
@@ -49,10 +43,11 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map_under_creation);
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
-        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this);
-        if (savedInstanceState!=null) {
-            latLngArrayList=savedInstanceState.getParcelableArrayList("points");
+            if (savedInstanceState != null) {
+                latLngArrayList = savedInstanceState.getParcelableArrayList("points");
+            }
         }
     }
 
