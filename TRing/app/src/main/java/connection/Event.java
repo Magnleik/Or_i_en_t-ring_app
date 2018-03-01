@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -127,6 +126,19 @@ public class Event {
      */
     public String getAvgTime() {
         return (String) properties.get("avg_time");
+    }
+
+    public int getNumPoints(){
+        if(points!=null){
+            return points.size();
+        }
+        else{
+            return 0;
+        }
+    }
+
+    public ArrayList<Point> getPoints(){
+        return points;
     }
 
     /**
