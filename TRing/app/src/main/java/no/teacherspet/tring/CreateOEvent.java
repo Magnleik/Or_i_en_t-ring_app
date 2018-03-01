@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,7 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
-public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback {
+public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
@@ -35,7 +37,8 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_oevent);
-
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -47,6 +50,11 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return true;
+    }
 
     /**
      * Manipulates the map once available.
