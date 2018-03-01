@@ -121,25 +121,6 @@ public class CreateOEvent extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode,resultCode,data);
-        if(data!=null) {
-            String name = data.getStringExtra("MarkerName");
-            if (requestCode == 1) {
-                if (resultCode == RESULT_OK) {
-                    if (name != null) {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title(name));
-                        arrayListWithCoords.add(point);
-                    } else {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(mi.getPosition()).title("Punkt " + (arrayListWithCoords.size() + 1)));
-                        arrayListWithCoords.add(point);
-                    }
-
-                }
-            }
-        }
-    }
-
     public void deleteLastPoint(View v) {
         if (arrayListWithCoords.size() > 0) {
             Marker lastMarker = arrayListWithCoords.get(arrayListWithCoords.size() - 1);
