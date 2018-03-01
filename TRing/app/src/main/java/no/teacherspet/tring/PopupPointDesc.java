@@ -25,10 +25,10 @@ public class PopupPointDesc extends Activity {
         int height = dm.heightPixels;
         getWindow().setLayout((int)(width*.8),(int)(height*.3));
         name = (EditText) findViewById(R.id.set_point_name);
-        name.setText("Punkt");
-        name.selectAll();
+        name.requestFocus();
         InputMethodManager imm= (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(name,InputMethodManager.SHOW_IMPLICIT);
+        imm.showSoftInput(name,InputMethodManager.SHOW_FORCED);
+        name.setText("Punkt");
     }
 
     public void onOkClick(View v){
