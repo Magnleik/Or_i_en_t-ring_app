@@ -8,7 +8,7 @@ import android.arch.persistence.room.Query;
  * Created by Hermann on 20.02.2018.
  */
 @Dao
-public interface DeleteDAO {
+public interface DeleteDao {
 
     @Query("DELETE FROM point")
     void deleteAllPoints();

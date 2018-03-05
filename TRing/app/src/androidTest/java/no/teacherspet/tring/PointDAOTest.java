@@ -1,27 +1,8 @@
 package no.teacherspet.tring;
 
-import android.arch.lifecycle.LifecycleActivity;
-import android.arch.lifecycle.LiveData;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import no.teacherspet.tring.Database.DAOs.DeleteDAO;
-import no.teacherspet.tring.Database.DAOs.OEventDAO;
-import no.teacherspet.tring.Database.DAOs.PointDAO;
-import no.teacherspet.tring.Database.DAOs.PointOEventJoinDAO;
-import no.teacherspet.tring.Database.DAOs.UserDAO;
-import no.teacherspet.tring.Database.Entities.Point;
-import no.teacherspet.tring.Database.LocalDatabase;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -32,23 +13,23 @@ import static junit.framework.Assert.assertNotSame;
  */
 @RunWith(AndroidJUnit4.class)
 public class PointDAOTest {
-
+/*
     LocalDatabase db;
-    PointDAO pointDAO;
-    UserDAO userDAO;
-    OEventDAO oEventDAO;
-    PointOEventJoinDAO pointOEventJoinDAO;
+    PointDao pointDAO;
+    UserDao userDAO;
+    OEventDao oEventDAO;
+    PointOEventJoinDao pointOEventJoinDAO;
 
     @Before
     public void setUp(){
         db = LocalDatabase.getInstance(InstrumentationRegistry.getTargetContext());
 
-        DeleteDAO delete = db.getDeleteDAO();
+        DeleteDao delete = db.deleteDAO();
         delete.deleteAllPoints();
-        pointDAO = db.getPointDAO();
-        userDAO = db.getUserDAO();
-        oEventDAO = db.getOEventDAO();
-        pointOEventJoinDAO = db.getPointOEventJoinDAO();
+        pointDAO = db.pointDAO();
+        userDAO = db.userDAO();
+        oEventDAO = db.oEventDAO();
+        pointOEventJoinDAO = db.pointOEventJoinDAO();
     }
     @After
     public void tearDown(){
@@ -87,5 +68,5 @@ public class PointDAOTest {
         return new LatLng(37.377166, -122.086966);
 
     }
-
+*/
 }

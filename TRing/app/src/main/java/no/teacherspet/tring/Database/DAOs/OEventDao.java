@@ -10,27 +10,27 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import no.teacherspet.tring.Database.Entities.Point;
+import io.reactivex.Flowable;
+import no.teacherspet.tring.Database.Entities.OEvent;
 
 /**
  * Created by Hermann on 13.02.2018.
  */
 @Dao
-public interface PointDAO {
+public interface OEventDao {
 
-    @Query("SELECT * FROM point")
-    LiveData<List<Point>> getAll();
+    @Query("SELECT * FROM o_event")
+    Flowable<List<OEvent>> getAll();
 
-    @Query("SELECT * FROM point WHERE id LIKE :id")
-    LiveData<Point> findById(int id);
+    @Query("SELECT * FROM o_event WHERE id LIKE :id")
+    Flowable<OEvent> findById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long[] insert(Point... points);
+    long[] insert(OEvent... oEvents);
 
     @Update
-    void update(Point... points);
+    void update(OEvent... oEvents);
 
     @Delete
-    void delete(Point... points);
-
+    void delete(OEvent... oEvents);
 }

@@ -18,7 +18,7 @@ android {
         each { type ->
             type.buildConfigField STRING, 'MAPS_API_KEY', '"' + MAPS_API_KEY + '"'
         }
-        manifestPlaceholders = [ MAPS_KEY : MAPS_API_KEY ]
+        manifestPlaceholders = [MAPS_KEY: MAPS_API_KEY]
     }
     buildTypes {
         release {
@@ -26,28 +26,41 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:25.4.0'
+    implementation 'com.android.support:support-v4:25.4.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.google.android.gms:play-services-maps:10.2.1'
-
+    //Dagger 2
+    compile "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
+    compile "com.google.dagger:dagger:$rootProject.daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
     //Room
     compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
+    implementation "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
 
     //Lifecycle dependencies
     annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleCompilerVersion"
     compile "android.arch.lifecycle:runtime:$rootProject.archLifecycleVersion"
     compile "android.arch.lifecycle:extensions:$rootProject.archLifecycleExtensionsVersion"
+    //RxJava
+    compile 'io.reactivex.rxjava2:rxjava:2.0.6'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 
     //Test migrations
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.9'
-
 }

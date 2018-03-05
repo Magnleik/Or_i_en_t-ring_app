@@ -25,7 +25,7 @@ task clean(type: Delete) {
 }
 
 ext {
-
+    daggerVersion = '2.13'
     //android
     archLifecycleVersion = '1.0.0-alpha1'
     archLifecycleCompilerVersion = '1.0.0-alpha1'

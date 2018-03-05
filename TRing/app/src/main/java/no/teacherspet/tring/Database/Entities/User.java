@@ -9,14 +9,14 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "user")
 public class User {
 
-    public User(/*int id,*/ boolean personalProfile, String firstName, String lastName) {
-//        this.id = id;
+    public User(int id, boolean personalProfile, String firstName, String lastName) {
+        this.id = id;
         this.personalProfile = personalProfile;
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey /*(autoGenerate = true)*/
     private int id;
 
     private boolean personalProfile;
@@ -51,7 +51,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String fullName() {
+    public String getFullName() {
         return firstName + " " + lastName;
     }
 

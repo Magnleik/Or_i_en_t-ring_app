@@ -1,6 +1,5 @@
 package no.teacherspet.tring.Database.DAOs;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -10,33 +9,35 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 import no.teacherspet.tring.Database.Entities.User;
 
 /**
  * Created by Hermann on 13.02.2018.
  */
 @Dao
-public interface UserDAO {
+public interface UserDao {
 
     @Query("SELECT * FROM user")
-    LiveData<List<User>> getAll();
+    Flowable<List<User>> getAll();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 0")
-    LiveData<List<User>> getOtherUsers();
+    Flowable<List<User>> getOtherUsers();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
-    LiveData<User> getPersonalUser();
+    Flowable<User> getPersonalUser();
 
     @Query("SELECT * FROM user WHERE id LIKE :id")
-    LiveData<User> findById(int id);
+    Flowable<User> findById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(User... users);
 
+    @Delete
+    int delete(User... users);
+
     @Update
     void update(User... users);
-
-    @Delete
-    void delete(User... Users);
 
 }
