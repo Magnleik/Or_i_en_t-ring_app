@@ -79,6 +79,10 @@ public class Event {
         points.remove(post);
     }
 
+    /**
+     * Removes a post from this event
+     * @param index The index of the Point to be removed
+     */
     public void removePost(int index){
         if(points.size()>=index){
             points.remove(index);
