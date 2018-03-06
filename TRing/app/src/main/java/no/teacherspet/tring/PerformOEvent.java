@@ -38,7 +38,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        points = StartupMenu.testEvents.get(StartupMenu.testEvents.size()-1).getPoints();
+        readPoints();
         setContentView(R.layout.activity_perform_oevent);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -56,6 +56,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public boolean onOptionsItemSelected(MenuItem item) {
         finish();
         return true;
+    }
+
+    public void readPoints(){
+        points = StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size()-1).getPoints();
     }
 
     /**

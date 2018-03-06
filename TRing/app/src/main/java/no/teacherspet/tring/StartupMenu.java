@@ -22,7 +22,7 @@ import connection.Event;
 public class StartupMenu extends AppCompatActivity{
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
-    public static HashMap<Integer, Event> testEvents;
+    private static HashMap<Integer, Event> testEvents;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
@@ -59,5 +59,12 @@ public class StartupMenu extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(),"Access denied",Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public static void addEvent(Event event){
+        testEvents.put(testEvents.size(),event);
+    }
+    public static HashMap<Integer,Event> getTestEvents(){
+        return testEvents;
     }
 }

@@ -161,7 +161,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         for(Marker marker:arrayListWithCoords){
             event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
         }
-        StartupMenu.testEvents.put(StartupMenu.testEvents.size(), event);
+        StartupMenu.addEvent(event);
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
