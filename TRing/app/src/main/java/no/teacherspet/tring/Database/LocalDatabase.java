@@ -35,12 +35,11 @@ public abstract class LocalDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-
     public abstract UserDao userDAO();
 
     public abstract PointDao pointDAO();
 
-    public abstract OEventDao iEventDAO();
+    public abstract OEventDao oEventDAO();
 
     public abstract PointOEventJoinDao pointOEventJoinDAO();
 

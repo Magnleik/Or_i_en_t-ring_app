@@ -39,6 +39,10 @@ public interface PointOEventJoinDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(PointOEventJoin... pointOEventJoins);
 
+    @Query("DELETE FROM point_oevent_join WHERE point_oevent_join.pointID =:pointID " +
+            "AND point_oevent_join.oEventID = :oEventID")
+    int delete(int pointID, int oEventID);
+
     @Delete
     int delete(PointOEventJoin... pointOEventJoins);
 

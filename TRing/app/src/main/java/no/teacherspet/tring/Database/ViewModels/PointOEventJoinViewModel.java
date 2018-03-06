@@ -45,15 +45,22 @@ public class PointOEventJoinViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Flowable<long[]> addJoin(PointOEventJoin... pointOEventJoins){
+        return Flowable.fromCallable(()->pointOEventJoinDao.insert(pointOEventJoins))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Flowable<Integer> deleteJoin(int pointID, int oEventID){
+        return Flowable.fromCallable(()->pointOEventJoinDao.delete(pointID, oEventID))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Flowable<Integer> deleteJoin(PointOEventJoin... pointOEventJoins){
         return Flowable.fromCallable(()->pointOEventJoinDao.delete(pointOEventJoins))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<long[]> addJoin(PointOEventJoin... pointOEventJoins){
-        return Flowable.fromCallable(()->pointOEventJoinDao.insert(pointOEventJoins))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
 }
