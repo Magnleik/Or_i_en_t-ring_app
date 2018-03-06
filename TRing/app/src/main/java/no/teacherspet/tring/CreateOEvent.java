@@ -35,8 +35,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
-    private MarkerInfo mi;
-    private ArrayList<Point> competition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +74,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        competition = StartupMenu.testEvents.get(StartupMenu.testEvents.size()).getPoints();
         mMap.getUiSettings().setMapToolbarEnabled(false);
         if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             position = new LatLng(10.416136, 10.405297);
@@ -165,7 +161,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         for(Marker marker:arrayListWithCoords){
             event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
         }
-        StartupMenu.testEvents.add(event);
+        StartupMenu.testEvents.put(StartupMenu.testEvents.size(), event);
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
