@@ -13,6 +13,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import connection.Event;
+import connection.NetworkManager;
 
 
 /**

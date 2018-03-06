@@ -105,6 +105,10 @@ public class Event {
         return points.get(0);
     }
 
+    /**
+     * Sets the starting location for this Event. Overrides any existing starting point. Is saved as the first point in the list of all points.
+     * @param startPoint The Point you wish to add as a starting location
+     */
     public void setStartPoint(Point startPoint) {
 
         if(points == null){ //Instantiate the array.
