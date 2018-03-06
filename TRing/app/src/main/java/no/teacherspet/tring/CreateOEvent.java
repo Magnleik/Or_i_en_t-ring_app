@@ -36,6 +36,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient lm;
     private LatLng position;
     private MarkerInfo mi;
+    private ArrayList<Point> competition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        competition = StartupMenu.testEvents.get(StartupMenu.testEvents.size()).getPoints();
         mMap.getUiSettings().setMapToolbarEnabled(false);
         if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             position = new LatLng(10.416136, 10.405297);

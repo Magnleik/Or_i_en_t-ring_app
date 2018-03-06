@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import connection.Event;
 
@@ -22,13 +22,13 @@ import connection.Event;
 public class StartupMenu extends AppCompatActivity{
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
-    public static ArrayList<Event> testEvents;
+    public static HashMap<Integer, Event> testEvents;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
         super.onCreate(savedInstanceState);
         if(testEvents==null){
-            testEvents=new ArrayList<>();
+            testEvents=new HashMap<>();
         }
         setContentView(R.layout.activity_startupmenu);
     }
