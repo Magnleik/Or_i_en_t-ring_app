@@ -79,6 +79,12 @@ public class Event {
         points.remove(post);
     }
 
+    public void removePost(int index){
+        if(points.size()>=index){
+            points.remove(index);
+        }
+    }
+
     /**
      * Remove all posts from this event, starting position will persist.
      */
