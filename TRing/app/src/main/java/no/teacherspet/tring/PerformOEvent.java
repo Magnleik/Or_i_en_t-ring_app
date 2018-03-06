@@ -38,7 +38,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        readPoints();
+        points = readPoints();
         setContentView(R.layout.activity_perform_oevent);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -58,8 +58,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return true;
     }
 
-    public void readPoints(){
-        points = StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size()-1).getPoints();
+    public ArrayList<Point> readPoints(){
+        if(StartupMenu.getTestEvents()!=null) {
+            return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
+        }
+        return null;
     }
 
     /**
@@ -141,21 +144,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         double lat=0;
         double lng=0;
         int numPoints=0;
-        for(Point point:points){
-            if(point!=null) {
-                lat += point.getLatitude();
-                lng += point.getLongitude();
-                numPoints++;
+        if (points != null) {
+            for (Point point : points) {
+                if (point != null) {
+                    lat += point.getLatitude();
+                    lng += point.getLongitude();
+                    numPoints++;
+                }
             }
         }
         lat=lat/numPoints;
         lng=lng/numPoints;
         return new LatLng(lat,lng);
-}
-
-
-
-
+    }
 
 }
 
