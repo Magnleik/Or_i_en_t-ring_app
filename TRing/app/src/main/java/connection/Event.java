@@ -128,6 +128,15 @@ public class Event {
     public String getAvgTime() {
         return (String) properties.get("avg_time");
     }
+
+
+    /**
+     * Get all the points in this event, the first point is always the starting location.
+     * @return ArrayList of all Points associated with the Event. Can be NULL if no points have been added yet.
+     */
+    public ArrayList<Point> getPoints(){
+        return points;
+    }
     
 
     /**
