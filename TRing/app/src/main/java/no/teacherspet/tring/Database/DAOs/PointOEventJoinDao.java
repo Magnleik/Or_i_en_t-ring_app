@@ -40,6 +40,6 @@ public interface PointOEventJoinDao {
     long[] insert(PointOEventJoin... pointOEventJoins);
 
     @Delete
-    void delete(PointOEventJoin... pointOEventJoins);
+    int delete(PointOEventJoin... pointOEventJoins);
 
 }

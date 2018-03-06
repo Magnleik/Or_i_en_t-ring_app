@@ -28,7 +28,7 @@ public class UserViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<User> getUserbyID(int userID){
+    public Flowable<User> getUserByID(int userID){
         return userDao.findById(userID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

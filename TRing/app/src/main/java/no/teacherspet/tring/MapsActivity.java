@@ -39,7 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Log.i("INFO:", getString(R.string.google_maps_key));
 
     }
-
+    //Changes to createUserActivity if a user has not been created
     private void createUser(User user){
         if(user == null){
             startActivity(new Intent(this, CreateUserActivity.class));

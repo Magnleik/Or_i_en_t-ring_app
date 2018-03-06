@@ -32,6 +32,6 @@ public interface PointDao {
     void update(Point... points);
 
     @Delete
-    void delete(Point... points);
+    int delete(Point... points);
 
 }

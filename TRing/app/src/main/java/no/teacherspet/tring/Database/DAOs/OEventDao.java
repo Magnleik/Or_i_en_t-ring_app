@@ -32,5 +32,5 @@ public interface OEventDao {
     void update(OEvent... oEvents);
 
     @Delete
-    void delete(OEvent... oEvents);
+    int delete(OEvent... oEvents);
 }
