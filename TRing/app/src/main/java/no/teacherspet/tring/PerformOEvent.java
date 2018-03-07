@@ -158,5 +158,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return new LatLng(lat,lng);
     }
 
+    public ArrayList<Point> getPoints() {
+        return points;
+    }
 }
 
