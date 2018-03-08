@@ -18,6 +18,7 @@ import android.widget.SimpleAdapter;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,23 +106,6 @@ public class MyEvents extends Fragment {
     //////////////TEST
 
 
-
-
-
-
-
-    public String[] initList() {
-        final HashMap<Integer,Event> theEventReceived = new StartupMenu().getTestEvents();
-        int i=0;
-        String[] listItems = new String[theEventReceived.size()];
-
-        for (Event ev : theEventReceived.values()) {
-           listItems[i] = ev.getProperty("event_name") + "";
-           i++;
-        }
-        return listItems;
-    }
-
     public ArrayList<Event> initList1() {
         final HashMap<Integer,Event> theEventReceived = new StartupMenu().getTestEvents();
         int i=0;
@@ -138,11 +122,30 @@ public class MyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
 
-        ArrayList<Event> listItems = initList1();
+        final ArrayList<Event> listItems = initList1();
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
+        final Context context = this.getContext();
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 1
+                Event selectedEvent = listItems.get(position);
+
+                // 2
+                Intent detailIntent = new Intent(context, PerformOEvent.class);
+
+                // 3
+                detailIntent.putExtra("MyEvent", selectedEvent);
+
+                // 4
+                startActivity(detailIntent);
+            }
+
+        });
 
 
     }
