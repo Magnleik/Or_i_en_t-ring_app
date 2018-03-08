@@ -65,6 +65,7 @@ public class Point {
         properties.put("description", description);
     }
 
+
     /**
      * Adds any property to this Point. DO NOT set ID, coordinates or description through this method. Will most likely NOT be saved on the server, though it will be sent.
      * @param key The property name, i.e. "point_title". Use lowercase letters and underscores.

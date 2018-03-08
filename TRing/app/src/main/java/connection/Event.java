@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -129,12 +129,25 @@ public class Event {
         return (String) properties.get("avg_time");
     }
 
+
+    /**
+     * Get all the points in this event, the first point is always the starting location.
+     * @return ArrayList of all Points associated with the Event. Can be NULL if no points have been added yet.
+     */
+    public ArrayList<Point> getPoints(){
+        return points;
+    }
+    
+
     /**
      * Adds any property to this Event. DO NOT set ID, minDistance or avgTime through this method. Will most likely NOT be saved on the server, though it will be sent.
      * @param key The property name, i.e. "event_title". Use lowercase letters and underscores.
      * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
      */
     public void addProperty(String key, Object value){
+        if(properties==null){
+            properties=new HashMap<>();
+        }
         properties.put(key,value);
     }
 

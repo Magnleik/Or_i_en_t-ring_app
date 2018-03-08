@@ -10,6 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
+import connection.Event;
+
 
 /**
  * Created by magnus on 13.02.2018.
@@ -18,10 +22,14 @@ import android.widget.Toast;
 public class StartupMenu extends AppCompatActivity{
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
+    private static HashMap<Integer, Event> testEvents;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
         super.onCreate(savedInstanceState);
+        if(testEvents==null){
+            testEvents=new HashMap<>();
+        }
         setContentView(R.layout.activity_startupmenu);
     }
 
@@ -51,5 +59,12 @@ public class StartupMenu extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(),"Access denied",Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public static void addEvent(Event event){
+        testEvents.put(testEvents.size(),event);
+    }
+    public static HashMap<Integer,Event> getTestEvents(){
+        return testEvents;
     }
 }

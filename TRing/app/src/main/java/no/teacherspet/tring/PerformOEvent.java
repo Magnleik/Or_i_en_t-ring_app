@@ -2,11 +2,12 @@ package no.teacherspet.tring;
 
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.CountDownTimer;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,26 +17,28 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
 
-public class PerformOEvent extends FragmentActivity implements OnMapReadyCallback {
+import connection.Point;
+
+public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
     private int positionViewed = 0;
+    private ArrayList<Point> points;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        points = readPoints();
         setContentView(R.layout.activity_perform_oevent);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -43,9 +46,24 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return true;
+    }
+
+    public ArrayList<Point> readPoints(){
+        if(StartupMenu.getTestEvents()!=null) {
+            return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
+        }
+        return null;
+    }
 
     /**
      * Manipulates the map once available.
@@ -59,10 +77,19 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        if(points!=null) {
+            for (Point point : points) {
+                if (point != null) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("event_name")));
+                }
+            }
+        }
         // Add a marker in Sydney and move the camera
-        LatLng gløs = new LatLng(63.416136, 10.405297);
-        mMap.addMarker(new MarkerOptions().position(gløs).title("Gløs:))"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(gløs));
+        //LatLng gløs = new LatLng(63.416136, 10.405297);
+        LatLng avgPosition = getAvgLatLng();
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(avgPosition,14));
     }
 
 
@@ -84,7 +111,7 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
                         LatLng latlng = new LatLng(latitude, longitude);
                         final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
                         //Zoomer til posisjon
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 12));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
                         positionViewed++;
 
 
@@ -113,11 +140,26 @@ public class PerformOEvent extends FragmentActivity implements OnMapReadyCallbac
         }
     }
 
+    private LatLng getAvgLatLng(){
+        double lat=0;
+        double lng=0;
+        int numPoints=0;
+        if (points != null) {
+            for (Point point : points) {
+                if (point != null) {
+                    lat += point.getLatitude();
+                    lng += point.getLongitude();
+                    numPoints++;
+                }
+            }
+        }
+        lat=lat/numPoints;
+        lng=lng/numPoints;
+        return new LatLng(lat,lng);
+    }
 
-
-
-
-
-
+    public ArrayList<Point> getPoints() {
+        return points;
+    }
 }
 
