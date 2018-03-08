@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -43,14 +44,11 @@ public class MyEvents extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private String title = "MyEvents";
     private Event selectedEvent;
+    private ListView mListView;
     ///////
 
-    List<Map<String, String>> myEventList = new ArrayList<>();
-    ArrayList<Event> listeFraServ = new ArrayList<>();
-    HashMap<String, String> event = new HashMap<String, String>();
-    ArrayList<LatLng> latLngList = new ArrayList<>();
+
     ///////
 
     private OnFragmentInteractionListener mListener;
@@ -105,100 +103,47 @@ public class MyEvents extends Fragment {
 
 
     //////////////TEST
-    private HashMap<String, String> addEventToList(String key, String name) {
-        HashMap<String, String> event = new HashMap<String, String>();
-        event.put(key, name);
 
-        return event;
+
+
+
+
+
+
+    public String[] initList() {
+        final HashMap<Integer,Event> theEventReceived = new StartupMenu().getTestEvents();
+        int i=0;
+        String[] listItems = new String[theEventReceived.size()];
+
+        for (Event ev : theEventReceived.values()) {
+           listItems[i] = ev.getProperty("event_name") + "";
+           i++;
+        }
+        return listItems;
     }
 
+    public ArrayList<Event> initList1() {
+        final HashMap<Integer,Event> theEventReceived = new StartupMenu().getTestEvents();
+        int i=0;
+        ArrayList<Event> listItems = new ArrayList<>();
 
-
-
-
-
-    public void initList() {
-        Point testPoint1 =  new Point(10.324, 20.420, "This is a test point");
-        Point testPoint2 = new Point(123.321, 12.123, "Test point #2");
-        Point testPoint3 = new Point(0.0, 0.0, "This is a starting point");
-        ArrayList<Point> points = new ArrayList<Point>();
-        points.add(testPoint1); points.add(testPoint2);
-        Event testEvent = new Event();
-        testEvent.addPosts(points);
-        testEvent.setStartPoint(testPoint3);
-        testEvent.addProperty("event_title", "Olmesterskapet");
-
-        Event testEvent1 = new Event();
-        testEvent1.addPosts(points);
-        testEvent1.setStartPoint(testPoint3);
-        testEvent1.addProperty("event_title","Hardangervidda rundt");
-
-        Event testEvent2 = new Event();
-        testEvent2.addPosts(points);
-        testEvent2.setStartPoint(testPoint3);
-        testEvent2.addProperty("event_title", "Tiiiiiidenes rebus");
-
-        this.listeFraServ.add(testEvent) ; this.listeFraServ.add(testEvent1) ; this.listeFraServ.add(testEvent2);
-
-        LatLng punkt = new LatLng(testPoint1.getLatitude(), testPoint1.getLongitude());
-        this.latLngList.add(punkt);
-
-
-
-
-
-
-
-
-
-
-
-        myEventList.add(addEventToList("event_title", listeFraServ.get(0).getProperty("event_title") + ""));
-        myEventList.add(addEventToList("event_title", listeFraServ.get(1).getProperty("event_title") + ""));
-        myEventList.add(addEventToList("event_title", listeFraServ.get(2).getProperty("event_title") + ""));
-
-
-
+        for (Event ev : theEventReceived.values()) {
+            listItems.add(ev);
+            i++;
+        }
+        return listItems;
     }
 
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
-        ListView lv = (ListView) getView().findViewById(R.id.my_events_list);
+        mListView = (ListView) getView().findViewById(R.id.my_events_list);
+
+        ArrayList<Event> listItems = initList1();
+
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
 
 
-
-
-        initList();
-
-        ListAdapter simpleAdt = new SimpleAdapter(getActivity(), myEventList, android.R.layout.simple_list_item_1, new String[] {"event_title"}, new int[] {android.R.id.text1});
-
-        lv.setAdapter(simpleAdt);
-
-        final Context context = this.getContext();
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // 1
-                String selectedEventTitle = myEventList.get(position).get("event_title");
-
-                for (Event e : listeFraServ) {
-                    if (e.getProperty("event_title").equals(selectedEventTitle)) {
-                        selectedEvent = e;
-                    }
-                }
-
-                // 2
-                Intent detailIntent = new Intent(context, PerformOEvent.class);
-
-                // 3
-                detailIntent.putParcelableArrayListExtra(selectedEvent.getProperty("event_title")+ "", latLngList  );
-
-                // 4
-                startActivity(detailIntent);
-            }
-
-        });
 
     }
 /////////////
