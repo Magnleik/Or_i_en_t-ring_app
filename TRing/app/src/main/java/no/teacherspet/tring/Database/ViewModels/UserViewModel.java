@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModel;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import no.teacherspet.tring.Database.DAOs.UserDao;
@@ -22,38 +24,43 @@ public class UserViewModel extends ViewModel {
         this.userDao = userDao;
     }
 
-    public Flowable<List<User>> getAllUsers(){
+    public Maybe<List<User>> getAllUsers(){
         return userDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<User> getUserByID(int userID){
+    public Maybe<User> getUserByID(int userID){
         return userDao.findById(userID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<List<User>> getOtherUsers(){
+    public Maybe<List<User>> getOtherUsers(){
         return userDao.getOtherUsers()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<User> getPersonalUser(){
+    public Maybe<User> getPersonalUser(){
         return userDao.getPersonalUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<Integer> deleteUsers(User... users){
-        return Flowable.fromCallable(()->userDao.delete(users))
+    public Maybe<Integer> getMaxID(){
+        return userDao.getMaxID().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
+    }
+
+    public Single<Integer> deleteUsers(User... users){
+        return Single.fromCallable(()->userDao.delete(users))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<long[]> addUsers(User... users){
-        return Flowable.fromCallable(()->userDao.insert(users))
+    public Single<long[]> addUsers(User... users){
+        return Single.fromCallable(()->userDao.insert(users))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

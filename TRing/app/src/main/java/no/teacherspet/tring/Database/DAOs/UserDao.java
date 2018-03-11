@@ -9,8 +9,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.User;
 
 /**
@@ -20,16 +19,19 @@ import no.teacherspet.tring.Database.Entities.User;
 public interface UserDao {
 
     @Query("SELECT * FROM user")
-    Flowable<List<User>> getAll();
+    Maybe<List<User>> getAll();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 0")
-    Flowable<List<User>> getOtherUsers();
+    Maybe<List<User>> getOtherUsers();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
-    Flowable<User> getPersonalUser();
+    Maybe<User> getPersonalUser();
 
     @Query("SELECT * FROM user WHERE id LIKE :id")
-    Flowable<User> findById(int id);
+    Maybe<User> findById(int id);
+
+    @Query("SELECT MAX(id) FROM user")
+    Maybe<Integer> getMaxID();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(User... users);

@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModel;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import no.teacherspet.tring.Database.DAOs.PointOEventJoinDao;
@@ -24,41 +26,41 @@ public class PointOEventJoinViewModel extends ViewModel {
         this.pointOEventJoinDao = pointOEventJoinDao;
     }
 
-    public Flowable<List<Point>> getPointsForOEvent(int oEventID){
+    public Maybe<List<Point>> getPointsForOEvent(int oEventID){
         return pointOEventJoinDao.getPointsForOEvent(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Flowable<Point> getStartPoint(int oEventID){
+    public Maybe<Point> getStartPoint(int oEventID){
         return pointOEventJoinDao.getStartPoint(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Flowable<List<Point>> getPointsNotStart(int oEventID){
+    public Maybe<List<Point>> getPointsNotStart(int oEventID){
         return pointOEventJoinDao.getPointsNotStart(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Flowable<List<OEvent>> getOEventsForPoint(int pointID){
+    public Maybe<List<OEvent>> getOEventsForPoint(int pointID){
         return pointOEventJoinDao.getOEventsForPoint(pointID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<long[]> addJoin(PointOEventJoin... pointOEventJoins){
-        return Flowable.fromCallable(()->pointOEventJoinDao.insert(pointOEventJoins))
+    public Single<long[]> addJoin(PointOEventJoin... pointOEventJoins){
+        return Single.fromCallable(()->pointOEventJoinDao.insert(pointOEventJoins))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<Integer> deleteJoin(int pointID, int oEventID){
-        return Flowable.fromCallable(()->pointOEventJoinDao.delete(pointID, oEventID))
+    public Single<Integer> deleteJoin(Point point, OEvent oEvent){
+        return Single.fromCallable(()->pointOEventJoinDao.delete(point.getId(), oEvent.getId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Flowable<Integer> deleteJoin(PointOEventJoin... pointOEventJoins){
-        return Flowable.fromCallable(()->pointOEventJoinDao.delete(pointOEventJoins))
+    public Single<Integer> deleteJoin(PointOEventJoin... pointOEventJoins){
+        return Single.fromCallable(()->pointOEventJoinDao.delete(pointOEventJoins))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

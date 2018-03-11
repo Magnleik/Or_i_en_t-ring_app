@@ -1,6 +1,8 @@
 package no.teacherspet.tring.Database.Entities;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -8,16 +10,17 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Created by Hermann on 13.02.2018.
  */
-@Entity(tableName = "point")
+@Entity(tableName = "point", indices = @Index(value = "id", unique = true))
 public class Point {
 
-    public Point(/*int id,*/ String description, LatLng latLng) {
+    public Point(String description, LatLng latLng) {
         this.description = description;
         this.latLng = latLng;
     }
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    @ColumnInfo(name = "id")
+    public int id;
 
     private String description;
     private LatLng latLng;

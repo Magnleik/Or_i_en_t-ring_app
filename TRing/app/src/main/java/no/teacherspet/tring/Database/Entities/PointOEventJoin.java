@@ -20,7 +20,7 @@ import android.arch.persistence.room.Index;
                         onDelete = ForeignKey.CASCADE)
                 },
         indices = {@Index("pointID"),
-                    @Index("oEventID")})
+                   @Index("oEventID")})
 public class PointOEventJoin {
 
     public PointOEventJoin(int pointID, int oEventID, boolean isStart){

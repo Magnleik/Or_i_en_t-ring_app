@@ -7,9 +7,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import io.reactivex.disposables.Disposable;
+import no.teacherspet.tring.Database.Entities.Point;
 import no.teacherspet.tring.Database.Entities.User;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
@@ -31,11 +35,13 @@ public class CreateUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_user);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("Create user");
 
         localDatabase = LocalDatabase.getInstance(this);
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         userID = 0;
+        userViewModel.getMaxID().subscribe(integer -> userID = integer);
 
         firstName = (EditText) findViewById(R.id.first_name);
         lastName = (EditText) findViewById(R.id.last_name);

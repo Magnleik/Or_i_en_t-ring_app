@@ -1,6 +1,5 @@
 package no.teacherspet.tring.Database.DAOs;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -10,7 +9,7 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.Point;
 
 /**
@@ -20,10 +19,13 @@ import no.teacherspet.tring.Database.Entities.Point;
 public interface PointDao {
 
     @Query("SELECT * FROM point")
-    Flowable<List<Point>> getAll();
+    Maybe<List<Point>> getAll();
 
     @Query("SELECT * FROM point WHERE id LIKE :id")
-    Flowable<Point> findById(int id);
+    Maybe<Point> findById(int id);
+
+    @Query("SELECT MAX(id) FROM point")
+    Maybe<Integer> getMaxID();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(Point... points);
