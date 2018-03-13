@@ -47,8 +47,8 @@
             android:theme="@style/AppTheme.PopupTheme" />
         <activity android:name=".CreateOEvent" />
         <activity android:name=".PerformOEvent"
-
         android:configChanges="keyboardHidden|screenSize" />
+
         <activity
             android:name=".CreateUserActivity"
             android:label="Create User"
@@ -59,6 +59,7 @@
             android:label="@string/title_activity_list_of_saved_events"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
 
     </application>
 
