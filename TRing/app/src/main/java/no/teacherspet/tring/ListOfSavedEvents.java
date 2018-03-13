@@ -45,8 +45,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_saved_events);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);

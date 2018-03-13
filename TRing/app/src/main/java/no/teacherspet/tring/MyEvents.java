@@ -2,10 +2,13 @@ package no.teacherspet.tring;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -124,6 +128,19 @@ public class MyEvents extends Fragment {
 
         final ArrayList<Event> listItems = initList1();
 
+        //TITTEL
+        TextView textView = new TextView(this.getContext());
+        textView.setText("Mine løp");
+        textView.setTextSize(25);
+        textView.setTypeface(Typeface.MONOSPACE);
+        textView.setGravity(Gravity.CENTER);
+        textView.setHeight(150);
+
+        mListView.addHeaderView(textView);
+        /////
+
+
+
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
@@ -132,17 +149,19 @@ public class MyEvents extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // 1
-                Event selectedEvent = listItems.get(position);
+                if (position >0) {
+                    // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
+                    Event selectedEvent = listItems.get(position - 1);
 
-                // 2
-                Intent detailIntent = new Intent(context, PerformOEvent.class);
+                    // 2
+                    Intent detailIntent = new Intent(context, PerformOEvent.class);
 
-                // 3
-                detailIntent.putExtra("MyEvent", selectedEvent);
+                    // 3
+                    detailIntent.putExtra("MyEvent", selectedEvent);
 
-                // 4
-                startActivity(detailIntent);
+                    // 4
+                    startActivity(detailIntent);
+                }
             }
 
         });

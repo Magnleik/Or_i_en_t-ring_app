@@ -98,7 +98,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if(points!=null) {
             for (Point point : points) {
                 if (point != null) {
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("event_name")));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("description")));
                 }
             }
         }

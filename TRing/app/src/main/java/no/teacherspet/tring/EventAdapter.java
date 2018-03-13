@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 import connection.Event;
@@ -48,14 +50,16 @@ public class EventAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get view for row item
-        View rowView = mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        View rowView = mInflater.inflate(R.layout.list_item_event, parent, false);
 
-        TextView titleTextView = (TextView) rowView.findViewById(android.R.id.text1);
+        TextView titleTextView = (TextView) rowView.findViewById(R.id.list_item_event_title);
+
 
 
         Event event = getItem(position);
 
         titleTextView.setText(event.getProperty("event_name")+"");
+
 
         return rowView;
     }
