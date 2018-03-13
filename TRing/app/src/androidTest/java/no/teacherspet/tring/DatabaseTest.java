@@ -164,7 +164,7 @@ public class DatabaseTest {
             return testoEvent.getId() == oEvents.get(0).getId();
         });
         pointDAO.delete(testPoint1);
-
+        //Point should not be there
         //pointOEventJoinDAO.getStartPoint(testoEvent.getId()).test().assertValue()
 
         assertNotSame(-1, pointOEventJoinDAO.delete(testJoin1));

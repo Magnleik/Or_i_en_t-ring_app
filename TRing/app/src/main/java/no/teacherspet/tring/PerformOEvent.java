@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 
+import connection.Event;
 import connection.Point;
 
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
@@ -33,12 +34,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private FusedLocationProviderClient mFusedLocationClient;
     private int positionViewed = 0;
     private ArrayList<Point> points;
+    private Event startedEvent;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        points = readPoints();
+
         setContentView(R.layout.activity_perform_oevent);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -50,6 +52,22 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // 1
+        this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        if(startedEvent!=null){
+            points = readPoints(startedEvent);
+        }
+
+
+// 2
+
+
+// 3
+
+
+// 4
+
     }
 
     @Override
@@ -58,9 +76,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return true;
     }
 
-    public ArrayList<Point> readPoints(){
+    public ArrayList<Point> readPoints(Event startedEvent){
         if(StartupMenu.getTestEvents()!=null) {
-            return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
+            return startedEvent.getPoints();
+            //return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
         }
         return null;
     }
@@ -81,7 +100,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if(points!=null) {
             for (Point point : points) {
                 if (point != null) {
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("event_name")));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("description")));
                 }
             }
         }

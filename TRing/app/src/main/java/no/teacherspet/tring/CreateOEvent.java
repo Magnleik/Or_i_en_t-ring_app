@@ -97,7 +97,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
-        // Add a marker in Sydney and move the camera
+
         if ((latLngArrayList.size()>0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlgn : latLngArrayList) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
