@@ -17,8 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
+        android:theme="@style/AppTheme">
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -43,10 +42,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".OrientationSelector" />
-        <activity android:name=".PopupPointDesc" android:theme="@style/AppTheme.PopupTheme" />
+        <activity
+            android:name=".PopupPointDesc"
+            android:theme="@style/AppTheme.PopupTheme" />
         <activity android:name=".CreateOEvent" />
         <activity android:name=".PerformOEvent"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|screenSize" />
+        <activity
+            android:name=".ListOfSavedEvents"
+            android:label="@string/title_activity_list_of_saved_events"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
