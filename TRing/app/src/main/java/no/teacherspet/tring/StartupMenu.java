@@ -65,6 +65,10 @@ public class StartupMenu extends AppCompatActivity{
         testEvents.put(testEvents.size(),event);
     }
     public static HashMap<Integer,Event> getTestEvents(){
+
+        if (testEvents==null) {
+            return new HashMap<>();
+        }
         return testEvents;
     }
 }

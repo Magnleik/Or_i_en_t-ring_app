@@ -55,7 +55,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         // 1
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
-        points = readPoints();
+        if(startedEvent!=null){
+            points = readPoints(startedEvent);
+        }
 
 
 // 2
@@ -74,7 +76,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return true;
     }
 
-    public ArrayList<Point> readPoints(){
+    public ArrayList<Point> readPoints(Event startedEvent){
         if(StartupMenu.getTestEvents()!=null) {
             return startedEvent.getPoints();
             //return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();

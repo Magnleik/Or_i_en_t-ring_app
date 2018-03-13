@@ -51,6 +51,7 @@ public class MyEvents extends Fragment {
     private String mParam2;
     private Event selectedEvent;
     private ListView mListView;
+    private HashMap<Integer,Event> theEventReceived;
     ///////
 
 
@@ -84,6 +85,7 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HashMap<Integer,Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -111,7 +113,7 @@ public class MyEvents extends Fragment {
 
 
     public ArrayList<Event> initList1() {
-        final HashMap<Integer,Event> theEventReceived = new StartupMenu().getTestEvents();
+        theEventReceived = new StartupMenu().getTestEvents();
         int i=0;
         ArrayList<Event> listItems = new ArrayList<>();
 
