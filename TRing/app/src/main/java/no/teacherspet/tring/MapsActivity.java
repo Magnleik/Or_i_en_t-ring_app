@@ -1,5 +1,6 @@
 package no.teacherspet.tring;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -10,12 +11,29 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import io.reactivex.disposables.Disposable;
+import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.UserViewModel;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
+    LocalDatabase localDatabase;
+    Disposable user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Starting create user activity
+        //startActivity(new Intent(this, CreateUserActivity.class));
+        localDatabase = LocalDatabase.getInstance(this);
+        UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
+
+        user = userViewModel.getPersonalUser()
+                .defaultIfEmpty(new User(-1,false, "", ""))
+                .subscribe(user1 -> createUser(user1));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -23,8 +41,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
-    }
 
+    }
+    //Changes to createUserActivity if a user has not been created
+    private void createUser(User user){
+        if(user.getId() < 0){
+            startActivity(new Intent(this, CreateUserActivity.class));
+        }
+        else{
+            this.user.dispose();
+        }
+    }
 
     /**
      * Manipulates the map once available.
