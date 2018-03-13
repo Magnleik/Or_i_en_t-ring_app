@@ -12,7 +12,7 @@ import java.util.Map;
 public class Point {
 
     private int id;
-    private Map<String, Object> properties;
+    private Map<String, String> properties;
     private Geometry geometry;
 
     /**
@@ -69,9 +69,9 @@ public class Point {
     /**
      * Adds any property to this Point. DO NOT set ID, coordinates or description through this method. Will most likely NOT be saved on the server, though it will be sent.
      * @param key The property name, i.e. "point_title". Use lowercase letters and underscores.
-     * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
+     * @param value The value to save to your parameter. Must be a String, and can be retrieved through getProperty.
      */
-    public void addProperty(String key, Object value){
+    public void addProperty(String key, String value){
         properties.put(key,value);
     }
 
@@ -80,11 +80,12 @@ public class Point {
      * @param key A String key used to save a property.
      * @return The object saved as a property
      */
-    public Object getProperty(String key){
+    public String getProperty(String key){
         return properties.get(key);
     }
 
     private class Geometry{
+        String type = "Point";
         double[] coordinates;
     }
 

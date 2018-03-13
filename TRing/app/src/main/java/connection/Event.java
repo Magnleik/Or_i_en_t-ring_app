@@ -15,7 +15,8 @@ public class Event {
 
     @SerializedName("features")
     private ArrayList<Point> points;
-    private Map<String, Object> properties;
+    //TODO: Need to make starting point as its own point, as this will be necessary for the database (because of ordering on server)
+    private Map<String, String> properties;
     private int id = -1;
 
 
@@ -29,7 +30,7 @@ public class Event {
     public Event(int id, ArrayList<Point> points, double minDistance, String avgTime){
         this.id = id;
         this.points = points;
-        properties.put("dist", minDistance);
+        properties.put("dist", Double.toString(minDistance));
         properties.put("avg_time", avgTime);
     }
 
@@ -124,7 +125,7 @@ public class Event {
     }
 
     public double getMinDistance() {
-        return (double) properties.get("dist");
+        return (Double.parseDouble( properties.get("dist")));
     }
 
     /**
@@ -132,7 +133,7 @@ public class Event {
      * @param minDistance Distance in meters
      */
     public void setMinDistance(double minDistance) {
-        properties.put("dist", minDistance);
+        properties.put("dist", Double.toString(minDistance));
     }
 
     /**
@@ -158,7 +159,7 @@ public class Event {
      * @param key The property name, i.e. "event_title". Use lowercase letters and underscores.
      * @param value The value to save to your parameter. Can be anything, and can be retrieved through getProperty.
      */
-    public void addProperty(String key, Object value){
+    public void addProperty(String key, String value){
         if(properties==null){
             properties=new HashMap<>();
         }
@@ -168,9 +169,9 @@ public class Event {
     /**
      * Retrieve a property value saved with the key. DO NOT use this to get ID, minDistance or avgTime.
      * @param key A String key used to save a property.
-     * @return The object saved as a property
+     * @return The String saved as a property
      */
-    public Object getProperty(String key){
+    public String getProperty(String key){
         return properties.get(key);
     }
 }

@@ -40,7 +40,7 @@ public class NetworkManager {
     private void init(){
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.31.35";
+        String URL = "http://10.22.19.15";
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
@@ -85,9 +85,11 @@ public class NetworkManager {
         call.enqueue(new Callback<Point>() {
             @Override
             public void onResponse(@NonNull Call<Point> call, @NonNull Response<Point> response) {
-                Point point = response.body();
-                System.out.println("We have a point!");
-                System.out.println("It's ID is: " + point.getId());
+                if(response.isSuccessful()) {
+                    Point point = response.body();
+                    System.out.println("We have a point!");
+                    System.out.println("It's ID is: " + point.getId());
+                }
             }
 
             @Override
@@ -107,9 +109,11 @@ public class NetworkManager {
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
-                Event event = response.body();
-                System.out.println("We have an event!");
-                System.out.println("It's ID is: " + event.getId());
+                if(response.isSuccessful()) {
+                    Event event = response.body();
+                    System.out.println("We have an event!");
+                    System.out.println("It's ID is: " + event.getId());
+                }
             }
 
             @Override
@@ -129,7 +133,9 @@ public class NetworkManager {
         call.enqueue(new Callback<List<String>>() {
             @Override
             public void onResponse(@NonNull Call<List<String>> call, @NonNull Response<List<String>> response) {
-                System.out.println("Call Test successful, strings: " + response.body());
+                if(response.isSuccessful()) {
+                    System.out.println("Call Test successful, strings: " + response.body());
+                }
             }
 
             @Override
@@ -150,8 +156,10 @@ public class NetworkManager {
         call.enqueue(new Callback<Point>() {
             @Override
             public void onResponse(@NonNull Call<Point> call, @NonNull Response<Point> response) {
-                Point resp = response.body();
-                System.out.println("Call sent");
+                if(response.isSuccessful()) {
+                    Point resp = response.body();
+                    System.out.println("Call sent");
+                }
             }
 
             @Override
@@ -173,17 +181,20 @@ public class NetworkManager {
         Event testEvent = new Event();
         testEvent.addPosts(points);
         testEvent.setStartPoint(testPoint3);
-        testEvent.addProperty("test_latlng", new LatLng(34.04,35.05));
-        testEvent.addProperty("test_point", new Point(12.3,32.1, "This is a point from a property"));
+        testEvent.addProperty("name", "test_property");
+        testEvent.addProperty("name", "test_property2");
 
         Call<Event> call = client.testCreateEvent(testEvent);
 
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
-                Event resp = response.body();
-                System.out.println("Call sent");
-                callback.onResponse(resp);
+
+                if(response.isSuccessful()) {
+                    Event resp = response.body();
+                    System.out.println("Call sent");
+                    callback.onResponse(resp);
+                }
             }
 
             @Override
