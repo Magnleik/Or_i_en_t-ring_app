@@ -2,5 +2,5 @@
     <string name="app_name">TRing</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_create_user">CreateUserActivity</string>
-
+    <string name ="create">create</string>
 </resources>

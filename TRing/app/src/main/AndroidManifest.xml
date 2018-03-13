@@ -40,7 +40,7 @@
         </activity>
         <activity
             android:name=".CreateUserActivity"
-            android:label="create_user"
+            android:label="Create User"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
