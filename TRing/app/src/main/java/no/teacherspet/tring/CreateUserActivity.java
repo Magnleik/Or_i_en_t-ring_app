@@ -41,7 +41,7 @@ public class CreateUserActivity extends AppCompatActivity {
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         userID = 0;
-        userViewModel.getMaxID().subscribe(integer -> userID = integer);
+        Disposable idDisposable =  userViewModel.getMaxID().subscribe(integer -> userID = integer);
 
         firstName = (EditText) findViewById(R.id.first_name);
         lastName = (EditText) findViewById(R.id.last_name);
@@ -50,6 +50,7 @@ public class CreateUserActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                idDisposable.dispose();
                if(lastName.getText().toString().trim().length() > 0 && firstName.getText().toString().trim().length() > 0 ){
                     insertUser();
                 }

@@ -25,8 +25,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        startActivity(new Intent(this, CreateUserActivity.class));
+        //Starting create user activity
+        //startActivity(new Intent(this, CreateUserActivity.class));
         localDatabase = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 

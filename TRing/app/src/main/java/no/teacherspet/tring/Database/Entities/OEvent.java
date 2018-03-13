@@ -9,12 +9,12 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "o_event")
 public class OEvent {
 
-    public OEvent(/*int id,*/ String name) {
-        //this.id = id;
+    public OEvent(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey //(autoGenerate = true)
     public int id;
 
     private String name;

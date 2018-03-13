@@ -16,7 +16,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    @PrimaryKey /*(autoGenerate = true)*/
+    @PrimaryKey //(autoGenerate = true)
     private int id;
 
     private boolean personalProfile;

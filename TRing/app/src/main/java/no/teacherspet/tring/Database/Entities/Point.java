@@ -13,13 +13,13 @@ import com.google.android.gms.maps.model.LatLng;
 @Entity(tableName = "point", indices = @Index(value = "id", unique = true))
 public class Point {
 
-    public Point(String description, LatLng latLng) {
+    public Point(int id, String description, LatLng latLng) {
+        this.id = id;
         this.description = description;
         this.latLng = latLng;
     }
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
+    @PrimaryKey //(autoGenerate = true)
     public int id;
 
     private String description;
