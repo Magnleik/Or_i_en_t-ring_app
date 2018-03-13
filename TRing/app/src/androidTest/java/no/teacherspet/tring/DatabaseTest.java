@@ -47,8 +47,8 @@ public class DatabaseTest {
     Integer id;
     Disposable idDisposable;
 
-    @Rule
-    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule() ;
+    //@Rule
+    //public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule() ;
 
     @Before
     public void setUp(){
