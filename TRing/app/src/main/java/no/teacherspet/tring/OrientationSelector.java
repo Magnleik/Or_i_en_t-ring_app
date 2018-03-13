@@ -18,7 +18,7 @@ public class OrientationSelector extends AppCompatActivity {
     }
 
     public void goToOrientationList (View v){
-        Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
+        Intent intent = new Intent(OrientationSelector.this,ListOfSavedEvents.class);
         startActivity(intent);
     }
 

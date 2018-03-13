@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">TRing</string>
     <string name="title_activity_maps">Map</string>
+
     <string name="title_activity_create_user">CreateUserActivity</string>
     <string name ="create">create</string>
-    </resources>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_list_of_saved_events">ListOfSavedEvents</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
+

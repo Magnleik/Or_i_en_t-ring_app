@@ -2,6 +2,7 @@ package connection;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.Map;
  * Created by Eirik on 15-Feb-18.
  */
 
-public class Event {
+public class Event implements Serializable {
 
     @SerializedName("features")
     private ArrayList<Point> points;
