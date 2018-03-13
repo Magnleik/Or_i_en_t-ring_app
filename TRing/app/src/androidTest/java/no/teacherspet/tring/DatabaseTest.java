@@ -44,11 +44,9 @@ public class DatabaseTest {
     UserDao userDAO;
     OEventDao oEventDAO;
     PointOEventJoinDao pointOEventJoinDAO;
-    Integer id;
-    Disposable idDisposable;
 
-    //@Rule
-    //public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule() ;
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule() ;
 
     @Before
     public void setUp(){
@@ -59,7 +57,6 @@ public class DatabaseTest {
         userDAO = db.userDAO();
         oEventDAO = db.oEventDAO();
         pointOEventJoinDAO = db.pointOEventJoinDAO();
-        id = 0;
     }
     @After
     public void tearDown(){
@@ -70,23 +67,22 @@ public class DatabaseTest {
     public void pointTest(){
         LatLng latlng = createLatLng();
         String description = "testPoint";
-        idDisposable = pointDAO.getMaxID().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .defaultIfEmpty(0).subscribe(integer -> id = integer + 1);;
-        Point testPoint = new Point(id, description, latlng);
-        idDisposable.dispose();
 
-        idDisposable = pointDAO.getAll().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .test().assertEmpty();
-        idDisposable.dispose();
+        pointDAO.getAll().test().assertValue(points -> {
+            return points.size() == 0;
+        });
+
+        Point testPoint = new Point(0, description, latlng);
         assertNotSame(-1, pointDAO.insert(testPoint));
-
-        idDisposable = pointDAO.findById(testPoint.getId()).subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(point -> assertEquals(testPoint, point));
-        idDisposable.dispose();
+        pointDAO.findById(testPoint.getId()).test().assertValue(point -> {
+            return testPoint.getId() == point.getId();
+        });
+        pointDAO.getMaxID().test().assertValue(integer -> {
+            return testPoint.getId() == integer;
+        });
         pointDAO.delete(testPoint);
-        idDisposable = pointDAO.getAll().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .test().assertEmpty();
-        idDisposable.dispose();
+        pointDAO.findById(testPoint.getId()).test().assertNoValues();
+
     }
     private LatLng createLatLng(){
         return new LatLng(37.377166, -122.086966);
@@ -97,62 +93,52 @@ public class DatabaseTest {
         String firstname = "firstname";
         String lastname = "lastname";
 
-        idDisposable = userDAO.getMaxID().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .defaultIfEmpty(0).subscribe(integer -> id = integer);
-        User testUser1 = new User(id + 1, true, firstname, lastname);
-        idDisposable.dispose();
-
-        idDisposable = userDAO.getAll().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .test().assertEmpty();
-        idDisposable.dispose();
+        User testUser1 = new User(0, true, firstname, lastname);
+        userDAO.getAll().test().assertValue(users -> {
+            return users.size() == 0;
+        });
         assertNotSame(-1, userDAO.insert(testUser1));
 
-        idDisposable = userDAO.findById(testUser1.getId()).subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(user -> assertEquals(testUser1, user));
-        idDisposable.dispose();
-        idDisposable = userDAO.getPersonalUser().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(user -> assertEquals(testUser1, user));
-        idDisposable.dispose();
-
+        userDAO.findById(testUser1.getId()).test().assertValue(user -> {
+            return testUser1.getId() == user.getId();
+        });
+        userDAO.getPersonalUser().test().assertValue(user -> {
+            return testUser1.getId() == user.getId();
+        });
+        userDAO.getMaxID().test().assertValue(integer -> {
+            return testUser1.getId() == integer;
+        });
         userDAO.delete(testUser1);
-        idDisposable = userDAO.getAll().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .test().assertEmpty();
-        idDisposable.dispose();
+        userDAO.getAll().test().assertValue(users -> {
+            return users.size() == 0;
+        });
     }
     @Test
     public void oEventTest(){
         String testname = "testname";
-        idDisposable = oEventDAO.getMaxID().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .defaultIfEmpty(0).subscribe(integer -> id = integer);
-        OEvent testoEvent = new OEvent(id, testname);
-        idDisposable.dispose();
-
+        OEvent testoEvent = new OEvent(0, testname);
+        oEventDAO.getAll().test().assertValue(oEvents -> {
+            return oEvents.size() == 0;
+        });
         assertNotSame(-1, oEventDAO.insert(testoEvent));
-        idDisposable = oEventDAO.getAll().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(oEvents -> assertNotNull(oEvents));
-        idDisposable.dispose();
-        idDisposable = oEventDAO.findById(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(oEvent -> assertEquals(testoEvent, oEvent));
-        idDisposable.dispose();
+        oEventDAO.findById(testoEvent.getId()).test().assertValue(oEvent -> {
+            return testoEvent.getId() == oEvent.getId();
+        });
         oEventDAO.delete(testoEvent);
-        idDisposable = oEventDAO.findById(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(oEvent -> assertNotSame(testoEvent, oEvent));
-        idDisposable.dispose();
+
+        oEventDAO.getAll().test().assertValue(oEvents -> {
+            return oEvents.size() == 0;
+        });
     }
 
     @Test
     public void joinTest(){
         LatLng latlng = createLatLng();
         String description = "testPoint";
-        Point testPoint1 = new Point(id, description, latlng);
-        pointDAO.insert(testPoint1);
-        idDisposable = pointDAO.getMaxID().subscribeOn(AndroidSchedulers.mainThread()).observeOn(AndroidSchedulers.mainThread())
-                .defaultIfEmpty(0).subscribe(integer -> id = integer);
-
-        Point testPoint2 = new Point(id +1, description, latlng);
-        pointDAO.insert(testPoint2);
-        assertNotSame(testPoint1.getId(), testPoint2.getId());
-        idDisposable.dispose();
+        Point testPoint1 = new Point(0, description, latlng);
+        Point testPoint2 = new Point(1, description, latlng);
+        assertNotSame(-1, pointDAO.insert(testPoint1));
+        assertNotSame(-1, pointDAO.insert(testPoint2));
 
         String testname = "testoEvent";
         OEvent testoEvent = new OEvent(0, testname);
@@ -165,32 +151,30 @@ public class DatabaseTest {
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin1));
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin2));
 
-        idDisposable = pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(points -> assertTrue(points.size() == 2 &&
-                testPoint1.id == points.get(0).getId()));
-        idDisposable.dispose();
-        idDisposable = pointOEventJoinDAO.getStartPoint(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(point -> assertEquals(testPoint1, point));
-        idDisposable.dispose();
-        idDisposable = pointOEventJoinDAO.getPointsNotStart(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(points -> assertTrue(testPoint2.id == points.get(0).getId()));
-        idDisposable.dispose();
-        idDisposable = pointOEventJoinDAO.getOEventsForPoint(testPoint2.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(oEvents -> assertTrue(testoEvent.id == oEvents.get(0).getId()));
-        idDisposable.dispose();
+        pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).test().assertValue(points -> {
+            return points.size() == 2 && (points.get(0).getId() == testPoint1.getId() || points.get(0).getId() == testPoint2.getId());
+        });
+        pointOEventJoinDAO.getStartPoint(testoEvent.getId()).test().assertValue(point -> {
+            return testPoint1.getId() == point.getId();
+        });
+        pointOEventJoinDAO.getPointsNotStart(testoEvent.getId()).test().assertValue(points -> {
+            return testPoint2.getId() == points.get(0).getId();
+        });
+        pointOEventJoinDAO.getOEventsForPoint(testPoint2.getId()).test().assertValue(oEvents -> {
+            return testoEvent.getId() == oEvents.get(0).getId();
+        });
         pointDAO.delete(testPoint1);
 
-        idDisposable = pointOEventJoinDAO.getStartPoint(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(point -> assertNotSame(testPoint1, point));
-        idDisposable.dispose();
-        pointOEventJoinDAO.delete(testJoin1);
-        idDisposable = pointOEventJoinDAO.getStartPoint(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(point -> assertNotSame(testPoint1, point));
-        idDisposable.dispose();
-        pointOEventJoinDAO.delete(testPoint2.getId(), testoEvent.getId());
-        idDisposable = pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(points -> assertFalse(points.contains(testPoint2)));
-        idDisposable.dispose();
+        //pointOEventJoinDAO.getStartPoint(testoEvent.getId()).test().assertValue()
+
+        assertNotSame(-1, pointOEventJoinDAO.delete(testJoin1));
+        pointOEventJoinDAO.getOEventsForPoint(testPoint1.getId()).test().assertValue(oEvents -> {
+            return oEvents.size() == 0;
+        });
+        assertNotSame(-1, pointOEventJoinDAO.delete(testPoint2.getId(), testoEvent.getId()));
+        pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).test().assertValue(points -> {
+            return points.size() == 0;
+        });
     }
 
 
