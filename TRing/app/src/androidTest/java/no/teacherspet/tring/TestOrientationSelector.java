@@ -27,7 +27,7 @@ public class TestOrientationSelector {
     @Rule
     public final ActivityTestRule<OrientationSelector> main = new ActivityTestRule<OrientationSelector>(OrientationSelector.class);
 
-    Instrumentation.ActivityMonitor performMonitor = getInstrumentation().addMonitor(PerformOEvent.class.getName(), null, false);
+    Instrumentation.ActivityMonitor listOfEventMonitor = getInstrumentation().addMonitor(ListOfSavedEvents.class.getName(), null, false);
 
     Instrumentation.ActivityMonitor createMonitor = getInstrumentation().addMonitor(CreateOEvent.class.getName(), null, false);
 
@@ -48,7 +48,7 @@ public class TestOrientationSelector {
     public void shouldGoToPerformOEventActivity() {
 
         onView(withId(R.id.perform_btn)).perform(click());
-        Activity activity=getInstrumentation().waitForMonitorWithTimeout(performMonitor, 1000);
+        Activity activity=getInstrumentation().waitForMonitorWithTimeout(listOfEventMonitor, 1000);
         assertNotNull(activity);
         activity.finish();
     }
