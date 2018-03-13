@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.internal.zzp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +20,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class NetworkManager {
+
 
     static private NetworkManager nm;
     private Client client;
@@ -198,22 +197,22 @@ public class NetworkManager {
 
     //region POST-methods
     /**
-     * Adds a point to the database, not affiliated with an Event
-     * @param point The Point to be added
+     * Adds points to the database, not affiliated with an Event
+     * @param points The Points to be added, can be any number
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets a Point
      */
-    public void addPoint(Point point, final ICallbackAdapter<Point> callback){
-        Call<Point> call = client.addPoint(point);
+    public void addPoints(final ICallbackAdapter<List<Point>> callback, Point... points){
+        Call<List<Point>> call = client.addPoints(points);
 
-        call.enqueue(new Callback<Point>() {
+        call.enqueue(new Callback<List<Point>>() {
             @Override
-            public void onResponse(@NonNull Call<Point> call, @NonNull Response<Point> response) {
+            public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
 
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "addPoint got onResponse, without success");
+                    Log.i("NETWORK", "addPoints got onResponse, without success");
                 }
                 else {
-                    Log.i("NETWORK", "addPoint successfull with response: " + response.toString());
+                    Log.i("NETWORK", "addPoints successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -221,7 +220,31 @@ public class NetworkManager {
             }
 
             @Override
-            public void onFailure(@NonNull Call<Point> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<Point>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
+    public void addPointsToEvent(final ICallbackAdapter<Event> callback, int eventID, Point... points){
+        Call<Event> call = client.addPointsToEvent(eventID, points);
+
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(Call<Event> call, Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "addPointsToEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "addPointsToEvent successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Event> call, Throwable t) {
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }
@@ -243,7 +266,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "addEvent got onResponse, without success");
                 }
                 else {
-                    Log.i("NETWORK", "addEvent successfull with response: " + response.toString());
+                    Log.i("NETWORK", "addEvent successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -371,7 +394,7 @@ public class NetworkManager {
         if(event.getId()<0){
             throw new IllegalArgumentException("Cannot update an Event with ID < 0, as this will not be an event in the database");
         }
-        Call<Event> call = client.updateEvent(event);
+        Call<Event> call = client.updateEvent(event.getId(),event);
 
         call.enqueue(new Callback<Event>() {
             @Override
