@@ -1,7 +1,5 @@
 package connection;
 
-import retrofit2.Response;
-
 /**
  * Created by Eirik on 27-Feb-18.
  */

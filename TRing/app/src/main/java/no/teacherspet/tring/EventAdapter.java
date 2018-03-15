@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 import connection.Event;
@@ -31,7 +29,10 @@ public class EventAdapter extends BaseAdapter {
     //1
     @Override
     public int getCount() {
-        return mDataSource.size();
+        if(mDataSource!=null) {
+            return mDataSource.size();
+        }
+        return 0;
     }
 
     //2
