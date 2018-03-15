@@ -3,21 +3,23 @@ package no.teacherspet.tring.Database.Entities;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.Map;
+
 /**
  * Created by Hermann on 13.02.2018.
  */
 @Entity(tableName = "o_event")
 public class RoomOEvent {
 
-    public RoomOEvent(int id, String name) {
+    public RoomOEvent(int id, Map<String, String> properties) {
         this.id = id;
-        this.name = name;
+        this.properties = properties;
     }
 
     @PrimaryKey //(autoGenerate = true)
     public int id;
 
-    private String name;
+    private Map<String, String> properties;
 
     public int getId() {
         return id;
@@ -26,11 +28,10 @@ public class RoomOEvent {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Map<String, String> getProperties() {
+        return properties;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
-
 }
