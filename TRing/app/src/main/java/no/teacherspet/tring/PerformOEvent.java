@@ -60,7 +60,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     }
 
     public ArrayList<Point> readPoints(){
-        if(StartupMenu.getTestEvents()!=null) {
+        if(!StartupMenu.getTestEvents().isEmpty()) {
             return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
         }
         return null;
@@ -88,12 +88,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     builder.include(new LatLng(point.getLatitude(),point.getLongitude()));
                 }
             }
-        }
-        // Add a marker in Sydney and move the camera
-        //LatLng gløs = new LatLng(63.416136, 10.405297);
         LatLngBounds bounds = builder.build();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,-10));
+        }
     }
 
 
