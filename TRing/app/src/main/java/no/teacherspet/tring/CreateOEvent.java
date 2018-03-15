@@ -26,6 +26,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 
 import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 import connection.Point;
 
 public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
@@ -35,6 +37,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private NetworkManager networkManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +164,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         for(Marker marker:arrayListWithCoords){
             event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
         }
+        networkManager = NetworkManager.getInstance();
+        networkManager.addEvent(event, new ICallbackAdapter<Event>() {
+            @Override
+            public void onResponse(Event object) {
+                if(object==null){
+                    Toast.makeText(getApplicationContext(),"Failed to create event.",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Toast.makeText(getApplicationContext(),"Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+            }
+        });
         StartupMenu.addEvent(event);
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
