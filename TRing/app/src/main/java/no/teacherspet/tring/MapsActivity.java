@@ -1,6 +1,5 @@
 package no.teacherspet.tring;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
@@ -10,11 +9,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.User;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 

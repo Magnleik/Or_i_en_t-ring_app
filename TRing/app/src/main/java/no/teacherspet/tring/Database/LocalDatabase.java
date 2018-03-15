@@ -14,13 +14,13 @@ import no.teacherspet.tring.Database.DAOs.UserDao;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 
 /**
  * Created by Hermann on 13.02.2018.
  */
 
-@Database(entities = {User.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 5, exportSchema = false)
+@Database(entities = {RoomUser.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 5, exportSchema = false)
 @TypeConverters(LatLngConverter.class)
 public abstract class LocalDatabase extends RoomDatabase {
 

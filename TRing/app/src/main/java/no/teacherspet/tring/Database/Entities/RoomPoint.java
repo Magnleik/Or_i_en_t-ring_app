@@ -22,7 +22,7 @@ public class RoomPoint {
     }
 
     @PrimaryKey //(autoGenerate = true)
-    public int id;
+    private int id;
 
     private LatLng latLng;
     private Map<String, String> properties;

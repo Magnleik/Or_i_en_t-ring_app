@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 
@@ -59,13 +59,13 @@ public class CreateUserActivity extends AppCompatActivity {
 
     private void insertUser() {
         saveButton.setEnabled(false);
-        User user = new User(userID, true, firstName.getText().toString(), lastName.getText().toString());
-        userViewModel.addUsers(user).subscribe(longs -> changeActivity(longs));
+        RoomUser roomUser = new RoomUser(userID, true, firstName.getText().toString(), lastName.getText().toString());
+        userViewModel.addUsers(roomUser).subscribe(longs -> changeActivity(longs));
     }
 
     private void changeActivity(long[] longs){
         if(longs[0] >= 0){
-            Toast.makeText(this, "User successfully saved", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "RoomUser successfully saved", Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, StartupMenu.class));
         }
         else{

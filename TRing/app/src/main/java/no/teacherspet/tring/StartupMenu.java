@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import connection.Event;
 import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 
@@ -38,7 +38,7 @@ public class StartupMenu extends AppCompatActivity{
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
         user = userViewModel.getPersonalUser()
-                .defaultIfEmpty(new User(-1,false, "", ""))
+                .defaultIfEmpty(new RoomUser(-1,false, "", ""))
                 .subscribe(user1 -> createUser(user1));
 
         super.onCreate(savedInstanceState);
@@ -48,9 +48,9 @@ public class StartupMenu extends AppCompatActivity{
         setContentView(R.layout.activity_startupmenu);
     }
 
-    //Changes to createUserActivity if a user has not been created
-    private void createUser(User user){
-        if(user.getId() < 0){
+    //Changes to createUserActivity if a roomUser has not been created
+    private void createUser(RoomUser roomUser){
+        if(roomUser.getId() < 0){
             startActivity(new Intent(this, CreateUserActivity.class));
         }
         else{

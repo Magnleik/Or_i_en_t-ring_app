@@ -7,9 +7,9 @@ import android.arch.persistence.room.PrimaryKey;
  * Created by Hermann on 13.02.2018.
  */
 @Entity(tableName = "user")
-public class User {
+public class RoomUser {
 
-    public User(int id, boolean personalProfile, String firstName, String lastName) {
+    public RoomUser(int id, boolean personalProfile, String firstName, String lastName) {
         this.id = id;
         this.personalProfile = personalProfile;
         this.firstName = firstName;

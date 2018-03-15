@@ -17,7 +17,7 @@ public class RoomOEvent {
     }
 
     @PrimaryKey //(autoGenerate = true)
-    public int id;
+    private int id;
 
     private Map<String, String> properties;
 
