@@ -7,13 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.Point;
 import no.teacherspet.tring.Database.Entities.User;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
@@ -70,7 +66,7 @@ public class CreateUserActivity extends AppCompatActivity {
     private void changeActivity(long[] longs){
         if(longs[0] >= 0){
             Toast.makeText(this, "User successfully saved", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(this, MapsActivity.class));
+            startActivity(new Intent(this, StartupMenu.class));
         }
         else{
             Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();

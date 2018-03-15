@@ -7,9 +7,9 @@ import android.arch.persistence.room.PrimaryKey;
  * Created by Hermann on 13.02.2018.
  */
 @Entity(tableName = "o_event")
-public class OEvent {
+public class RoomOEvent {
 
-    public OEvent(int id, String name) {
+    public RoomOEvent(int id, String name) {
         this.id = id;
         this.name = name;
     }

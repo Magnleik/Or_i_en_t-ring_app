@@ -11,9 +11,9 @@ import com.google.android.gms.maps.model.LatLng;
  * Created by Hermann on 13.02.2018.
  */
 @Entity(tableName = "point", indices = @Index(value = "id", unique = true))
-public class Point {
+public class RoomPoint {
 
-    public Point(int id, String description, LatLng latLng) {
+    public RoomPoint(int id, String description, LatLng latLng) {
         this.id = id;
         this.description = description;
         this.latLng = latLng;
