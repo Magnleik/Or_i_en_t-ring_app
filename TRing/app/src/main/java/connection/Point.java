@@ -2,6 +2,7 @@ package connection;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  * Created by Eirik on 15-Feb-18.
  */
 
-public class Point {
+public class Point implements Serializable {
 
     private int id;
     private Map<String, String> properties;
@@ -84,7 +85,8 @@ public class Point {
         return properties.get(key);
     }
 
-    private class Geometry{
+
+    private class Geometry implements Serializable{
         String type = "Point";
         double[] coordinates;
     }

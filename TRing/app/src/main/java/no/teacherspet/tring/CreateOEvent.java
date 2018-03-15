@@ -35,7 +35,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
-    private MarkerInfo mi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +97,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
         }
-        // Add a marker in Sydney and move the camera
+
         if ((latLngArrayList.size()>0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlgn : latLngArrayList) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
@@ -162,7 +161,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         for(Marker marker:arrayListWithCoords){
             event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
         }
-        StartupMenu.testEvents.add(event);
+        StartupMenu.addEvent(event);
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
