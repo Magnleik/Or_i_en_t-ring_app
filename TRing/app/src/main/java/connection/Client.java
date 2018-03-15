@@ -8,6 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by Eirik on 20-Feb-18.
@@ -52,23 +53,23 @@ public interface Client {
     );
 
     @POST("/api/events/{ID}/points")
-    Call<Event> addPointsToEvent(
+    Call<Void> addPointsToEvent(
             @Path("ID") int eventID,
             @Body Point... points
     );
 
     @GET("/api/points/nearby")
     Call<List<Point>> getNearbyPoints (
-            @Body double latitude,
-            @Body double longitude,
-            @Body double radius
+            @Query("lat") double latitude,
+            @Query("lng") double longitude,
+            @Query("dist") double radius
     );
 
     @GET("/api/events/nearby")
     Call<List<Event>> getNearbyEvents (
-            @Body double latitude,
-            @Body double longitude,
-            @Body double radius
+            @Query("lat") double latitude,
+            @Query("lng") double longitude,
+            @Query("dist") double radius
     );
 
     @GET("/api/events/{ID}/points")

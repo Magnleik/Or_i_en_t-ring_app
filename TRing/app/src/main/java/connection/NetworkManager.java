@@ -40,7 +40,7 @@ public class NetworkManager {
     private void init(){
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.19.15";
+        String URL = "http://10.22.16.182";
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
@@ -57,6 +57,7 @@ public class NetworkManager {
 
         //Just here for testing:
 
+        /*
         connectionStringTest();
         connectionPointTest();
         connectionEventTest();
@@ -72,6 +73,7 @@ public class NetworkManager {
 
             }
         });
+        */
 
         //System.out.println("From the init, we get a event ID of: " + event.getId());
     }
@@ -183,6 +185,7 @@ public class NetworkManager {
         testEvent.setStartPoint(testPoint3);
         testEvent.addProperty("name", "test_property");
         testEvent.addProperty("name", "test_property2");
+        testEvent.addProperty("avg_time", "00:00:00");
 
         Call<Event> call = client.testCreateEvent(testEvent);
 
@@ -238,12 +241,12 @@ public class NetworkManager {
         });
     }
 
-    public void addPointsToEvent(final ICallbackAdapter<Event> callback, int eventID, Point... points){
-        Call<Event> call = client.addPointsToEvent(eventID, points);
+    public void addPointsToEvent(final ICallbackAdapter<Void> callback, int eventID, Point... points){
+        Call<Void> call = client.addPointsToEvent(eventID, points);
 
-        call.enqueue(new Callback<Event>() {
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Event> call, Response<Event> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 if(!response.isSuccessful()){
                     Log.i("NETWORK", "addPointsToEvent got onResponse, without success");
                 }
@@ -255,7 +258,7 @@ public class NetworkManager {
             }
 
             @Override
-            public void onFailure(Call<Event> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }
@@ -303,18 +306,20 @@ public class NetworkManager {
      * @param maxDist The radius of search
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets an ArrayList of Points within the given circle
      */
-    public void getPointsNearby(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Point>> callback){
+    public void getNearbyPoints(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Point>> callback){
 
+        Point sendPoint = new Point(latitude,longitude," ");
+        sendPoint.addProperty("max_dist", String.valueOf(maxDist));
         Call<List<Point>> call = client.getNearbyPoints(latitude,longitude,maxDist);
 
         call.enqueue(new Callback<List<Point>>() {
             @Override
             public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "getPointsNearby got onResponse, without success");
+                    Log.i("NETWORK", "getNearbyPoints got onResponse, without success");
                 }
                 else {
-                    Log.i("NETWORK", "getPointsNearby successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getNearbyPoints successfull with response: " + response.toString());
                 }
 
                 callback.onResponse((ArrayList<Point>) response.body());
@@ -338,7 +343,7 @@ public class NetworkManager {
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets all events starting within the given circle
      */
     public void getNearbyEvents(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Event>> callback){
-        Call<List<Event>> call = client.getNearbyEvents(latitude,longitude,maxDist);
+        Call<List<Event>> call = client.getNearbyEvents(latitude, longitude, maxDist);
 
         call.enqueue(new Callback<List<Event>>() {
             @Override
