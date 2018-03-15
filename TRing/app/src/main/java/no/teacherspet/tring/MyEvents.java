@@ -51,7 +51,7 @@ public class MyEvents extends Fragment {
     private String mParam2;
     private Event selectedEvent;
     private ListView mListView;
-    private HashMap<Integer,Event> theEventReceived;
+    private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
@@ -88,7 +88,7 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HashMap<Integer,Event> theEventReceived = new HashMap<>();
+        HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -109,47 +109,43 @@ public class MyEvents extends Fragment {
     }
 
 
-
-
-
     //////////////TEST
 
 
     public ArrayList<Event> initList1() {
-        if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            lm=LocationServices.getFusedLocationProviderClient(this.getActivity());
+        networkManager = NetworkManager.getInstance();
+        if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
             lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     position = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (position.longitude==0.0 || position.latitude==0.0) {
+                        ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
+                            @Override
+                            public void onResponse(ArrayList<Event> object) {
+                                if (object == null) {
+                                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    for (int i = 0; i < object.size(); i++) {
+                                        theEventReceived.put(object.get(i).getId(), object.get(i));
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            }
+                        };
+                        networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                    }
                 }
             });
         }
-        networkManager = NetworkManager.getInstance();
-        if(position!=null){
-            ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
-                @Override
-                public void onResponse(ArrayList<Event> object) {
-                    if(object==null){
-                        Toast.makeText(getContext(),"Something went wrong",Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        for (int i = 0; i < object.size(); i++) {
-                            theEventReceived.put(object.get(i).getId(), object.get(i));
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    Toast.makeText(getContext(),"Something went wrong",Toast.LENGTH_SHORT).show();
-                }
-            };
-            networkManager.getNearbyEvents(position.latitude,position.longitude,3, adapter);
-        }
         //theEventReceived = new StartupMenu().getTestEvents();
         ArrayList<Event> listItems = new ArrayList<>();
-        if(theEventReceived!=null) {
+        if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);
             }
@@ -159,7 +155,7 @@ public class MyEvents extends Fragment {
     }
 
 
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
 
         final ArrayList<Event> listItems = initList1();
@@ -176,7 +172,6 @@ public class MyEvents extends Fragment {
         /////
 
 
-
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
@@ -185,7 +180,7 @@ public class MyEvents extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position >0) {
+                if (position > 0) {
                     // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
                     Event selectedEvent = listItems.get(position - 1);
 

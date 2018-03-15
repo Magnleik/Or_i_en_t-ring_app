@@ -182,12 +182,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(getApplicationContext(),"Couldn't connect to internet", Toast.LENGTH_SHORT).show();
             }
         });
-        StartupMenu.addEvent(event);
-        Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+        //StartupMenu.addEvent(event);
+        //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
 
-        finish();
+        //finish();
     }
 
     @Override
