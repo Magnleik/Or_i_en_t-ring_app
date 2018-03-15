@@ -13,6 +13,10 @@ import android.widget.Toast;
 import java.util.HashMap;
 
 import connection.Event;
+import io.reactivex.disposables.Disposable;
+import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 
 
 /**
@@ -23,14 +27,35 @@ public class StartupMenu extends AppCompatActivity{
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
     private static HashMap<Integer, Event> testEvents;
+    LocalDatabase localDatabase;
+    Disposable user;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
+
+        //Starting create user activity
+        localDatabase = LocalDatabase.getInstance(this);
+        UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
+
+        user = userViewModel.getPersonalUser()
+                .defaultIfEmpty(new User(-1,false, "", ""))
+                .subscribe(user1 -> createUser(user1));
+
         super.onCreate(savedInstanceState);
         if(testEvents==null){
             testEvents=new HashMap<>();
         }
         setContentView(R.layout.activity_startupmenu);
+    }
+
+    //Changes to createUserActivity if a user has not been created
+    private void createUser(User user){
+        if(user.getId() < 0){
+            startActivity(new Intent(this, CreateUserActivity.class));
+        }
+        else{
+            this.user.dispose();
+        }
     }
 
 

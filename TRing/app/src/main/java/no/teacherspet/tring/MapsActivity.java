@@ -20,19 +20,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
 
-    LocalDatabase localDatabase;
-    Disposable user;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Starting create user activity
-        //startActivity(new Intent(this, CreateUserActivity.class));
-        localDatabase = LocalDatabase.getInstance(this);
-        UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
-
-        user = userViewModel.getPersonalUser()
-                .defaultIfEmpty(new User(-1,false, "", ""))
-                .subscribe(user1 -> createUser(user1));
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -42,15 +31,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         //Log.i("INFO:", getString(R.string.google_maps_key));
 
-    }
-    //Changes to createUserActivity if a user has not been created
-    private void createUser(User user){
-        if(user.getId() < 0){
-            startActivity(new Intent(this, CreateUserActivity.class));
-        }
-        else{
-            this.user.dispose();
-        }
     }
 
     /**
