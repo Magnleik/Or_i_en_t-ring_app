@@ -15,6 +15,7 @@ import retrofit2.http.Path;
 
 public interface Client {
 
+    //region test-calls
     @GET("/api/test/point/{ID}")
     Call<Point> testGetPointByID(
             @Path("ID") int pointID
@@ -36,30 +37,41 @@ public interface Client {
     @POST("/api/test/event")
     Call<Event> testCreateEvent(@Body Event event);
 
-    @POST
-    Call<Point> addPoint(@Body Point point);
+    //endregion
 
-    @POST
-    Call<Event> addEvent(@Body Event event);
+    @POST("/api/points")
+    Call<List<Point>> addPoints(@Body Point... points);
 
-    @PUT
-    Call<Event> updateEvent(@Body Event event);
+    @POST("/api/events")
+    Call<Event> addEvent(@Body Event events);
 
-    @GET
+    @PUT("/api/events/{ID}")
+    Call<Event> updateEvent(
+            @Path("ID") int ID,
+            @Body Event event
+    );
+
+    @POST("/api/events/{ID}/points")
+    Call<Event> addPointsToEvent(
+            @Path("ID") int eventID,
+            @Body Point... points
+    );
+
+    @GET("/api/points/nearby")
     Call<List<Point>> getNearbyPoints (
-            @Path("latitude") double latitude,
-            @Path("longitude") double longitude,
-            @Path("radius") double radius
+            @Body double latitude,
+            @Body double longitude,
+            @Body double radius
     );
 
-    @GET
+    @GET("/api/events/nearby")
     Call<List<Event>> getNearbyEvents (
-            @Path("latitude") double latitude,
-            @Path("longitude") double longitude,
-            @Path("radius") double radius
+            @Body double latitude,
+            @Body double longitude,
+            @Body double radius
     );
 
-    @GET
+    @GET("/api/events/{ID}/points")
     Call<Event> getEventById(
             @Path("ID") int ID
     );
