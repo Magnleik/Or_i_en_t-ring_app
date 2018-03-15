@@ -166,11 +166,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         //LAGRE
         //Reset
 
-        eventTitleField.setText("");
-        arrayListWithCoords.clear();
-        mMap.clear();
-        //Add startpoint om man vil lage ny rute?
-        mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
+        finish();
     }
 
     @Override

@@ -60,15 +60,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             points = readPoints();
         }
 
-
-// 2
-
-
-// 3
-
-
-// 4
-
     }
 
     @Override
