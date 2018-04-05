@@ -21,7 +21,7 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
  */
 
 @Database(entities = {RoomUser.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 6, exportSchema = false)
-@TypeConverters(LatLngConverter.class)
+@TypeConverters(DataConverters.class)
 public abstract class LocalDatabase extends RoomDatabase {
 
     private static volatile LocalDatabase INSTANCE;

@@ -57,7 +57,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
 
     }
-
+    //TODO Last inn lagrede OEvents fra lokal database/server
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -15,7 +15,7 @@ import java.util.Map;
  * Created by Hermann on 20.02.2018.
  */
 
-public class LatLngConverter {
+public class DataConverters {
 
     private final String stringSplit = "¥";
 

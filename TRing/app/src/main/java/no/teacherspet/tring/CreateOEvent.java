@@ -27,6 +27,12 @@ import java.util.ArrayList;
 
 import connection.Event;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 
 public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -55,6 +61,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
+
+    //TODO Lagre OEvent i lokal database etter oppretting
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -162,6 +170,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
         }
         StartupMenu.addEvent(event);
+        saveEventToRoom(event);
         Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
@@ -171,6 +180,30 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap.clear();
         //Add startpoint om man vil lage ny rute?
         mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
+    }
+
+    private void saveEventToRoom(Event event){
+        LocalDatabase localDatabase;
+        PointViewModel pointViewModel;
+        OEventViewModel oEventViewModel;
+        PointOEventJoinViewModel pointOEventJoinViewModel;
+        localDatabase = LocalDatabase.getInstance(this);
+        pointViewModel = new PointViewModel(localDatabase.pointDAO());
+        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
+        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+
+        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties);
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> checkSave(longs));
+
+    }
+
+    private void checkSave(long[] longs) {
+        if(longs[0] >= 0){
+            Toast.makeText(this, "OEvent successfully saved", Toast.LENGTH_LONG).show();
+        }
+        else{
+            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
