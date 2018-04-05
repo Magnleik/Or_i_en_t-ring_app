@@ -410,7 +410,7 @@ public class NetworkManager {
         if(event.getId()<0){
             throw new IllegalArgumentException("Cannot update an Event with ID < 0, as this will not be an event in the database");
         }
-        Call<Event> call = client.updateEvent(event.getId(),event);
+        Call<Event> call = client.updateEvent(event);
 
         call.enqueue(new Callback<Event>() {
             @Override

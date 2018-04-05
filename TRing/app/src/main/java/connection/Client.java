@@ -46,9 +46,8 @@ public interface Client {
     @POST("/api/events")
     Call<Event> addEvent(@Body Event events);
 
-    @PUT("/api/events/{ID}")
+    @PUT("/api/events")
     Call<Event> updateEvent(
-            @Path("ID") int ID,
             @Body Event event
     );
 
