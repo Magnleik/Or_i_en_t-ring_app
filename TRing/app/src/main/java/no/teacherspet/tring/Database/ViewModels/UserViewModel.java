@@ -41,7 +41,7 @@ public class UserViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<RoomUser> getPersonalUser(){
+    public Maybe<List<RoomUser>> getPersonalUser(){
         return userDao.getPersonalUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

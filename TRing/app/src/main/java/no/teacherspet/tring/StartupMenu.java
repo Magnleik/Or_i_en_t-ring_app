@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.List;
 
 import connection.Event;
 import io.reactivex.disposables.Disposable;
@@ -33,13 +34,11 @@ public class StartupMenu extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
 
-        //Starting create user activity
         localDatabase = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
-        user = userViewModel.getPersonalUser()
-                .defaultIfEmpty(new RoomUser(-1,false, "", ""))
-                .subscribe(user1 -> createUser(user1));
+        //Checks if we should start createUserActivity
+        user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
@@ -49,12 +48,12 @@ public class StartupMenu extends AppCompatActivity{
     }
 
     //Changes to createUserActivity if a roomUser has not been created
-    private void createUser(RoomUser roomUser){
-        if(roomUser.getId() < 0){
-            startActivity(new Intent(this, CreateUserActivity.class));
+    private void createUser(List<RoomUser> roomUser){
+        if(roomUser.size() > 0 && roomUser.get(0).getId() >= 0){
+            this.user.dispose();
         }
         else{
-            this.user.dispose();
+            startActivity(new Intent(this, CreateUserActivity.class));
         }
     }
 

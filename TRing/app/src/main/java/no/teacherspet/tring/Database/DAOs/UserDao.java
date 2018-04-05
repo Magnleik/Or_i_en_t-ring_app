@@ -25,7 +25,7 @@ public interface UserDao {
     Maybe<List<RoomUser>> getOtherUsers();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
-    Maybe<RoomUser> getPersonalUser();
+    Maybe<List<RoomUser>> getPersonalUser();
 
     @Query("SELECT * FROM user WHERE id LIKE :id")
     Maybe<RoomUser> findById(int id);
