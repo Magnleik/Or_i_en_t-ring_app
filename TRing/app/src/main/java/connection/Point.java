@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Point implements Serializable {
 
-    private int id;
+    private int id = -1;
     private Map<String, String> properties;
     private Geometry geometry;
 

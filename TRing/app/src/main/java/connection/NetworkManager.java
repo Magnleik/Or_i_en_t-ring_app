@@ -401,16 +401,13 @@ public class NetworkManager {
 
     //region PUT-methods
     /**
-     * Updates the existing event if it exists in the database, and returns the updated Event.
+     * Updates the existing events properties if it exists in the database, and returns the updated Event. Ignores points.
      * @param event The Event you wish to update in the database
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the updated event
      */
-    public void updateEvent(Event event, final ICallbackAdapter<Event> callback){
+    public void updateEventProperties(Event event, final ICallbackAdapter<Event> callback){
 
-        if(event.getId()<0){
-            throw new IllegalArgumentException("Cannot update an Event with ID < 0, as this will not be an event in the database");
-        }
-        Call<Event> call = client.updateEvent(event);
+        Call<Event> call = client.updateEventProperties(event.getId(), event._getAllProperties());
 
         call.enqueue(new Callback<Event>() {
             @Override
@@ -419,7 +416,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "updateEvent got onResponse, without success");
                 }
                 else {
-                    Log.i("NETWORK", "updateEvent successfull with response: " + response.toString());
+                    Log.i("NETWORK", "updateEvent successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -435,5 +432,35 @@ public class NetworkManager {
     }
 
     //endregion
+
+    /**
+     * Removes the Point with the given pointID from the Event with the given eventID.
+     * @param eventID The int ID of the Event
+     * @param pointID The int ID of the Point
+     * @param callback The callback to handle results. Override its methods to check for validity of the response. onResponse returns Void
+     */
+    public void removePointFromEvent(int eventID, int pointID, final ICallbackAdapter<Void> callback){
+
+        Call<Void> call = client.removePointFromEvent(eventID,pointID);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "removePointFromEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "removePointFromEvent was successful with response: " + response.toString());
+                }
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
 
 }
