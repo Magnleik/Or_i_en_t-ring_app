@@ -196,6 +196,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         if(point.getDistanceFromPoint(position)<acc*100){
                             visitedPoints.add(point);
                             Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
+                            if(visitedPoints.size()==points.size()){
+                                //TODO: get the user back to the start point
+                            }
                             break;
                         }
                     }
