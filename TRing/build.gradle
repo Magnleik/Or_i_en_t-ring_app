@@ -17,9 +17,21 @@ allprojects {
     repositories {
         jcenter()
         google()
+        //Room persistence library
+        maven { url "https://maven.google.com" }
+
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    daggerVersion = '2.13'
+    //android
+    archLifecycleVersion = '1.0.0-alpha4'
+    archLifecycleCompilerVersion = '1.0.0-alpha4'
+    archLifecycleExtensionsVersion = '1.0.0-alpha4'
+    roomVersion = '1.0.0-alpha5'
 }

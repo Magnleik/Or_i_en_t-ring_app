@@ -10,6 +10,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+
+import connection.Event;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
@@ -17,6 +20,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static junit.framework.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by petterbjorkaas on 13/02/2018.
@@ -27,7 +31,7 @@ public class TestOrientationSelector {
     @Rule
     public final ActivityTestRule<OrientationSelector> main = new ActivityTestRule<OrientationSelector>(OrientationSelector.class);
 
-    Instrumentation.ActivityMonitor performMonitor = getInstrumentation().addMonitor(PerformOEvent.class.getName(), null, false);
+    Instrumentation.ActivityMonitor listOfEventMonitor = getInstrumentation().addMonitor(ListOfSavedEvents.class.getName(), null, false);
 
     Instrumentation.ActivityMonitor createMonitor = getInstrumentation().addMonitor(CreateOEvent.class.getName(), null, false);
 
@@ -48,7 +52,7 @@ public class TestOrientationSelector {
     public void shouldGoToPerformOEventActivity() {
 
         onView(withId(R.id.perform_btn)).perform(click());
-        Activity activity=getInstrumentation().waitForMonitorWithTimeout(performMonitor, 1000);
+        Activity activity=getInstrumentation().waitForMonitorWithTimeout(listOfEventMonitor, 1000);
         assertNotNull(activity);
         activity.finish();
     }
