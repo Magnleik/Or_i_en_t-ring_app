@@ -37,7 +37,11 @@ public class NetworkManager {
     private void init(){
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+<<<<<<< HEAD
         String URL = "http://10.22.18.2";
+=======
+        String URL = "http://10.22.16.182";
+>>>>>>> refs/remotes/origin/eirik/network
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
@@ -53,6 +57,10 @@ public class NetworkManager {
         client = retrofit.create(Client.class);
 
         //Just here for testing:
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/eirik/network
         /*
         connectionStringTest();
         connectionPointTest();
@@ -70,6 +78,10 @@ public class NetworkManager {
             }
         });
         */
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/eirik/network
         //System.out.println("From the init, we get a event ID of: " + event.getId());
     }
 
@@ -169,6 +181,12 @@ public class NetworkManager {
         Event testEvent = new Event();
         testEvent.addPosts(points);
         testEvent.setStartPoint(testPoint3);
+<<<<<<< HEAD
+=======
+        testEvent.addProperty("name", "test_property");
+        testEvent.addProperty("name", "test_property2");
+        testEvent.addProperty("avg_time", "00:00:00");
+>>>>>>> refs/remotes/origin/eirik/network
 
         Call<Event> call = client.testCreateEvent(testEvent);
 
@@ -219,6 +237,7 @@ public class NetworkManager {
         });
     }
 
+<<<<<<< HEAD
     /**
      * Finds all points within a circle with radius maxDist from the given location
      * @param latitude The latitude of given position
@@ -234,6 +253,14 @@ public class NetworkManager {
         call.enqueue(new Callback<List<Point>>() {
             @Override
             public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
+=======
+    public void addPointsToEvent(final ICallbackAdapter<Void> callback, int eventID, Point... points){
+        Call<Void> call = client.addPointsToEvent(eventID, points);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+>>>>>>> refs/remotes/origin/eirik/network
                 if(!response.isSuccessful()){
                     Log.i("NETWORK", "getPointsNearby got onResponse, without success");
                 }
@@ -245,7 +272,11 @@ public class NetworkManager {
             }
 
             @Override
+<<<<<<< HEAD
             public void onFailure(@NonNull Call<List<Point>> call, @NonNull Throwable t) {
+=======
+            public void onFailure(Call<Void> call, Throwable t) {
+>>>>>>> refs/remotes/origin/eirik/network
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }
@@ -295,17 +326,32 @@ public class NetworkManager {
      * @param event The Event to add to the database
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the same Event, with updated information from the database - including its generated ID.
      */
+<<<<<<< HEAD
     public void addEvent(Event event, final ICallbackAdapter<Event> callback){
         Call<Event> call = client.addEvent(event);
+=======
+    public void getNearbyPoints(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Point>> callback){
+
+        Point sendPoint = new Point(latitude,longitude," ");
+        sendPoint.addProperty("max_dist", String.valueOf(maxDist));
+        Call<List<Point>> call = client.getNearbyPoints(latitude,longitude,maxDist);
+>>>>>>> refs/remotes/origin/eirik/network
 
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
+<<<<<<< HEAD
                     Log.i("NETWORK", "addEvent got onResponse, without success");
                 }
                 else {
                     Log.i("NETWORK", "addEvent successfull with response: " + response.toString());
+=======
+                    Log.i("NETWORK", "getNearbyPoints got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "getNearbyPoints successfull with response: " + response.toString());
+>>>>>>> refs/remotes/origin/eirik/network
                 }
 
                 callback.onResponse(response.body());
@@ -328,8 +374,12 @@ public class NetworkManager {
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets all events starting within the given circle
      */
     public void getNearbyEvents(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Event>> callback){
+<<<<<<< HEAD
         ArrayList result = null;
         Call<List<Event>> call = client.getNearbyEvents(latitude,longitude,maxDist);
+=======
+        Call<List<Event>> call = client.getNearbyEvents(latitude, longitude, maxDist);
+>>>>>>> refs/remotes/origin/eirik/network
 
         call.enqueue(new Callback<List<Event>>() {
             @Override
@@ -384,4 +434,73 @@ public class NetworkManager {
 
     }
 
+<<<<<<< HEAD
+=======
+    //endregion
+
+    //region PUT-methods
+    /**
+     * Updates the existing events properties if it exists in the database, and returns the updated Event. Ignores points.
+     * @param event The Event you wish to update in the database
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the updated event
+     */
+    public void updateEventProperties(Event event, final ICallbackAdapter<Event> callback){
+
+        Call<Event> call = client.updateEventProperties(event.getId(), event._getAllProperties());
+
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "updateEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "updateEvent successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+
+    }
+
+    //endregion
+
+    /**
+     * Removes the Point with the given pointID from the Event with the given eventID.
+     * @param eventID The int ID of the Event
+     * @param pointID The int ID of the Point
+     * @param callback The callback to handle results. Override its methods to check for validity of the response. onResponse returns Void
+     */
+    public void removePointFromEvent(int eventID, int pointID, final ICallbackAdapter<Void> callback){
+
+        Call<Void> call = client.removePointFromEvent(eventID,pointID);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "removePointFromEvent got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "removePointFromEvent was successful with response: " + response.toString());
+                }
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
+>>>>>>> refs/remotes/origin/eirik/network
 }

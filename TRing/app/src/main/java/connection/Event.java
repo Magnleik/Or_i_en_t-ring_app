@@ -160,4 +160,8 @@ public class Event implements Serializable {
     public Object getProperty(String key){
         return properties.get(key);
     }
+
+    public Map<String, String> _getAllProperties() {
+        return properties;
+    }
 }

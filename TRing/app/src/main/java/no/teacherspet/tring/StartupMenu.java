@@ -14,14 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
-<<<<<<< HEAD
 import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
-=======
-import connection.NetworkManager;
->>>>>>> refs/remotes/origin/eirik/network
 
 
 /**
