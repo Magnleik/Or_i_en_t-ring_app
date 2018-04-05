@@ -22,7 +22,7 @@ public class Point implements Serializable {
      * @param longitude Longitude of the point, in WGS84
      * @param description Description of the point (optional)
      */
-    public Point(@NonNull double latitude,@NonNull double longitude, String description){
+    public Point(double latitude,double longitude, String description){
         geometry = new Geometry();
         geometry.coordinates = new double[]{latitude,longitude};
         properties = new HashMap<>();
@@ -51,7 +51,7 @@ public class Point implements Serializable {
      * @return Returns the String representing this point's description, if there is one. Null otherwise.
      */
     public String getDescription() {
-        return (String)properties.get("description");
+        return properties.get("description");
     }
 
     public void setLatitude(double latitude) {
@@ -85,6 +85,13 @@ public class Point implements Serializable {
         return properties.get(key);
     }
 
+    public void _setId(int id) {
+        this.id = id;
+    }
+
+    public Map<String, String> _getAllProperties() {
+        return properties;
+    }
 
     private class Geometry implements Serializable{
         String type = "Point";

@@ -18,30 +18,6 @@ import retrofit2.http.Query;
 
 public interface Client {
 
-    //region test-calls
-    @GET("/api/test/point/{ID}")
-    Call<Point> testGetPointByID(
-            @Path("ID") int pointID
-    );
-
-    @GET("/")
-    Call<List<String>> getTestStrings(
-            /*@Path("FILLINPLS") int testStringID*/
-    );
-
-    @GET("/api/test/event/{ID}")
-    Call<Event> testGetEventByID(
-            @Path("ID") int eventID
-    );
-
-    @POST("/api/test/point")
-    Call<Point> testCreatePoint(@Body Point point);
-
-    @POST("/api/test/event")
-    Call<Event> testCreateEvent(@Body Event event);
-
-    //endregion
-
     @POST("/api/points")
     Call<List<Point>> addPoints(@Body Point... points);
 

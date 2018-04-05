@@ -142,7 +142,7 @@ public class Event implements Serializable {
      * @return Returns the avgTime as a string in format hh:mm:ss
      */
     public String getAvgTime() {
-        return (String) properties.get("avg_time");
+        return  properties.get("avg_time");
     }
 
 
@@ -174,6 +174,10 @@ public class Event implements Serializable {
      */
     public String getProperty(String key){
         return properties.get(key);
+    }
+
+    public void _setId(int id) {
+        this.id = id;
     }
 
     public Map<String, String> _getAllProperties() {
