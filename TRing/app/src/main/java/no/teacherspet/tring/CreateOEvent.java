@@ -29,6 +29,7 @@ import connection.Event;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
@@ -41,6 +42,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
+    LocalDatabase localDatabase;
+    PointViewModel pointViewModel;
+    OEventViewModel oEventViewModel;
+    PointOEventJoinViewModel pointOEventJoinViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,24 +187,50 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
     }
 
+    /**
+     * Saves the Event and Points, and adds connections between them in the Room database
+     */
     private void saveEventToRoom(Event event){
-        LocalDatabase localDatabase;
-        PointViewModel pointViewModel;
-        OEventViewModel oEventViewModel;
-        PointOEventJoinViewModel pointOEventJoinViewModel;
         localDatabase = LocalDatabase.getInstance(this);
         pointViewModel = new PointViewModel(localDatabase.pointDAO());
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
-        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties);
+        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
         oEventViewModel.addOEvents(newevent).subscribe(longs -> checkSave(longs));
+
+        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
+        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
+        RoomPoint roomPoint;
+        PointOEventJoin join;
+        Point point;
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            point = event.getPoints().get(i);
+            roomPoint = new RoomPoint(point.getId(), point._getProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+
+            if(i > 0){
+                join = new PointOEventJoin(point.getId(), event.getId(), false);
+            }
+            else{
+                join = new PointOEventJoin(point.getId(), event.getId(), true);
+            }
+            roomPoints[i] = roomPoint;
+            joins[i] = join;
+        }
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> checkSave(longs));
+        pointOEventJoinViewModel.addJoin(joins).subscribe(longs -> checkSave(longs));
 
     }
 
     private void checkSave(long[] longs) {
-        if(longs[0] >= 0){
-            Toast.makeText(this, "OEvent successfully saved", Toast.LENGTH_LONG).show();
+        boolean allSaved= true;
+        for (int i = 0; i < longs.length; i++) {
+            if(longs[i] < 0){
+                allSaved = false;
+            }
+        }
+        if(allSaved){
+            Toast.makeText(this, "Save successfully", Toast.LENGTH_LONG).show();
         }
         else{
             Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();

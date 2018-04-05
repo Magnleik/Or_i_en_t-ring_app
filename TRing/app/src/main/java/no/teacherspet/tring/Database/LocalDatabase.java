@@ -20,7 +20,7 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
  * Created by Hermann on 13.02.2018.
  */
 
-@Database(entities = {RoomUser.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 6, exportSchema = false)
+@Database(entities = {RoomUser.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 7, exportSchema = false)
 @TypeConverters(DataConverters.class)
 public abstract class LocalDatabase extends RoomDatabase {
 

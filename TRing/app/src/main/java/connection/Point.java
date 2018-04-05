@@ -12,13 +12,8 @@ import java.util.Map;
 
 public class Point implements Serializable {
 
-<<<<<<< HEAD
-    private int id;
-    private Map<String, Object> properties;
-=======
     private int id = -1;
     private Map<String, String> properties;
->>>>>>> refs/remotes/origin/eirik/network
     private Geometry geometry;
 
     /**

@@ -19,6 +19,7 @@ public class RoomPoint {
         this.id = id;
         this.properties = properties;
         this.latLng = latLng;
+        this.visited = false;
     }
 
     @PrimaryKey //(autoGenerate = true)
@@ -26,6 +27,7 @@ public class RoomPoint {
 
     private LatLng latLng;
     private Map<String, String> properties;
+    private boolean visited;
 
     public int getId() {
         return id;
@@ -46,5 +48,12 @@ public class RoomPoint {
     }
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    public boolean isVisited() {
+        return visited;
+    }
+    public void setVisited(boolean visited) {
+        this.visited = visited;
     }
 }
