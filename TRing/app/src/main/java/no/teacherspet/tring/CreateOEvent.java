@@ -202,6 +202,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         //finish();
     }
 
+    /**
+     * Saves the currently created points to an arraylist to be provided later when the state is restored. Used when phone is flipped and state is destroyed
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
