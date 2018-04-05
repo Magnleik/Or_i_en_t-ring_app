@@ -1,6 +1,9 @@
 package connection;
 
+import android.location.Location;
 import android.support.annotation.NonNull;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -85,6 +88,16 @@ public class Point implements Serializable {
         return properties.get(key);
     }
 
+    /**
+     * Determines the distance between this point and a given position.
+     * @param position The position to find the distance to
+     * @return The distance between point and position
+     */
+    public float getDistanceFromPoint(LatLng position){
+        float[] result = new float[1];
+        Location.distanceBetween(getLatitude(),getLongitude(),position.latitude,position.longitude,result);
+        return result[0];
+    }
 
     private class Geometry implements Serializable{
         String type = "Point";

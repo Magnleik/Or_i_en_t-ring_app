@@ -110,6 +110,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
+     * @param v
+     */
     public void createPoints(View v) {
 
         Toast.makeText(getApplicationContext(), "Klikk på kartet for å legge til punkter.", Toast.LENGTH_LONG).show();
@@ -148,6 +152,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Removes the latest element in the marker array. Method gets called when the "Slett forrige" button is pressed
+     * @param v
+     */
     public void deleteLastPoint(View v) {
         if (arrayListWithCoords.size() > 0) {
             Marker lastMarker = arrayListWithCoords.get(arrayListWithCoords.size() - 1);
@@ -156,6 +164,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Creates a new event with the given markers as posts. Gives the event the name found in the EditText on top of the screen. Method gets called when The "Ferdig" button is pressed
+     * @param v
+     */
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         Event event = new Event();
