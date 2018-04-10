@@ -1,14 +1,17 @@
 package connection;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,9 +27,15 @@ public class NetworkManager {
 
     static private NetworkManager nm;
     private Client client;
+    OkHttpClient.Builder httpClient;
+    Retrofit.Builder builder;
+    Retrofit retrofit;
+    AuthenticationInterceptor interceptor;
+
 
     private NetworkManager(){
         init();
+        addCredentials("USERname", "PASSword");
     }
 
     public static NetworkManager getInstance(){
@@ -37,17 +46,43 @@ public class NetworkManager {
         return nm;
     }
 
+    public void addCredentials(String username, String password){
+
+        String authToken = null;
+
+        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
+            authToken = Credentials.basic(username, password);
+        }
+
+        if (!TextUtils.isEmpty(authToken)) { //FIXME: Does this handle null?
+            AuthenticationInterceptor interceptor =
+                    new AuthenticationInterceptor(authToken);
+
+            if (!httpClient.interceptors().contains(interceptor)) {
+                httpClient.addInterceptor(interceptor);
+
+                builder.client(httpClient.build());
+                retrofit = builder.build();
+            }
+        }
+
+        client = retrofit.create(Client.class);
+
+        updatePointTest();
+
+    }
+
     private void init(){
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.16.207";
-        Retrofit.Builder builder = new Retrofit.Builder()
+        httpClient = new OkHttpClient.Builder();
+        String URL = "http://10.22.19.155";
+        builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
                         GsonConverterFactory.create()
                 );
 
-        Retrofit retrofit = builder
+        retrofit = builder
                 .client(
                         httpClient.build()
                 )
@@ -57,12 +92,51 @@ public class NetworkManager {
 
         //Just here for testing:
 
+        updatePointTest();
+        //addPointsTest();
         //addEventTest();
         //updateEventPropertiesTest();
 
     }
 
     //region Testing methods
+
+    private void updatePointTest(){
+        Point testPoint1 =  new Point(10.324, 50, "This is an updated test point");
+        testPoint1._setId(80);
+
+        updatePoint(testPoint1, new ICallbackAdapter<Point>() {
+            @Override
+            public void onResponse(Point object) {
+                System.out.println(" ");
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println(" ");
+            }
+        });
+    }
+
+    private void addPointsTest(){
+
+        Point testPoint1 =  new Point(10.324, 20.420, "This is a test point");
+        Point testPoint2 = new Point(123.321, 12.123, "Test point #2");
+        Point testPoint3 = new Point(0.0, 0.0, "This is a starting point");
+
+        addPoints(new ICallbackAdapter<List<Point>>() {
+            @Override
+            public void onResponse(List<Point> object) {
+                System.out.println("Recieved points with the first being " + object.get(0).getId());
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println(t.getMessage());
+            }
+        }, testPoint1,testPoint2,testPoint3);
+
+    }
 
     private void addEventTest(){
 
@@ -404,5 +478,25 @@ public class NetworkManager {
     }
 
     //endregion
+
+    public class AuthenticationInterceptor implements Interceptor {
+
+        private String authToken;
+
+        public AuthenticationInterceptor(String token) {
+            this.authToken = token;
+        }
+
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+
+            Request.Builder builder = original.newBuilder()
+                    .header("Authorization", authToken);
+
+            Request request = builder.build();
+            return chain.proceed(request);
+        }
+    }
 
 }
