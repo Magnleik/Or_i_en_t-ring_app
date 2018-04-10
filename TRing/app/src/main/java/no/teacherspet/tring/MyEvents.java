@@ -159,9 +159,6 @@ public class MyEvents extends Fragment {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList1();
-        //TITTEL
-
-        /////
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
@@ -173,8 +170,8 @@ public class MyEvents extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
-                    // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
-                    Event selectedEvent = listItems.get(position - 1);
+
+                    Event selectedEvent = listItems.get(position);
 
                     // 2
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
