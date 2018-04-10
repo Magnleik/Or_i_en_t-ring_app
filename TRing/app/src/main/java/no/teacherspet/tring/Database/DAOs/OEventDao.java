@@ -7,7 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -19,7 +19,7 @@ import no.teacherspet.tring.Database.Entities.RoomOEvent;
 public interface OEventDao {
 
     @Query("SELECT * FROM o_event")
-    Maybe<List<RoomOEvent>> getAll();
+    Maybe<ArrayList<RoomOEvent>> getAll();
 
     @Query("SELECT * FROM o_event WHERE id LIKE :id")
     Maybe<RoomOEvent> findById(int id);

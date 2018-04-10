@@ -7,7 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.RoomUser;
@@ -19,13 +19,13 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
 public interface UserDao {
 
     @Query("SELECT * FROM user")
-    Maybe<List<RoomUser>> getAll();
+    Maybe<ArrayList<RoomUser>> getAll();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 0")
-    Maybe<List<RoomUser>> getOtherUsers();
+    Maybe<ArrayList<RoomUser>> getOtherUsers();
 
     @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
-    Maybe<List<RoomUser>> getPersonalUser();
+    Maybe<ArrayList<RoomUser>> getPersonalUser();
 
     @Query("SELECT * FROM user WHERE id LIKE :id")
     Maybe<RoomUser> findById(int id);
