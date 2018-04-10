@@ -160,14 +160,7 @@ public class MyEvents extends Fragment {
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList1();
         //TITTEL
-        TextView textView = new TextView(this.getContext());
-        textView.setText("Mine løp");
-        textView.setTextSize(25);
-        textView.setTypeface(Typeface.MONOSPACE);
-        textView.setGravity(Gravity.CENTER);
-        textView.setHeight(150);
 
-        mListView.addHeaderView(textView);
         /////
 
 
