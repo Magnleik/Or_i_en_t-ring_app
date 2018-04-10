@@ -3,8 +3,6 @@ package connection;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +38,7 @@ public class NetworkManager {
     private void init(){
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.19.15";
+        String URL = "http://10.22.19.155";
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
