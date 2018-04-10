@@ -30,12 +30,11 @@ public class NetworkManager {
     OkHttpClient.Builder httpClient;
     Retrofit.Builder builder;
     Retrofit retrofit;
-    AuthenticationInterceptor interceptor;
 
 
     private NetworkManager(){
         init();
-        addCredentials("USERname", "PASSword");
+        //addCredentials("USERname", "PASSword");
     }
 
     public static NetworkManager getInstance(){
@@ -46,7 +45,12 @@ public class NetworkManager {
         return nm;
     }
 
-    public void addCredentials(String username, String password){
+    /**
+     * When logging on, call this method with the username and password. Will add authentification to the HTTP calls.
+     * @param username The username
+     * @param password The password
+     */
+    private void addCredentials(String username, String password){
 
         String authToken = null;
 
@@ -92,7 +96,7 @@ public class NetworkManager {
 
         //Just here for testing:
 
-        updatePointTest();
+        //updatePointTest();
         //addPointsTest();
         //addEventTest();
         //updateEventPropertiesTest();

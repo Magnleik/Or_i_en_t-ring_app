@@ -18,6 +18,7 @@ import retrofit2.http.Query;
 
 public interface Client {
 
+
     @POST("/api/points")
     Call<List<Point>> addPoints(@Body Point... points);
 
