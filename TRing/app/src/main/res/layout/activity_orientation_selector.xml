@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="no.teacherspet.tring.OrientationSelector">
+    tools:context="no.teacherspet.tring.activities.OrientationSelector">
 
     <Button
         android:id="@+id/perform_btn"

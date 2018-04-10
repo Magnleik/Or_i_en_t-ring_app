@@ -10,9 +10,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 
-import connection.Event;
+import no.teacherspet.tring.activities.CreateOEvent;
+import no.teacherspet.tring.activities.ListOfSavedEvents;
+import no.teacherspet.tring.activities.OrientationSelector;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;

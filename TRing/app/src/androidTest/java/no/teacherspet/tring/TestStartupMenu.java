@@ -11,6 +11,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import no.teacherspet.tring.activities.OrientationSelector;
+import no.teacherspet.tring.activities.StartupMenu;
+
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

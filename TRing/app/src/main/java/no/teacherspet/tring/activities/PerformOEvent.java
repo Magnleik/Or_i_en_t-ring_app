@@ -1,5 +1,6 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 
 import connection.Event;
 import connection.Point;
+import no.teacherspet.tring.R;
 
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -34,13 +37,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private FusedLocationProviderClient mFusedLocationClient;
     private int positionViewed = 0;
     private ArrayList<Point> points;
+    private ArrayList<Point> visitedPoints;
     private Event startedEvent;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_perform_oevent);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -54,19 +57,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // 1
+        //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
         if(startedEvent!=null){
-            points = readPoints(startedEvent);
+            points = readPoints();
         }
-
-
-// 2
-
-
-// 3
-
-
-// 4
 
     }
 
@@ -76,10 +71,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return true;
     }
 
-    public ArrayList<Point> readPoints(Event startedEvent){
-        if(StartupMenu.getTestEvents()!=null) {
-            return startedEvent.getPoints();
-            //return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
+    /**
+     * Reads the points from the event to be performed
+     * @return The list of points to be included
+     */
+    public ArrayList<Point> readPoints(){
+        if(!StartupMenu.getTestEvents().isEmpty()) {
+            return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
         }
         return null;
     }
@@ -97,24 +95,26 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        LatLng avgPosition = getAvgLatLng();
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
         if(points!=null) {
             for (Point point : points) {
                 if (point != null) {
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("description")));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((String) point.getProperty("event_name")));
+                    builder.include(new LatLng(point.getLatitude(),point.getLongitude()));
                 }
             }
-        }
-        // Add a marker in Sydney and move the camera
-        //LatLng gløs = new LatLng(63.416136, 10.405297);
-        LatLng avgPosition = getAvgLatLng();
+        LatLngBounds bounds = builder.build();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(avgPosition,14));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,-10));
+        }
     }
 
 
-
-
-
+    /**
+     * Shows the users location for 5 seconds when the user presses the button for requesting to do so.
+     * @param v
+     */
     public void showLocationButtonPressed(View v) {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -159,6 +159,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
+    /**
+     * gives the average LatLng for the points in the event. Used for centering the camera correctly for the user.
+     * @return Average LatLng for the set of points.
+     */
     private LatLng getAvgLatLng(){
         double lat=0;
         double lng=0;
@@ -177,6 +181,41 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return new LatLng(lat,lng);
     }
 
+    /**
+     * executes if the uses presses button for being at a point. Checks Whether the user is close enough to an unchecked point to qualifying reaching it, and gives feedback based on this
+     * @param v
+     */
+    public void onArrivedBtnPressed(View v) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    LatLng position = new LatLng(location.getLatitude(),location.getLongitude());
+                    float acc = location.getAccuracy();
+                    int prevsize = visitedPoints.size();
+                    for(Point point:points){
+                        if(point.getDistanceFromPoint(position)<(1-acc)*100){
+                            visitedPoints.add(point);
+                            Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
+                            if(visitedPoints.size()==points.size()){
+                                //TODO: get the user back to the start point
+
+                            }
+                            break;
+                        }
+                    }
+                    if(prevsize!=visitedPoints.size()){
+                        Toast.makeText(getApplicationContext(),"There is no new point here to be visited",Toast.LENGTH_LONG);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     *
+     * @return The points of the event to be performed
+     */
     public ArrayList<Point> getPoints() {
         return points;
     }

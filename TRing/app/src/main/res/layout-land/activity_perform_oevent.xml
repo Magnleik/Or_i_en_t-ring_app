@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="no.teacherspet.tring.PerformOEvent">
+    tools:context="no.teacherspet.tring.activities.PerformOEvent">
 
     <fragment
         android:id="@+id/map_used_in_event"
@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toStartOf="@+id/test_position_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context="no.teacherspet.tring.MapsActivity" />
+        tools:context="no.teacherspet.tring.activities.MapsActivity" />
 
     <Button
         android:id="@+id/show_position_btn"
@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="Eg trur eg e framme"
+        android:onClick="onArrivedBtnPressed"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/show_position_btn" />
