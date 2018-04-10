@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import connection.Event;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -27,12 +28,14 @@ import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
  */
 public class MyEvents extends Fragment {
 
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     private Event selectedEvent;
     private RecyclerView eventsList;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    private ArrayList<RoomOEvent> oEvents;
+    private List<RoomOEvent> oEvents;
     private HashMap<Integer,Event> theEventReceived;
 
     private OnFragmentInteractionListener mListener;
@@ -59,7 +62,7 @@ public class MyEvents extends Fragment {
         eventsList = (RecyclerView) getView().findViewById(R.id.my_events_list);
         eventsList.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
-        eventsList.setLayoutManager(layoutManager);
+        //eventsList.setLayoutManager(layoutManager);
 
 
     }
@@ -84,6 +87,14 @@ public class MyEvents extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+    public static MyEvents newInstance(String param1, String param2) {
+        MyEvents fragment = new MyEvents();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /**

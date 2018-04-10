@@ -3,6 +3,7 @@ package no.teacherspet.tring.Database.ViewModels;
 import android.arch.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -23,7 +24,7 @@ public class PointViewModel extends ViewModel {
         this.pointDao = pointDao;
     }
 
-    public Maybe<ArrayList<RoomPoint>> getAllPoints(){
+    public Maybe<List<RoomPoint>> getAllPoints(){
         return pointDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

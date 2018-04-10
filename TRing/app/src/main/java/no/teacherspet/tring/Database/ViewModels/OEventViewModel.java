@@ -3,6 +3,7 @@ package no.teacherspet.tring.Database.ViewModels;
 import android.arch.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -23,7 +24,7 @@ public class OEventViewModel extends ViewModel {
         this.oEventDao = oEventDao;
     }
 
-    public Maybe<ArrayList<RoomOEvent>> getAllOEvents(){
+    public Maybe<List<RoomOEvent>> getAllOEvents(){
         return oEventDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

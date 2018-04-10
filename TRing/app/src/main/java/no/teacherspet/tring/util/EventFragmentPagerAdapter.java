@@ -5,8 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
+import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 
 /**

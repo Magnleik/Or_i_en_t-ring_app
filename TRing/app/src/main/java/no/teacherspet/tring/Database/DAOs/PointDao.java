@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
@@ -19,7 +20,7 @@ import no.teacherspet.tring.Database.Entities.RoomPoint;
 public interface PointDao {
 
     @Query("SELECT * FROM point")
-    Maybe<ArrayList<RoomPoint>> getAll();
+    Maybe<List<RoomPoint>> getAll();
 
     @Query("SELECT * FROM point WHERE id LIKE :id")
     Maybe<RoomPoint> findById(int id);

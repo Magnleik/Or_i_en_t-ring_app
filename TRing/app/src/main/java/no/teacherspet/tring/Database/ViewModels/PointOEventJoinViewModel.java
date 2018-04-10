@@ -3,6 +3,7 @@ package no.teacherspet.tring.Database.ViewModels;
 import android.arch.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -25,7 +26,7 @@ public class PointOEventJoinViewModel extends ViewModel {
         this.pointOEventJoinDao = pointOEventJoinDao;
     }
 
-    public Maybe<ArrayList<RoomPoint>> getPointsForOEvent(int oEventID){
+    public Maybe<List<RoomPoint>> getPointsForOEvent(int oEventID){
         return pointOEventJoinDao.getPointsForOEvent(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -35,12 +36,12 @@ public class PointOEventJoinViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Maybe<ArrayList<RoomPoint>> getPointsNotStart(int oEventID){
+    public Maybe<List<RoomPoint>> getPointsNotStart(int oEventID){
         return pointOEventJoinDao.getPointsNotStart(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Maybe<ArrayList<RoomOEvent>> getOEventsForPoint(int pointID){
+    public Maybe<List<RoomOEvent>> getOEventsForPoint(int pointID){
         return pointOEventJoinDao.getOEventsForPoint(pointID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

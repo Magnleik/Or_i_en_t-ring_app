@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import no.teacherspet.tring.R;
 import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
@@ -38,7 +37,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_saved_events);
-        
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
@@ -90,8 +89,3 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
     }
 }
-
-
-
-
-

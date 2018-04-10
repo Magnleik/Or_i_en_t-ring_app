@@ -3,6 +3,7 @@ package no.teacherspet.tring.Database.ViewModels;
 import android.arch.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -23,7 +24,7 @@ public class UserViewModel extends ViewModel {
         this.userDao = userDao;
     }
 
-    public Maybe<ArrayList<RoomUser>> getAllUsers(){
+    public Maybe<List<RoomUser>> getAllUsers(){
         return userDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -35,13 +36,13 @@ public class UserViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<ArrayList<RoomUser>> getOtherUsers(){
+    public Maybe<List<RoomUser>> getOtherUsers(){
         return userDao.getOtherUsers()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<ArrayList<RoomUser>> getPersonalUser(){
+    public Maybe<List<RoomUser>> getPersonalUser(){
         return userDao.getPersonalUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

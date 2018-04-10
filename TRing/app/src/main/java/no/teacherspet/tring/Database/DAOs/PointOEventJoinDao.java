@@ -7,6 +7,7 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Maybe;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -21,7 +22,7 @@ public interface PointOEventJoinDao {
 
     @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID")
-    Maybe<ArrayList<RoomPoint>> getPointsForOEvent(int oEventID);
+    Maybe<List<RoomPoint>> getPointsForOEvent(int oEventID);
 
     @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 1")
@@ -29,11 +30,11 @@ public interface PointOEventJoinDao {
 
     @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 0")
-    Maybe<ArrayList<RoomPoint>> getPointsNotStart(int oEventID);
+    Maybe<List<RoomPoint>> getPointsNotStart(int oEventID);
 
     @Query("SELECT * FROM o_event INNER JOIN point_oevent_join ON o_event.id = point_oevent_join.oEventID" +
             " WHERE point_oevent_join.pointID = :pointID")
-    Maybe<ArrayList<RoomOEvent>> getOEventsForPoint(int pointID);
+    Maybe<List<RoomOEvent>> getOEventsForPoint(int pointID);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(PointOEventJoin... pointOEventJoins);
