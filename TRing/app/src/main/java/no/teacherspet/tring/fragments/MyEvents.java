@@ -165,7 +165,6 @@ public class MyEvents extends Fragment {
         final ArrayList<Event> listItems = initList();
 
 
-
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 

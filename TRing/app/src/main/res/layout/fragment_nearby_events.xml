@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="no.teacherspet.tring.fragments.NearbyEvents">
 
     <!-- TODO: Update blank fragment layout -->
@@ -9,7 +10,9 @@
     <ListView
         android:id="@+id/nearby_events_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
 
 
 </FrameLayout>

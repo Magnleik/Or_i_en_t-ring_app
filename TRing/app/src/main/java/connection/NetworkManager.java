@@ -38,7 +38,7 @@ public class NetworkManager {
     private void init(){
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.19.155";
+        String URL = "https://tring-tba4250.herokuapp.com";
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(

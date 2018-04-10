@@ -57,6 +57,7 @@ public class MostPopularEvents extends Fragment {
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private ArrayList<Event> listItems;
 
     private OnFragmentInteractionListener mListener;
 
@@ -100,15 +101,16 @@ public class MostPopularEvents extends Fragment {
 
 
 
-    public ArrayList<Event> initList() {
+    public void initList() {
         networkManager = NetworkManager.getInstance();
+        theEventReceived = new HashMap<>();
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
             lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     position = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (position.longitude==0.0 || position.latitude==0.0) {
+                    if (!(position.longitude==0.0 || position.latitude==0.0)) {
                         ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
                             @Override
                             public void onResponse(ArrayList<Event> object) {
@@ -118,6 +120,13 @@ public class MostPopularEvents extends Fragment {
                                     for (int i = 0; i < object.size(); i++) {
                                         theEventReceived.put(object.get(i).getId(), object.get(i));
                                     }
+                                }
+                                listItems = new ArrayList<>();
+                                if (theEventReceived != null) {
+                                    for (Event ev : theEventReceived.values()) {
+                                        listItems.add(ev);
+                                    }
+                                    updateList();
                                 }
                             }
 
@@ -132,25 +141,22 @@ public class MostPopularEvents extends Fragment {
             });
         }
         //theEventReceived = new StartupMenu().getTestEvents();
-        ArrayList<Event> listItems = new ArrayList<>();
-        if (theEventReceived != null) {
-            for (Event ev : theEventReceived.values()) {
-                listItems.add(ev);
-            }
-            return listItems;
-        }
-        return null;
+
+    }
+
+    public void updateList() {
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
     }
 
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.popular_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        final ArrayList<Event> listItems = initList();
+        initList();
 
 
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
-        mListView.setAdapter(eventAdapter);
+
 
         final Context context = this.getContext();
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
