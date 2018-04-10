@@ -26,6 +26,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 
 import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -34,6 +36,7 @@ import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointViewModel;
+import no.teacherspet.tring.R;
 
 public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -42,6 +45,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private NetworkManager networkManager;
     LocalDatabase localDatabase;
     PointViewModel pointViewModel;
     OEventViewModel oEventViewModel;
@@ -66,8 +70,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-    //TODO Lagre OEvent i lokal database etter oppretting
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -120,6 +122,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
+     * @param v
+     */
     public void createPoints(View v) {
 
         Toast.makeText(getApplicationContext(), "Klikk på kartet for å legge til punkter.", Toast.LENGTH_LONG).show();
@@ -158,6 +164,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Removes the latest element in the marker array. Method gets called when the "Slett forrige" button is pressed
+     * @param v
+     */
     public void deleteLastPoint(View v) {
         if (arrayListWithCoords.size() > 0) {
             Marker lastMarker = arrayListWithCoords.get(arrayListWithCoords.size() - 1);
@@ -166,6 +176,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Creates a new event with the given markers as posts. Gives the event the name found in the EditText on top of the screen. Method gets called when The "Ferdig" button is pressed
+     * @param v
+     */
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         Event event = new Event();
@@ -179,19 +193,32 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
             }
         }
-        StartupMenu.addEvent(event);
+        networkManager = NetworkManager.getInstance();
+        networkManager.addEvent(event, new ICallbackAdapter<Event>() {
+            @Override
+            public void onResponse(Event object) {
+                if(object==null){
+                    Toast.makeText(getApplicationContext(),"Failed to create event.",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.",Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Toast.makeText(getApplicationContext(),"Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+            }
+        });
         saveEventToRoom(event);
-        Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+        //StartupMenu.addEvent(event);
+        //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
 
-        eventTitleField.setText("");
-        arrayListWithCoords.clear();
-        mMap.clear();
-        //Add startpoint om man vil lage ny rute?
-        mMap.addMarker(new MarkerOptions().position(new LatLng(63.416136, 10.405297)).title("Gløs<3"));
+        //finish();
     }
-
     /**
      * Saves the Event and Points, and adds connections between them in the Room database
      */
@@ -242,6 +269,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Saves the currently created points to an arraylist to be provided later when the state is restored. Used when phone is flipped and state is destroyed
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
