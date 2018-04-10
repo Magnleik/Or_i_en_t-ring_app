@@ -5,9 +5,10 @@
     tools:context="no.teacherspet.tring.NearbyEvents">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ListView
+        android:id="@+id/nearby_events_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Nearby events" />
+        android:layout_height="match_parent" />
 
 </FrameLayout>
+

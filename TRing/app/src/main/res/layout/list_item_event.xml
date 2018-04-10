@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toStartOf="@+id/avg_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Navnn" />
+        tools:text="Navn" />
 
     <TextView
         android:id="@+id/avg_time_title"

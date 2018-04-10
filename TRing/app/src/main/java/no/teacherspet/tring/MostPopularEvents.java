@@ -1,12 +1,32 @@
 package no.teacherspet.tring;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 
 
 /**
@@ -26,6 +46,12 @@ public class MostPopularEvents extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Event selectedEvent;
+    private ListView mListView;
+    private HashMap<Integer, Event> theEventReceived;
+    private NetworkManager networkManager;
+    private FusedLocationProviderClient lm;
+    private LatLng position;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,6 +92,86 @@ public class MostPopularEvents extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_most_popular_events, container, false);
     }
+
+
+
+    public ArrayList<Event> initList1() {
+        networkManager = NetworkManager.getInstance();
+        if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
+            lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    position = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (position.longitude==0.0 || position.latitude==0.0) {
+                        ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
+                            @Override
+                            public void onResponse(ArrayList<Event> object) {
+                                if (object == null) {
+                                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    for (int i = 0; i < object.size(); i++) {
+                                        theEventReceived.put(object.get(i).getId(), object.get(i));
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            }
+                        };
+                        networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                    }
+                }
+            });
+        }
+        //theEventReceived = new StartupMenu().getTestEvents();
+        ArrayList<Event> listItems = new ArrayList<>();
+        if (theEventReceived != null) {
+            for (Event ev : theEventReceived.values()) {
+                listItems.add(ev);
+            }
+            return listItems;
+        }
+        return null;
+    }
+
+
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        mListView = (ListView) getView().findViewById(R.id.popular_events_list);
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
+        final ArrayList<Event> listItems = initList1();
+
+
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
+
+        final Context context = this.getContext();
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+
+                    Event selectedEvent = listItems.get(position);
+
+                    // 2
+                    Intent detailIntent = new Intent(context, PerformOEvent.class);
+
+                    // 3
+                    detailIntent.putExtra("MyEvent", selectedEvent);
+
+                    // 4
+                    startActivity(detailIntent);
+                }
+            }
+
+        });
+
+
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
