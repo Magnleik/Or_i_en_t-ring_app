@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +35,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         // primary sections of the activity.
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
@@ -42,6 +46,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
     }
 
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

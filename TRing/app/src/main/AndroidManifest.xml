@@ -52,13 +52,11 @@
 
         <activity
             android:name=".CreateUserActivity"
-            android:label="Create User"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="Create User" />
 
         <activity
             android:name=".ListOfSavedEvents"
-            android:label="@string/title_activity_list_of_saved_events"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:label="@string/title_activity_list_of_saved_events">
         </activity>
 
 

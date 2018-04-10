@@ -157,9 +157,8 @@ public class MyEvents extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
-
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList1();
-
         //TITTEL
         TextView textView = new TextView(this.getContext());
         textView.setText("Mine løp");
