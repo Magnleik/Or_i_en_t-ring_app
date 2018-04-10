@@ -1,15 +1,19 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.util;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import no.teacherspet.tring.fragments.MostPopularEvents;
+import no.teacherspet.tring.fragments.MyEvents;
+import no.teacherspet.tring.fragments.NearbyEvents;
+
 /**
  * Created by magnus on 10.04.2018.
  */
 
-class EventFragmentPagerAdapter extends FragmentPagerAdapter {
+public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
     private static final int PAGE_COUNT = 3;
     private static final String[] titles = new String[] {"My events", "Nearby events", "Popular events"};
     private Context context;

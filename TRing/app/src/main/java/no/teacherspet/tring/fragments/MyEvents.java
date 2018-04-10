@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +27,10 @@ import java.util.HashMap;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.activities.ListOfSavedEvents;
+import no.teacherspet.tring.activities.PerformOEvent;
+import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.EventAdapter;
 
 
 /**

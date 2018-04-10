@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import android.widget.Toast;
 import java.util.HashMap;
 
 import connection.Event;
-import connection.NetworkManager;
+import no.teacherspet.tring.R;
 
 
 /**

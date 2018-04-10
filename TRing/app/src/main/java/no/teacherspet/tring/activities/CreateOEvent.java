@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +29,7 @@ import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
+import no.teacherspet.tring.R;
 
 public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
 

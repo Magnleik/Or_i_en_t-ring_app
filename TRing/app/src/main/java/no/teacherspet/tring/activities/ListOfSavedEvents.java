@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +9,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import no.teacherspet.tring.R;
+import no.teacherspet.tring.fragments.MostPopularEvents;
+import no.teacherspet.tring.fragments.MyEvents;
+import no.teacherspet.tring.fragments.NearbyEvents;
+import no.teacherspet.tring.util.EventFragmentPagerAdapter;
+import no.teacherspet.tring.util.PagerAdapter;
 
 public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
 
