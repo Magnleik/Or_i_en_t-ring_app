@@ -2,6 +2,7 @@ package no.teacherspet.tring;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -40,7 +41,12 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setAdapter(new EventFragmentPagerAdapter(getSupportFragmentManager(),
+                ListOfSavedEvents.this));
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.bringToFront();
+        tabLayout.setupWithViewPager(mViewPager);
 
 
 
