@@ -1,22 +1,19 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,6 +27,10 @@ import java.util.HashMap;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.activities.ListOfSavedEvents;
+import no.teacherspet.tring.activities.PerformOEvent;
+import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.EventAdapter;
 
 
 /**
@@ -159,6 +160,7 @@ public class MyEvents extends Fragment {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList1();
+
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);

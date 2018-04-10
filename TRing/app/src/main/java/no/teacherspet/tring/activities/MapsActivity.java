@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.User;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
+import no.teacherspet.tring.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 

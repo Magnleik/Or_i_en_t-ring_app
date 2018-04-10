@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,16 +28,18 @@ import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 
+import no.teacherspet.tring.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MostPopularEvents.OnFragmentInteractionListener} interface
+ * {@link NearbyEvents.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MostPopularEvents#newInstance} factory method to
+ * Use the {@link NearbyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MostPopularEvents extends Fragment {
+public class NearbyEvents extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -46,16 +48,15 @@ public class MostPopularEvents extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private Event selectedEvent;
-    private ListView mListView;
-    private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private HashMap<Integer, Event> theEventReceived;
+    private ListView mListView;
 
     private OnFragmentInteractionListener mListener;
 
-    public MostPopularEvents() {
+    public NearbyEvents() {
         // Required empty public constructor
     }
 
@@ -65,11 +66,11 @@ public class MostPopularEvents extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MostPopularEvents.
+     * @return A new instance of fragment NearbyEvents.
      */
     // TODO: Rename and change types and number of parameters
-    public static MostPopularEvents newInstance(String param1, String param2) {
-        MostPopularEvents fragment = new MostPopularEvents();
+    public static NearbyEvents newInstance(String param1, String param2) {
+        NearbyEvents fragment = new NearbyEvents();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,6 +81,7 @@ public class MostPopularEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -90,10 +92,8 @@ public class MostPopularEvents extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_most_popular_events, container, false);
+        return inflater.inflate(R.layout.fragment_nearby_events, container, false);
     }
-
-
 
     public ArrayList<Event> initList1() {
         networkManager = NetworkManager.getInstance();
@@ -139,7 +139,7 @@ public class MostPopularEvents extends Fragment {
 
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mListView = (ListView) getView().findViewById(R.id.popular_events_list);
+        mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList1();
 

@@ -1,8 +1,12 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.util;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import no.teacherspet.tring.fragments.MostPopularEvents;
+import no.teacherspet.tring.fragments.MyEvents;
+import no.teacherspet.tring.fragments.NearbyEvents;
 
 /**
  * Created by petterbjorkaas on 06/03/2018.

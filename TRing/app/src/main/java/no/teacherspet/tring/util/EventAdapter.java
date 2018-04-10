@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.util;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import connection.Event;
+import no.teacherspet.tring.R;
 
 /**
  * Created by petterbjorkaas on 08/03/2018.

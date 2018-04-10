@@ -1,13 +1,21 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import no.teacherspet.tring.R;
+import no.teacherspet.tring.fragments.MostPopularEvents;
+import no.teacherspet.tring.fragments.MyEvents;
+import no.teacherspet.tring.fragments.NearbyEvents;
+import no.teacherspet.tring.util.EventFragmentPagerAdapter;
+import no.teacherspet.tring.util.PagerAdapter;
 
 public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
 
@@ -40,7 +48,12 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setAdapter(new EventFragmentPagerAdapter(getSupportFragmentManager(),
+                ListOfSavedEvents.this));
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.bringToFront();
+        tabLayout.setupWithViewPager(mViewPager);
 
 
 

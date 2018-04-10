@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,16 +7,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.Point;
 import no.teacherspet.tring.Database.Entities.User;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
+import no.teacherspet.tring.R;
 
 public class CreateUserActivity extends AppCompatActivity {
 
