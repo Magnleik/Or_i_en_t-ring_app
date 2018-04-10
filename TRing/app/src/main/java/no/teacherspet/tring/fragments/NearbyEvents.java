@@ -98,7 +98,7 @@ public class NearbyEvents extends Fragment {
         return inflater.inflate(R.layout.fragment_nearby_events, container, false);
     }
 
-    public ArrayList<Event> initList1() {
+    public ArrayList<Event> initList() {
         networkManager = NetworkManager.getInstance();
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
@@ -144,7 +144,7 @@ public class NearbyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        final ArrayList<Event> listItems = initList1();
+        final ArrayList<Event> listItems = initList();
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);

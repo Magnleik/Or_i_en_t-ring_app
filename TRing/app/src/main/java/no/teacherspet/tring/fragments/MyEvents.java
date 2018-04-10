@@ -30,6 +30,7 @@ import connection.NetworkManager;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.activities.StartupMenu;
 import no.teacherspet.tring.util.EventAdapter;
 
 
@@ -113,7 +114,7 @@ public class MyEvents extends Fragment {
     //////////////TEST
 
 
-    public ArrayList<Event> initList1() {
+    public ArrayList<Event> initList() {
         networkManager = NetworkManager.getInstance();
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
@@ -144,7 +145,9 @@ public class MyEvents extends Fragment {
                 }
             });
         }
+
         //theEventReceived = new StartupMenu().getTestEvents();
+
         ArrayList<Event> listItems = new ArrayList<>();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
@@ -159,7 +162,7 @@ public class MyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        final ArrayList<Event> listItems = initList1();
+        final ArrayList<Event> listItems = initList();
 
 
 
