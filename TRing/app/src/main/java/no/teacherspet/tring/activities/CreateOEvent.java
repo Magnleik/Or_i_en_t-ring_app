@@ -175,7 +175,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         String eventTitle = eventTitleField.getText().toString();
         event.addProperty("event_name",eventTitle);
         for(Marker marker:arrayListWithCoords){
-            event.addPost(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
+            if(event.getPoints()==null){
+                event.setStartPoint(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
+            }
+            else {
+                event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+            }
         }
         networkManager = NetworkManager.getInstance();
         networkManager.addEvent(event, new ICallbackAdapter<Event>() {

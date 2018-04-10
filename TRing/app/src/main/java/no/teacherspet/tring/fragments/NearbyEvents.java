@@ -1,7 +1,10 @@
 package no.teacherspet.tring.fragments;
 
 import android.content.Context;
+<<<<<<< HEAD
 import android.content.Intent;
+=======
+>>>>>>> origin/magnus/maps_layout
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+<<<<<<< HEAD
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,7 +31,22 @@ import java.util.HashMap;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+=======
+import android.widget.ListView;
+import android.widget.Toast;
+>>>>>>> origin/magnus/maps_layout
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -47,6 +66,13 @@ public class NearbyEvents extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private Event selectedEvent;
+    private ListView mListView;
+    private HashMap<Integer, Event> theEventReceived;
+    private NetworkManager networkManager;
+    private FusedLocationProviderClient lm;
+    private LatLng position;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -85,6 +111,7 @@ public class NearbyEvents extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
+        networkManager=NetworkManager.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -198,6 +225,48 @@ public class NearbyEvents extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public ArrayList<Event> initList() {
+        networkManager = NetworkManager.getInstance();
+        if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
+            lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    position = new LatLng(location.getLatitude(), location.getLongitude());
+                    if (position.longitude==0.0 || position.latitude==0.0) {
+                        ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
+                            @Override
+                            public void onResponse(ArrayList<Event> object) {
+                                if (object == null) {
+                                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    for (int i = 0; i < object.size(); i++) {
+                                        theEventReceived.put(object.get(i).getId(), object.get(i));
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            }
+                        };
+                        networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                    }
+                }
+            });
+        }
+        //theEventReceived = new StartupMenu().getTestEvents();
+        ArrayList<Event> listItems = new ArrayList<>();
+        if (theEventReceived != null) {
+            for (Event ev : theEventReceived.values()) {
+                listItems.add(ev);
+            }
+            return listItems;
+        }
+        return null;
     }
 
     /**
