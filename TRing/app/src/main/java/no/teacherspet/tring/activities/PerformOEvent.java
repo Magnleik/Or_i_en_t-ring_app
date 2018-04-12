@@ -61,6 +61,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
         if(startedEvent!=null){
             points = readPoints();
+            if (points==null){
+                finish();
+            }
         }
 
     }
@@ -76,10 +79,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @return The list of points to be included
      */
     public ArrayList<Point> readPoints(){
-        if(!StartupMenu.getTestEvents().isEmpty()) {
-            return StartupMenu.getTestEvents().get(StartupMenu.getTestEvents().size() - 1).getPoints();
+        if(!startedEvent.getPoints().isEmpty()) {
+            return startedEvent.getPoints();
         }
-        return null;
+        else {
+            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_LONG).show();
+            return null;
+        }
     }
 
     /**
@@ -106,7 +112,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
         LatLngBounds bounds = builder.build();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,-10));
+        mMap.
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,1));
         }
     }
 
