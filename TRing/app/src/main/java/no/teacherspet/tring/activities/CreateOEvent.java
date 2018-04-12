@@ -91,10 +91,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
         if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            position = new LatLng(10.416136, 10.405297);
-            mMap.addMarker(new MarkerOptions().position(position).title("Gløs<3"));
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,15));
+            Toast.makeText(getApplicationContext(),"App needs permission to access location services on phone to run",Toast.LENGTH_LONG).show();
+            finish();
         }
         else{
             lm.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -106,9 +104,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     else{
                         position = new LatLng(10.416136, 10.405297);
                     }
-                    mMap.addMarker(new MarkerOptions().position(position).title("Gløs<3"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,15));
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
                 }
             });
         }

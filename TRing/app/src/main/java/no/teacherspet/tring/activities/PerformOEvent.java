@@ -118,6 +118,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,0));
                 mMap.moveCamera(CameraUpdateFactory.zoomOut());
                 mMap.setLatLngBoundsForCameraTarget(bounds);
+                mMap.setMinZoomPreference(12.0f);
+                mMap.setMaxZoomPreference(20.0f);
             }
         });
         }
@@ -204,21 +206,24 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 @Override
                 public void onSuccess(Location location) {
                     LatLng position = new LatLng(location.getLatitude(),location.getLongitude());
-                    float acc = location.getAccuracy();
+                    if(visitedPoints==null){
+                        visitedPoints=new ArrayList<>();
+                    }
                     int prevsize = visitedPoints.size();
                     for(Point point:points){
-                        if(point.getDistanceFromPoint(position)<(1-acc)*100){
+                        float distance = point.getDistanceFromPoint(position);
+                        if(distance<20){
                             visitedPoints.add(point);
                             Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
                             if(visitedPoints.size()==points.size()){
                                 //TODO: get the user back to the start point
-
+                                Toast.makeText(getApplicationContext(),"You have visited all the points! Get to the finish line!",Toast.LENGTH_SHORT).show();
                             }
                             break;
                         }
                     }
-                    if(prevsize!=visitedPoints.size()){
-                        Toast.makeText(getApplicationContext(),"There is no new point here to be visited",Toast.LENGTH_LONG);
+                    if(prevsize==visitedPoints.size()){
+                        Toast.makeText(getApplicationContext(),"There is no new point here to be visited",Toast.LENGTH_LONG).show();
                     }
                 }
             });
