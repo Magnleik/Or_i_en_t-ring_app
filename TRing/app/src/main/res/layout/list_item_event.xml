@@ -16,13 +16,13 @@
         android:gravity="center_vertical"
         android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textView3"
+        app:layout_constraintEnd_toStartOf="@+id/avg_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Navnn" />
+        tools:text="Navn" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/avg_time_title"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:layout_alignParentEnd="true"
@@ -33,38 +33,38 @@
         tools:layout_editor_absoluteY="231dp" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/avg_time"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_alignEnd="@+id/textView"
-        android:layout_below="@+id/textView"
+        android:layout_alignEnd="@+id/avg_time_title"
+        android:layout_below="@+id/avg_time_title"
         android:layout_marginEnd="26dp"
         android:text="-"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintStart_toStartOf="@+id/avg_time_title"
+        app:layout_constraintTop_toBottomOf="@+id/avg_time_title" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/avg_dist_title"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="12dp"
-        android:layout_toStartOf="@+id/textView"
+        android:layout_toStartOf="@+id/avg_time_title"
         android:text="Distance:"
-        app:layout_constraintEnd_toStartOf="@+id/textView"
+        app:layout_constraintEnd_toStartOf="@+id/avg_time_title"
         tools:layout_editor_absoluteY="231dp" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/avg_dist"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_alignEnd="@+id/textView3"
-        android:layout_below="@+id/textView3"
+        android:layout_alignEnd="@+id/avg_dist_title"
+        android:layout_below="@+id/avg_dist_title"
         android:layout_marginEnd="23dp"
         android:text="-"
-        app:layout_constraintEnd_toStartOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintEnd_toStartOf="@+id/avg_time_title"
+        app:layout_constraintStart_toStartOf="@+id/avg_dist_title"
+        app:layout_constraintTop_toBottomOf="@+id/avg_dist_title" />
 
 </RelativeLayout>

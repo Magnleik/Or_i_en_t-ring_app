@@ -1,15 +1,18 @@
 package no.teacherspet.tring.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,6 +28,9 @@ import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.activities.ListOfSavedEvents;
+import no.teacherspet.tring.activities.PerformOEvent;
+import no.teacherspet.tring.util.EventAdapter;
 
 
 /**
@@ -47,6 +53,7 @@ public class NearbyEvents extends Fragment {
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private ArrayList<Event> listItems;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -79,6 +86,7 @@ public class NearbyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        HashMap<Integer, Event> theEventReceived = new HashMap<>();
         networkManager=NetworkManager.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -92,6 +100,43 @@ public class NearbyEvents extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nearby_events, container, false);
     }
+
+
+
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
+        initList();
+
+
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
+
+        final Context context = this.getContext();
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position >= 0) {
+
+                    Event selectedEvent = listItems.get(position);
+
+                    // 2
+                    Intent detailIntent = new Intent(context, PerformOEvent.class);
+
+                    // 3
+                    detailIntent.putExtra("MyEvent", selectedEvent);
+
+                    // 4
+                    startActivity(detailIntent);
+                }
+            }
+
+        });
+
+
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -117,7 +162,8 @@ public class NearbyEvents extends Fragment {
         mListener = null;
     }
 
-    public ArrayList<Event> initList() {
+    public void initList() {
+        theEventReceived = new HashMap<>();
         networkManager = NetworkManager.getInstance();
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
@@ -125,7 +171,7 @@ public class NearbyEvents extends Fragment {
                 @Override
                 public void onSuccess(Location location) {
                     position = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (position.longitude==0.0 || position.latitude==0.0) {
+                    if (!(position.longitude==0.0 || position.latitude==0.0)) {
                         ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
                             @Override
                             public void onResponse(ArrayList<Event> object) {
@@ -135,6 +181,13 @@ public class NearbyEvents extends Fragment {
                                     for (int i = 0; i < object.size(); i++) {
                                         theEventReceived.put(object.get(i).getId(), object.get(i));
                                     }
+                                }
+                                listItems = new ArrayList<>();
+                                if (theEventReceived != null) {
+                                    for (Event ev : theEventReceived.values()) {
+                                        listItems.add(ev);
+                                    }
+                                    updateList();
                                 }
                             }
 
@@ -149,14 +202,12 @@ public class NearbyEvents extends Fragment {
             });
         }
         //theEventReceived = new StartupMenu().getTestEvents();
-        ArrayList<Event> listItems = new ArrayList<>();
-        if (theEventReceived != null) {
-            for (Event ev : theEventReceived.values()) {
-                listItems.add(ev);
-            }
-            return listItems;
-        }
-        return null;
+
+    }
+
+    private void updateList() {
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
     }
 
     /**
