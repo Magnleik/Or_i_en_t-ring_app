@@ -32,8 +32,6 @@ public class StartupMenu extends AppCompatActivity{
             testEvents=new HashMap<>();
         }
         setContentView(R.layout.activity_startupmenu);
-
-        NetworkManager.getInstance();
     }
 
 

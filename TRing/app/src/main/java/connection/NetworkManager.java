@@ -350,6 +350,36 @@ public class NetworkManager {
         });
     }
 
+    /**
+     * Post the time taken to complete the event with the given ID. Used to update the avgTime.
+     * @param eventID The int ID of the event you wish to post a time for.
+     * @param time The time used, on the format "hh:mm:ss"
+     * @param callback The callback to handle results. onResponse gets passed the updated event - so time can be compared to the updated avgTime.
+     */
+    public void postTime(int eventID, String time, ICallbackAdapter<Event> callback){
+        Call<Event> call = client.postTime(eventID, time);
+
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "postTime got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "postTime successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
     //endregion
 
     //region GET-methods

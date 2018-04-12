@@ -42,9 +42,10 @@ public interface Client {
             @Body User user
     );
 
-    @GET("/api/users")
-    Call<Boolean> logIn(
-            @Body User user
+    @POST("/api/events/{eventID}/time/{time}")
+    Call<Event> postTime(
+            @Path("eventID") int eventID,
+            @Path("time") String time
     );
 
     @DELETE("/api/events/{eventID}/points/{pointID}")
@@ -75,6 +76,11 @@ public interface Client {
     @GET("/api/events/{ID}/points")
     Call<Event> getEventById(
             @Path("ID") int ID
+    );
+
+    @GET("/api/users")
+    Call<Boolean> logIn(
+            @Body User user
     );
 
 }
