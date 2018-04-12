@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -212,9 +213,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     int prevsize = visitedPoints.size();
                     for(Point point:points){
                         float distance = point.getDistanceFromPoint(position);
-                        if(distance<20){
+                        if((distance<20) && !visitedPoints.contains(point)){
                             visitedPoints.add(point);
                             Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                             if(visitedPoints.size()==points.size()){
                                 //TODO: get the user back to the start point
                                 Toast.makeText(getApplicationContext(),"You have visited all the points! Get to the finish line!",Toast.LENGTH_SHORT).show();
