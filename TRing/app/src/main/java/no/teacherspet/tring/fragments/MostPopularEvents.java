@@ -163,7 +163,7 @@ public class MostPopularEvents extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
+                if (position >= 0) {
 
                     Event selectedEvent = listItems.get(position);
 

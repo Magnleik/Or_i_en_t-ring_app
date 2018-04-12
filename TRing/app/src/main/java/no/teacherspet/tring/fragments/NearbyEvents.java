@@ -27,17 +27,6 @@ import java.util.HashMap;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import connection.Event;
-import connection.ICallbackAdapter;
-import connection.NetworkManager;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -128,7 +117,7 @@ public class NearbyEvents extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
+                if (position >= 0) {
 
                     Event selectedEvent = listItems.get(position);
 
