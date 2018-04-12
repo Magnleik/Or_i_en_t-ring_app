@@ -24,12 +24,6 @@ public class CreateUserActivity extends AppCompatActivity {
     EditText passwordCheck;
     ProgressBar progressBar;
     Button saveButton;
-    Integer userID;
-
-    //UserViewModel userViewModel;
-    //LocalDatabase localDatabase;
-
-    //Disposable userList;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,12 +31,6 @@ public class CreateUserActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Create user");
-
-        //localDatabase = LocalDatabase.getInstance(this);
-        //userViewModel = new UserViewModel(localDatabase.userDAO());
-
-        userID = 0;
-        //Disposable idDisposable =  userViewModel.getMaxID().subscribe(integer -> userID = integer);
 
         createUsername = (EditText) findViewById(R.id.create_username);
         createPassword = (EditText) findViewById(R.id.create_password);
@@ -54,9 +42,7 @@ public class CreateUserActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //idDisposable.dispose();
                if(createPassword.getText().toString().trim().length() > 0 && createUsername.getText().toString().trim().length() > 0 && passwordCheck.getText().toString().trim().length() > 0 ){
-                    //insertUser();
 
                    if(createPassword.getText().toString().equals(passwordCheck.getText().toString())){
                        createUser();
@@ -72,11 +58,6 @@ public class CreateUserActivity extends AppCompatActivity {
         });
     }
 
-    private void insertUser() {
-        saveButton.setEnabled(false);
-        User user = new User(userID, true, createUsername.getText().toString(), createPassword.getText().toString());
-        //userViewModel.addUsers(user).subscribe(longs -> changeActivity(longs));
-    }
 
     private void createUser(){
 
@@ -112,6 +93,7 @@ public class CreateUserActivity extends AppCompatActivity {
         });
     }
 
+    //FIXME: Change this to work for new implementation
     private void changeActivity(long[] longs){
         if(longs[0] >= 0){
             Toast.makeText(this, "User successfully saved", Toast.LENGTH_LONG).show();
@@ -125,8 +107,6 @@ public class CreateUserActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        //userList.dispose();
-        //localDatabase.close();
         super.onDestroy();
     }
 }

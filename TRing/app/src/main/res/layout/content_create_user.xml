@@ -24,11 +24,6 @@
             android:hint="Username"
             android:inputType="textPersonName"
             app:layout_constraintTop_toTopOf="parent" />
-    <!-- TODO Remove when testing in create user not important -->
-        <TextView
-            android:id="@+id/testID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/create_password"
