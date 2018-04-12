@@ -112,8 +112,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
         LatLngBounds bounds = builder.build();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
-        mMap.
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,1));
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,0));
+                mMap.moveCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
         }
     }
 
