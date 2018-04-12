@@ -202,6 +202,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.",Toast.LENGTH_SHORT).show();
+                    saveEventToRoom(object);
                     finish();
                 }
             }
@@ -211,7 +212,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(getApplicationContext(),"Couldn't connect to internet", Toast.LENGTH_SHORT).show();
             }
         });
-        saveEventToRoom(event);
         //StartupMenu.addEvent(event);
         //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
@@ -231,13 +231,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
-        RoomPoint roomPoint;
-        PointOEventJoin join;
-        Point point;
         for (int i = 0; i < event.getPoints().size(); i++) {
-            point = event.getPoints().get(i);
-            roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
-
+            Point point = event.getPoints().get(i);
+            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            PointOEventJoin join;
             if(i > 0){
                 join = new PointOEventJoin(point.getId(), event.getId(), false);
             }

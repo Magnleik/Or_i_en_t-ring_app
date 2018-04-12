@@ -58,7 +58,6 @@ public class MyEvents extends Fragment {
     private FusedLocationProviderClient lm;
     private LatLng position;
     private LocalDatabase database;
-    private PointViewModel pointViewModel;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private ArrayList<Event> listItems;
@@ -138,7 +137,6 @@ public class MyEvents extends Fragment {
     public void loadData() {
         listItems = new ArrayList<>();
         database = LocalDatabase.getInstance(this.getContext());
-        pointViewModel = new PointViewModel(database.pointDAO());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
 
@@ -158,15 +156,17 @@ public class MyEvents extends Fragment {
         if(roomPoints.size() > 0){
             ArrayList<Point> points = new ArrayList<>();
             for(RoomPoint roomPoint : roomPoints){
-                Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, roomPoint.getProperties().get("description"));
+                Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
                 point._setId(roomPoint.getId());
                 for(String key : roomPoint.getProperties().keySet()){
                     point.addProperty(key, roomPoint.getProperties().get(key));
                 }
                 points.add(point);
             }
-            double minDist = Double.parseDouble(oEvent.getProperties().get("dist"));
-            Event event = new Event(oEvent.getId(), points, minDist, oEvent.getProperties().get("avg_time"));
+            Event event = new Event();
+            event._setId(oEvent.getId());
+            event.setStartPoint(points.get(0));
+            event.addPosts(points);
             for(String key : oEvent.getProperties().keySet()){
                 event.addProperty(key, oEvent.getProperties().get(key));
             }
