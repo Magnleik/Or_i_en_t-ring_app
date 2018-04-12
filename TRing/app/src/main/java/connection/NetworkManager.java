@@ -34,7 +34,6 @@ public class NetworkManager {
 
     private NetworkManager(){
         init();
-        //addCredentials("USERname", "PASSword");
     }
 
     public static NetworkManager getInstance(){
@@ -279,6 +278,78 @@ public class NetworkManager {
 
     }
 
+    /**
+     * Create a new user in the database, and authenticates this instance of the application (from the server perspective, logs you in).
+     * @param username The username chosen
+     * @param password The password chosen
+     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
+     */
+    public void createUser(String username, String password, final ICallbackAdapter<Boolean> callback){
+
+        User myUser = new User(username,password);
+
+        Call<Boolean> call = client.createNewUser(myUser);
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "createUser got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "createUser successful with response: " + response.toString());
+                    if(response.body()!=null && response.body()) {
+                        addCredentials(username, password);
+                    }
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
+    /**
+     * Check log in credentials with the database, and authenticates this instance of the application (from the server perspective, logs you in).
+     * @param username The username chosen
+     * @param password The password chosen
+     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
+     */
+    public void logIn(String username, String password, final ICallbackAdapter<Boolean> callback){
+
+        User myUser = new User(username,password);
+
+        Call<Boolean> call = client.logIn(myUser);
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "logIn got onResponse, without success");
+                }
+                else {
+                    Log.i("NETWORK", "logIn successful with response: " + response.toString());
+                    if(response.body()!=null && response.body()) {
+                        addCredentials(username, password);
+                    }
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
     //endregion
 
     //region GET-methods
@@ -482,6 +553,14 @@ public class NetworkManager {
     }
 
     //endregion
+
+    /**
+     * Checks to see if the client is already authenticated. And thus does not need to log in.
+     * @return Returns true if authenticated.
+     */
+    public boolean isAuthenticated(){
+        return httpClient.interceptors().size() > 0;
+    }
 
     public class AuthenticationInterceptor implements Interceptor {
 

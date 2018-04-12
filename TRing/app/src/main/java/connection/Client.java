@@ -37,6 +37,16 @@ public interface Client {
             @Body Point... points
     );
 
+    @POST("/api/users")
+    Call<Boolean> createNewUser(
+            @Body User user
+    );
+
+    @GET("/api/users")
+    Call<Boolean> logIn(
+            @Body User user
+    );
+
     @DELETE("/api/events/{eventID}/points/{pointID}")
     Call<Void> removePointFromEvent(
             @Path("eventID") int eventID,
