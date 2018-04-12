@@ -30,6 +30,7 @@ import connection.NetworkManager;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.activities.StartupMenu;
 import no.teacherspet.tring.util.EventAdapter;
 
 
@@ -144,7 +145,9 @@ public class MyEvents extends Fragment {
                 }
             });
         }
+
         //theEventReceived = new StartupMenu().getTestEvents();
+
         ArrayList<Event> listItems = new ArrayList<>();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
@@ -160,7 +163,6 @@ public class MyEvents extends Fragment {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
         final ArrayList<Event> listItems = initList();
-        /////
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
@@ -172,8 +174,8 @@ public class MyEvents extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0) {
-                    // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
-                    Event selectedEvent = listItems.get(position - 1);
+
+                    Event selectedEvent = listItems.get(position);
 
                     // 2
                     Intent detailIntent = new Intent(context, PerformOEvent.class);

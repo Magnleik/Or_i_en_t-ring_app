@@ -204,8 +204,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
         //LAGRE
         //Reset
-
-        //finish();
     }
 
     /**
