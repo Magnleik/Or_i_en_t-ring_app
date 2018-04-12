@@ -104,8 +104,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     else{
                         position = new LatLng(10.416136, 10.405297);
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                 }
             });
         }

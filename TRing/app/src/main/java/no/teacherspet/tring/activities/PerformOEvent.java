@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,7 +24,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 
@@ -35,6 +35,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest locationRequest;
+    private Location currentLocation;
     private int positionViewed = 0;
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
@@ -55,10 +57,12 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.flushLocations();
 
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
         if(startedEvent!=null){
             points = readPoints();
             if (points==null){
@@ -66,6 +70,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
         }
 
+    }
+
+    private void createLocationRequest(){
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
@@ -133,7 +142,46 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public void showLocationButtonPressed(View v) {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            Task getLocation = mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            createLocationRequest();
+            /*
+            mFusedLocationClient.requestLocationUpdates(locationRequest,new LocationCallback(){
+                @Override
+                public void onLocationResult(LocationResult locationResult){
+                    // Got last known location. In some rare situations this can be null.
+                    Location location = (Location) locationResult.getLastLocation();
+                    if (location != null) {
+                        //Oppretter og viser en markor der hvor bruker er
+                        double longitude = location.getLongitude();
+                        double latitude = location.getLatitude();
+                        LatLng latlng = new LatLng(latitude, longitude);
+                        final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
+                        //Zoomer til posisjon
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                        positionViewed++;
+                        mFusedLocationClient.removeLocationUpdates(this);
+
+
+                        //Markor fjernes etter 5 sekund
+                        CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+                            int sek = 5;
+                            @Override
+                            public void onTick(long l) {
+                                sek--;
+                                Toast.makeText(getApplicationContext(), "Dette er " + positionViewed + ".gang posisjonen vises, markor fjernes om " + sek+  " sekunder" , Toast.LENGTH_SHORT).show();
+
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                posisjonsmarkor.remove();
+
+                            }
+                        }.start();
+                    }
+                }
+            }, null);
+            */
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     // Got last known location. In some rare situations this can be null.
@@ -168,6 +216,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             });
+
         } else {
             Toast.makeText(getApplicationContext(), "Du må gi appen tilgang til bruk av GPS." , Toast.LENGTH_LONG).show();
 
@@ -202,6 +251,40 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      */
     public void onArrivedBtnPressed(View v) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            createLocationRequest();
+            /*
+            mFusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+
+                    currentLocation = (Location) locationResult.getLastLocation();
+                    LatLng position = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+                    if(visitedPoints==null){
+                        visitedPoints = new ArrayList<>();
+                    }
+                    int prevsize = visitedPoints.size();
+                    for(Point point:points){
+                        float distance = point.getDistanceFromPoint(position);
+                        if(distance<20){
+                            if(!visitedPoints.contains(point)) {
+                                visitedPoints.add(point);
+                                Toast.makeText(getApplicationContext(), "You arrived at a previously unvisited point!", Toast.LENGTH_LONG).show();
+                            }
+                            if(visitedPoints.size()==points.size()){
+                                //TODO: get the user back to the start point
+                                Toast.makeText(getApplicationContext(),"You have visited all the points! Get to the finish line!",Toast.LENGTH_SHORT).show();
+                            }
+                            break;
+                        }
+                    }
+                    if(prevsize==visitedPoints.size()){
+                        Toast.makeText(getApplicationContext(),"There is no new point here to be visited",Toast.LENGTH_LONG).show();
+                    }
+                    mFusedLocationClient.removeLocationUpdates(this);
+
+                }
+            }, null);
+            */
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
@@ -213,8 +296,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     for(Point point:points){
                         float distance = point.getDistanceFromPoint(position);
                         if(distance<20){
-                            visitedPoints.add(point);
-                            Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
+                            if(!visitedPoints.contains(point)) {
+                                visitedPoints.add(point);
+                                Toast.makeText(getApplicationContext(), "You arrived at a previously unvisited point!", Toast.LENGTH_LONG).show();
+                            }
                             if(visitedPoints.size()==points.size()){
                                 //TODO: get the user back to the start point
                                 Toast.makeText(getApplicationContext(),"You have visited all the points! Get to the finish line!",Toast.LENGTH_SHORT).show();
