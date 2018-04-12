@@ -117,6 +117,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             public void onMapLoaded() {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,0));
                 mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                mMap.setLatLngBoundsForCameraTarget(bounds);
             }
         });
         }
