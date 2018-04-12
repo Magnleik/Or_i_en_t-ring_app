@@ -78,7 +78,7 @@ public class NetworkManager {
     private void init(){
 
         httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.19.155";
+        String URL = "http://10.22.19.32";
         builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
