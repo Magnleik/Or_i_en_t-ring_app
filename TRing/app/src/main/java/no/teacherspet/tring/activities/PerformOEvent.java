@@ -121,12 +121,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
         LatLngBounds bounds = builder.build();
         mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                //TODO: display information when marker is clicked
+                return false;
+            }
+        });
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds,0));
-                mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 mMap.setLatLngBoundsForCameraTarget(bounds);
+                mMap.moveCamera(CameraUpdateFactory.zoomOut());
                 mMap.setMinZoomPreference(12.0f);
                 mMap.setMaxZoomPreference(20.0f);
             }
