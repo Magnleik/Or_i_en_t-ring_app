@@ -1,5 +1,7 @@
 package no.teacherspet.tring.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -118,18 +120,35 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             public void onMapClick(LatLng latLng) {
-                //Marker Point = mMap.addMarker(new MarkerOptions().position(latLng).title("Punkt " + (arrayListWithCoords.size()+1)));
-                //arrayListWithCoords.add(Point);
                 position = latLng;
-                Intent intent = new Intent(CreateOEvent.this, PopupPointDesc.class);
-                startActivityForResult(intent, 1);
-                // Sjekk at punkt blir registrert
-                // Toast.makeText(getApplicationContext(), "" + arrayListWithCoords.get(arrayListWithCoords.size() -1) , Toast.LENGTH_LONG).show();
-
+                addNewPoint();
             }
         });
     }
 
+    public void addNewPoint() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Legg til nytt punkt");
+        EditText input = new EditText(this);
+        input.setHint("Navn");
+        builder.setView(input);
+        builder.setPositiveButton("Legg til", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String pointName = input.getText().toString();
+                addNewMarker(pointName);
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
     /**
      * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
      *
@@ -146,7 +165,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             case 1:
                 if (data != null) {
                     if (resultCode == RESULT_OK)
-                        addNewMarker(data);
+                        addNewMarker(data.getStringExtra("MarkerName"));
                 }
                 break;
 
@@ -159,8 +178,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void addNewMarker(Intent data) {
-        String name = data.getStringExtra("MarkerName");
+    private void addNewMarker(String name) {
         if (name != null) {
             Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name).draggable(true));
             arrayListWithCoords.add(point);
