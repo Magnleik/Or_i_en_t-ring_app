@@ -21,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +51,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng position;
     private NetworkManager networkManager;
     private LocationRequest locationRequest;
+    private Marker startPoint;
     LocalDatabase localDatabase;
     PointViewModel pointViewModel;
     OEventViewModel oEventViewModel;
@@ -123,22 +125,37 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
             public void onMapClick(LatLng latLng) {
                 position = latLng;
-                addNewPoint();
+                openAddDialog(null);
+            }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                openEditDialog(marker);
+                return false;
             }
         });
     }
 
-    public void addNewPoint() {
+    public void openAddDialog(Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Legg til nytt punkt");
         EditText input = new EditText(this);
         input.setHint("Navn");
+        if(marker!=null) {
+            builder.setTitle("Endre navn");
+            input.setText(marker.getTitle());
+        }
         builder.setView(input);
         builder.setPositiveButton("Legg til", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String pointName = input.getText().toString();
-                addNewMarker(pointName);
+                if(marker!=null){
+                    marker.setTitle(input.getText().toString());
+                }
+                else {
+                    addNewMarker(input.getText().toString());
+                }
                 dialog.dismiss();
             }
         });
@@ -151,70 +168,100 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    public void openEditDialog(Marker marker) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(marker.getTitle());
+        CharSequence[] elements = {"Sett som startpunkt", "Rediger", "Slett"};
+        builder.setItems(elements, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        if (startPoint != null) {
+                            startPoint.setIcon(BitmapDescriptorFactory.defaultMarker());
+                        }
+                        startPoint = marker;
+                        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        dialog.dismiss();
+                        break;
+                    case 1:
+                        position = marker.getPosition();
+                        openAddDialog(marker);
+                        dialog.dismiss();
+                        break;
+                    case 2:
+                        deletePoint(marker);
+                        dialog.dismiss();
+                }
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     /**
      * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
      *
      * @param v
      */
-    public void addExistingPoints(View v) {
-        Intent intent = new Intent(CreateOEvent.this,AddExistingPoint.class);
-        startActivityForResult(intent,2);
+    public void existingPointClicked(View v) {
+        Intent intent = new Intent(CreateOEvent.this, AddExistingPoint.class);
+        startActivityForResult(intent, 2);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (resultCode) {
-            case 1:
-                if (data != null) {
-                    if (resultCode == RESULT_OK)
-                        addNewMarker(data.getStringExtra("MarkerName"));
-                }
-                break;
-
             case 2:
                 if (data != null) {
                     if (resultCode == RESULT_OK) {
-                        addExistingMarker(data);
+                        addExistingMarkers(data);
                     }
                 }
         }
     }
 
     private void addNewMarker(String name) {
+        Marker point;
         if (name != null) {
-            Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name).draggable(true));
+            point = mMap.addMarker(new MarkerOptions().position(position).title(name).draggable(true));
             arrayListWithCoords.add(point);
         } else {
-            Marker point = mMap.addMarker(new MarkerOptions().position(position).title("Punkt " + (arrayListWithCoords.size() + 1)).draggable(true));
+            point = mMap.addMarker(new MarkerOptions().position(position).title("Punkt " + (arrayListWithCoords.size() + 1)).draggable(true));
             arrayListWithCoords.add(point);
         }
     }
 
 
-    private void addExistingMarker(Intent data) {
+    private void addExistingMarkers(Intent data) {
         ArrayList<LatLng> positions = data.getParcelableArrayListExtra("selectedPositions");
-        for (LatLng position:positions){
-            mMap.addMarker(new MarkerOptions().position(position));
+        for (LatLng position : positions) {
+            this.position = position;
+            //TODO hent ut navn til ulike markers
+            addNewMarker(null);
         }
-        Toast.makeText(getApplicationContext(),"Added " + positions.size() + " points.",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Added " + positions.size() + " points.", Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Removes the latest element in the marker array. Method gets called when the "Slett forrige" button is pressed
      *
-     * @param v
+     * @param marker to be removed
      */
-    public void deleteLastPoint(View v) {
+    public void deletePoint(Marker marker) {
+        if (marker == startPoint) {
+            startPoint = null;
+        }
         if (arrayListWithCoords.size() > 0) {
-            Marker lastMarker = arrayListWithCoords.get(arrayListWithCoords.size() - 1);
-            lastMarker.remove();
-            arrayListWithCoords.remove(lastMarker);
+            marker.remove();
+            arrayListWithCoords.remove(marker);
         }
     }
 
     //Adds marker on the users location
 
-    private void createLocationRequest(){
+    private void createLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
@@ -231,14 +278,14 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
 
-                        position=new LatLng(location.getLatitude(), location.getLongitude());
+                        position = new LatLng(location.getLatitude(), location.getLongitude());
                         addNewMarker(null);
                     }
                 }
             });
 
         } else {
-            Toast.makeText(getApplicationContext(), "Du må gi appen tilgang til bruk av GPS." , Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Du må gi appen tilgang til bruk av GPS.", Toast.LENGTH_LONG).show();
 
         }
     }

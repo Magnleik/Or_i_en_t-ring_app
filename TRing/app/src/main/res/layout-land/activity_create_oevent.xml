@@ -12,24 +12,24 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Løypenavn"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
+        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.477" />
+        app:layout_constraintVertical_bias="0.196" />
 
     <fragment
         android:id="@+id/map_under_creation"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="356dp"
         android:layout_height="360dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/create_event_name"
+        android:layout_marginStart="240dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:context="no.teacherspet.tring.activities.MapsActivity" />
@@ -38,27 +38,18 @@
         android:id="@+id/done_creating_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:onClick="saveEvent"
-        android:text="Ferdig"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/map_under_creation" />
-
-    <Button
-        android:id="@+id/delete_last_point_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:onClick="deleteLastPoint"
-        android:text="Angre"
-        app:layout_constraintBottom_toTopOf="@+id/done_creating_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/map_under_creation" />
+        android:layout_marginTop="8dp"
+        android:onClick="saveEvent"
+        android:text="Ferdig"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.668" />
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/floatingActionMenu"
@@ -77,7 +68,7 @@
             android:id="@+id/add_point_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="addExistingPoints"
+            android:onClick="existingPointClicked"
             android:src="@drawable/place"
             app:fab_label="Hent lagrede punkt"
             app:fab_size="mini" />

@@ -10,14 +10,16 @@
         android:id="@+id/create_event_name"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="84dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Løypenavn"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/map_under_creation"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <fragment
@@ -25,41 +27,15 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="356dp"
         android:layout_height="360dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_event_name"
+        app:layout_constraintTop_toTopOf="parent"
         tools:context="no.teacherspet.tring.activities.MapsActivity" />
-
-    <Button
-        android:id="@+id/delete_last_point_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="12dp"
-        android:onClick="deleteLastPoint"
-        android:text="Angre"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/map_under_creation" />
-
-    <Button
-        android:id="@+id/done_creating_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:onClick="saveEvent"
-        android:text="Ferdig"
-        app:layout_constraintBottom_toBottomOf="@+id/delete_last_point_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.152"
-        app:layout_constraintStart_toEndOf="@+id/delete_last_point_btn" />
 
 
     <com.github.clans.fab.FloatingActionMenu
@@ -80,8 +56,8 @@
             android:id="@+id/add_point_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="existingPointClicked"
             android:src="@drawable/place"
-            android:onClick="addExistingPoints"
             app:fab_label="Hent lagrede punkt"
             app:fab_size="mini" />
 
@@ -89,13 +65,30 @@
             android:id="@+id/my_location_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/my_location"
             android:onClick="addMarkerMyPosition"
+            android:src="@drawable/my_location"
             app:fab_label="Lag punkt på min posisjon"
             app:fab_size="mini" />
 
 
     </com.github.clans.fab.FloatingActionMenu>
+
+    <Button
+        android:id="@+id/done_creating_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="saveEvent"
+        android:text="Ferdig"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_under_creation"
+        app:layout_constraintVertical_bias="0.259" />
 
 
 </android.support.constraint.ConstraintLayout>
