@@ -71,7 +71,6 @@ public interface Client {
 
     );
 
-
     @POST("/api/users")
     Call<Boolean> createNewUser(
             @Body User user
@@ -82,7 +81,6 @@ public interface Client {
             @Path("eventID") int eventID,
             @Path("time") String time
     );
-
 
     @DELETE("/api/events/{eventID}/points/{pointID}")
 
@@ -141,7 +139,6 @@ public interface Client {
             @Path("ID") int ID
 
     );
-
 
     @GET("/api/users")
     Call<Boolean> logIn(
