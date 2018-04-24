@@ -47,7 +47,7 @@ public class NetworkManager {
 
     private void init(){
         httpClient = new OkHttpClient.Builder();
-        String URL = "https://tring-tba4250.herokuapp.com";
+        String URL = "http://10.22.18.116";
         builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
@@ -66,7 +66,7 @@ public class NetworkManager {
 
         //updatePointTest();
         //addPointsTest();
-        //addEventTest();
+        addEventTest();
         //updateEventPropertiesTest();
 
     }
@@ -127,7 +127,11 @@ public class NetworkManager {
         addEvent(testEvent, new ICallbackAdapter<Event>() {
             @Override
             public void onResponse(Event object) {
-                System.out.println("Recieved event with ID " + object.getId());
+                if(object!=null) {
+                    System.out.println("Recieved event with ID " + object.getId());
+                }else{
+                    System.out.println("Received response on addEventTest with NULL as response body");
+                }
             }
 
             @Override
