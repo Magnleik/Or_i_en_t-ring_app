@@ -181,8 +181,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                         if (startPoint != null) {
                             startPoint.setIcon(BitmapDescriptorFactory.defaultMarker());
                         }
-                        startPoint = marker;
                         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        startPoint = marker;
                         dialog.dismiss();
                         break;
                     case 1:
@@ -250,7 +250,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param marker to be removed
      */
     public void deletePoint(Marker marker) {
-        if (marker == startPoint) {
+        if (marker.equals(startPoint)) {
             startPoint = null;
         }
         if (arrayListWithCoords.size() > 0) {
