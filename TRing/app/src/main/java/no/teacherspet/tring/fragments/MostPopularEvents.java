@@ -109,33 +109,35 @@ public class MostPopularEvents extends Fragment {
             lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    position = new LatLng(location.getLatitude(), location.getLongitude());
-                    if (!(position.longitude==0.0 || position.latitude==0.0)) {
-                        ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
-                            @Override
-                            public void onResponse(ArrayList<Event> object) {
-                                if (object == null) {
-                                    Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    for (int i = 0; i < object.size(); i++) {
-                                        theEventReceived.put(object.get(i).getId(), object.get(i));
+                    if(location != null) {
+                        position = new LatLng(location.getLatitude(), location.getLongitude());
+                        if (!(position.longitude == 0.0 || position.latitude == 0.0)) {
+                            ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
+                                @Override
+                                public void onResponse(ArrayList<Event> object) {
+                                    if (object == null) {
+                                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        for (int i = 0; i < object.size(); i++) {
+                                            theEventReceived.put(object.get(i).getId(), object.get(i));
+                                        }
+                                    }
+                                    listItems = new ArrayList<>();
+                                    if (theEventReceived != null) {
+                                        for (Event ev : theEventReceived.values()) {
+                                            listItems.add(ev);
+                                        }
+                                        updateList();
                                     }
                                 }
-                                listItems = new ArrayList<>();
-                                if (theEventReceived != null) {
-                                    for (Event ev : theEventReceived.values()) {
-                                        listItems.add(ev);
-                                    }
-                                    updateList();
-                                }
-                            }
 
-                            @Override
-                            public void onFailure(Throwable t) {
-                                Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
-                            }
-                        };
-                        networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                                @Override
+                                public void onFailure(Throwable t) {
+                                    Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                                }
+                            };
+                            networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                        }
                     }
                 }
             });

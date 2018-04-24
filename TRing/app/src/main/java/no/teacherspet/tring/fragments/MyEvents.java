@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
@@ -22,6 +23,7 @@ import java.util.List;
 import connection.Event;
 import connection.NetworkManager;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
@@ -151,6 +153,7 @@ public class MyEvents extends Fragment {
         }
         else{
             listItems = null;
+            Toast.makeText(this.getContext(), "Found no events", Toast.LENGTH_SHORT).show();
         }
     }
     private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints){
@@ -172,6 +175,11 @@ public class MyEvents extends Fragment {
                 event.addProperty(key, oEvent.getProperties().get(key));
             }
             listItems.add(event);
+            updateList();
+            Toast.makeText(this.getContext(), "Added event to listItems", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(this.getContext(), "Found no points", Toast.LENGTH_SHORT).show();
         }
     }
     private void updateList() {

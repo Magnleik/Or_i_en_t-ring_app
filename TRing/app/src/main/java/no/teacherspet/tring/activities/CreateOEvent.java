@@ -51,7 +51,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private PointViewModel pointViewModel;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel pointOEventJoinViewModel;
-    private boolean savedAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,11 +195,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         networkManager.addEvent(event, new ICallbackAdapter<Event>() {
             @Override
             public void onResponse(Event object) {
-                if(object==null){
-                    Toast.makeText(getApplicationContext(),"Failed to create event.",Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.",Toast.LENGTH_SHORT).show();
+                if (object == null) {
+                    Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
                     saveEventToRoom(object);
                     finish();
                 }
@@ -208,7 +206,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onFailure(Throwable t) {
-                Toast.makeText(getApplicationContext(),"Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
             }
         });
         //StartupMenu.addEvent(event);
@@ -223,17 +221,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         localDatabase = LocalDatabase.getInstance(this);
         pointViewModel = new PointViewModel(localDatabase.pointDAO());
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
-        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        savedAll = true;
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> checkSave(longs));
+        oEventViewModel.addOEvents(newevent);
 
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
-        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
             Point point = event.getPoints().get(i);
             RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            roomPoints[i] = roomPoint;
+        }
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
+    }
+    private void joinPointsToEvent(Event event){
+        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+
+        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
             PointOEventJoin join;
             if(i > 0){
                 join = new PointOEventJoin(point.getId(), event.getId(), false);
@@ -241,23 +246,23 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             else{
                 join = new PointOEventJoin(point.getId(), event.getId(), true);
             }
-            roomPoints[i] = roomPoint;
             joins[i] = join;
         }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> checkSave(longs));
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
+    }
+
+    private void checkSave(long[] longs) {
+        boolean savedAll = true;
+        for (long aLong : longs) {
+            if (aLong < 0) {
+                savedAll = false;
+            }
+        }
         if(savedAll){
             Toast.makeText(this, "Save to phone successfull", Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(this, "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
-        }
-    }
-    private void checkSave(long[] longs) {
-        for (long aLong : longs) {
-            if (aLong < 0) {
-                savedAll = false;
-            }
         }
     }
 
