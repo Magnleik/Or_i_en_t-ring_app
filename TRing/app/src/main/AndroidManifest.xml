@@ -50,6 +50,9 @@
         <activity android:name=".activities.PerformOEvent"
         android:configChanges="keyboardHidden|screenSize" />
 
+        <activity android:name=".activities.AddExistingPoint">
+
+        </activity>
         <activity
             android:name=".activities.CreateUserActivity"
             android:label="Create User" />

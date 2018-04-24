@@ -19,6 +19,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -62,13 +63,14 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        setResult(RESULT_CANCELED,null);
+        setResult(RESULT_CANCELED, null);
         finish();
         return false;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getApplicationContext(), "App needs permission to access location services on phone to run", Toast.LENGTH_LONG).show();
             finish();
@@ -80,22 +82,37 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                         networkManager.getNearbyPoints(location.getLatitude(), location.getLongitude(), 200, new ICallbackAdapter<ArrayList<Point>>() {
                             @Override
                             public void onResponse(ArrayList<Point> object) {
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
                                 for (Point point : object) {
                                     mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
+                                    builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                                 }
                                 Toast.makeText(getApplicationContext(), "Select points you wish to add", Toast.LENGTH_SHORT).show();
-                                mMap.moveCamera(CameraUpdateFactory.zoomTo(20.0f));
-                                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+                                LatLngBounds bounds = builder.build();
+
+                                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                                    @Override
+                                    public void onMapLoaded() {
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                                        mMap.setLatLngBoundsForCameraTarget(bounds);
+                                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                                    }
+                                });
                                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                     @Override
                                     public boolean onMarkerClick(Marker marker) {
-                                        if(selectedMarker != null){
-                                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                                        if (selectedPoints.contains(marker.getPosition())) {
+                                            selectedPoints.remove(marker.getPosition());
+                                            marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                                            return false;
+                                        } else {
+                                            if (selectedMarker != null) {
+                                                selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                                            }
+                                            selectedMarker = marker;
+                                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                                            return true;
                                         }
-                                        selectedMarker = marker;
-                                        selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                                        selectedMarker.showInfoWindow();
-                                        return true;
                                     }
                                 });
                             }
@@ -111,17 +128,18 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-    public void addButtonClick(View v){
-        if(selectedMarker != null){
+    public void addButtonClick(View v) {
+        if (selectedMarker != null) {
             selectedPoints.add(selectedMarker.getPosition());
             selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            selectedMarker = null;
         }
     }
 
-    public void doneAddingClick(View v){
+    public void doneAddingClick(View v) {
         Intent intent = new Intent();
         intent.putExtra("SelectedPositions", selectedPoints);
-        setResult(RESULT_OK,intent);
+        setResult(RESULT_OK, intent);
         finish();
     }
 

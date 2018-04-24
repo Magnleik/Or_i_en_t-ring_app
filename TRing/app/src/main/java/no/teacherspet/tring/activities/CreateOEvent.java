@@ -136,29 +136,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param v
      */
     public void addExistingPoints(View v) {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), "App needs permission to access location services on phone to run", Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            lm.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    NetworkManager.getInstance().getNearbyPoints(location.getLatitude(), location.getLongitude(), 200, new ICallbackAdapter<ArrayList<Point>>() {
-                        @Override
-                        public void onResponse(ArrayList<Point> object) {
-                            Intent intent = new Intent(CreateOEvent.this, AddExistingPoint.class);
-                            startActivityForResult(intent, 2);
-                            //TODO: visualize the points on screen which can be chosen
-                        }
-
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Could not find any points nearby.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
-        }
+        Intent intent = new Intent(CreateOEvent.this,AddExistingPoint.class);
+        startActivityForResult(intent,2);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -190,7 +169,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             arrayListWithCoords.add(point);
         }
     }
-    private void addExistingMarker(Intent data){
+
+    private void addExistingMarker(Intent data) {
 
     }
 
