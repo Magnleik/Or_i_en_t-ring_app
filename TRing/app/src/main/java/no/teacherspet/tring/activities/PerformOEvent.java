@@ -62,7 +62,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
-        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
         if(startedEvent!=null){
             points = readPoints();
             if (points==null){

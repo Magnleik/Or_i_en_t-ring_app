@@ -34,15 +34,14 @@
         <activity
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".activities.StartupMenu"/>
-
-        <activity android:name=".activities.OrientationSelector" >
+        <activity android:name=".activities.StartupMenu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".activities.OrientationSelector" />
         <activity
             android:name=".activities.PopupPointDesc"
             android:theme="@style/AppTheme.PopupTheme" />
@@ -53,6 +52,10 @@
         <activity
             android:name=".activities.CreateUserActivity"
             android:label="Create User" />
+
+        <activity
+            android:name=".activities.LogInActivity"
+            android:label="Log In" />
 
         <activity
             android:name=".activities.ListOfSavedEvents"

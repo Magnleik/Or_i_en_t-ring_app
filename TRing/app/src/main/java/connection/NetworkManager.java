@@ -45,40 +45,9 @@ public class NetworkManager {
         return nm;
     }
 
-    /**
-     * When logging on, call this method with the username and password. Will add authentification to the HTTP calls.
-     * @param username The username
-     * @param password The password
-     */
-    private void addCredentials(String username, String password){
-
-        String authToken = null;
-
-        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
-            authToken = Credentials.basic(username, password);
-        }
-
-        if (!TextUtils.isEmpty(authToken)) { //FIXME: Does this handle null?
-            AuthenticationInterceptor interceptor =
-                    new AuthenticationInterceptor(authToken);
-
-            if (!httpClient.interceptors().contains(interceptor)) {
-                httpClient.addInterceptor(interceptor);
-
-                builder.client(httpClient.build());
-                retrofit = builder.build();
-            }
-        }
-
-        client = retrofit.create(Client.class);
-
-        updatePointTest();
-
-    }
-
     private void init(){
         httpClient = new OkHttpClient.Builder();
-        String URL = "http://10.22.19.155";
+        String URL = "http://10.22.18.116";
         builder = new Retrofit.Builder()
                 .baseUrl(URL)
                 .addConverterFactory(
@@ -97,7 +66,7 @@ public class NetworkManager {
 
         //updatePointTest();
         //addPointsTest();
-        //addEventTest();
+        addEventTest();
         //updateEventPropertiesTest();
 
     }
@@ -158,7 +127,11 @@ public class NetworkManager {
         addEvent(testEvent, new ICallbackAdapter<Event>() {
             @Override
             public void onResponse(Event object) {
-                System.out.println("Recieved event with ID " + object.getId());
+                if(object!=null) {
+                    System.out.println("Recieved event with ID " + object.getId());
+                }else{
+                    System.out.println("Received response on addEventTest with NULL as response body");
+                }
             }
 
             @Override
@@ -206,7 +179,7 @@ public class NetworkManager {
             public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
 
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "addPoints got onResponse, without success");
+                    Log.i("NETWORK", "addPoints got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "addPoints successful with response: " + response.toString());
@@ -231,7 +204,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "addPointsToEvent got onResponse, without success");
+                    Log.i("NETWORK", "addPointsToEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "addPointsToEvent successful with response: " + response.toString());
@@ -260,7 +233,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "addEvent got onResponse, without success");
+                    Log.i("NETWORK", "addEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "addEvent successful with response: " + response.toString());
@@ -279,78 +252,6 @@ public class NetworkManager {
     }
 
     /**
-     * Create a new user in the database, and authenticates this instance of the application (from the server perspective, logs you in).
-     * @param username The username chosen
-     * @param password The password chosen
-     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
-     */
-    public void createUser(String username, String password, final ICallbackAdapter<Boolean> callback){
-
-        User myUser = new User(username,password);
-
-        Call<Boolean> call = client.createNewUser(myUser);
-
-        call.enqueue(new Callback<Boolean>() {
-            @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                if(!response.isSuccessful()){
-                    Log.i("NETWORK", "createUser got onResponse, without success");
-                }
-                else {
-                    Log.i("NETWORK", "createUser successful with response: " + response.toString());
-                    if(response.body()!=null && response.body()) {
-                        addCredentials(username, password);
-                    }
-                }
-
-                callback.onResponse(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
-                Log.e("NETWORK", t.getMessage(), t);
-                callback.onFailure(t);
-            }
-        });
-    }
-
-    /**
-     * Check log in credentials with the database, and authenticates this instance of the application (from the server perspective, logs you in).
-     * @param username The username chosen
-     * @param password The password chosen
-     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
-     */
-    public void logIn(String username, String password, final ICallbackAdapter<Boolean> callback){
-
-        User myUser = new User(username,password);
-
-        Call<Boolean> call = client.logIn(myUser);
-
-        call.enqueue(new Callback<Boolean>() {
-            @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                if(!response.isSuccessful()){
-                    Log.i("NETWORK", "logIn got onResponse, without success");
-                }
-                else {
-                    Log.i("NETWORK", "logIn successful with response: " + response.toString());
-                    if(response.body()!=null && response.body()) {
-                        addCredentials(username, password);
-                    }
-                }
-
-                callback.onResponse(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
-                Log.e("NETWORK", t.getMessage(), t);
-                callback.onFailure(t);
-            }
-        });
-    }
-
-    /**
      * Post the time taken to complete the event with the given ID. Used to update the avgTime.
      * @param eventID The int ID of the event you wish to post a time for.
      * @param time The time used, on the format "hh:mm:ss"
@@ -363,7 +264,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "postTime got onResponse, without success");
+                    Log.i("NETWORK", "postTime got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "postTime successful with response: " + response.toString());
@@ -401,7 +302,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<List<Point>> call, @NonNull Response<List<Point>> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "getNearbyPoints got onResponse, without success");
+                    Log.i("NETWORK", "getNearbyPoints got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "getNearbyPoints successfull with response: " + response.toString());
@@ -434,7 +335,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "getNearbyEvents got onResponse, without success");
+                    Log.i("NETWORK", "getNearbyEvents got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "getNearbyEvents successfull with response: " + response.toString());
@@ -464,7 +365,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "getEventById got onResponse, without success");
+                    Log.i("NETWORK", "getEventById got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "getEventById successfull with response: " + response.toString());
@@ -498,7 +399,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "updateEventProperties got onResponse, without success");
+                    Log.i("NETWORK", "updateEventProperties got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "updateEventProperties successful with response: " + response.toString());
@@ -530,7 +431,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Point> call, @NonNull Response<Point> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "updatePoint got onResponse, without success");
+                    Log.i("NETWORK", "updatePoint got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "updatePoint successful with response: " + response.toString());
@@ -566,7 +467,7 @@ public class NetworkManager {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "removePointFromEvent got onResponse, without success");
+                    Log.i("NETWORK", "removePointFromEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
                     Log.i("NETWORK", "removePointFromEvent was successful with response: " + response.toString());
@@ -583,6 +484,128 @@ public class NetworkManager {
     }
 
     //endregion
+
+    //region login-logic
+
+    /**
+     * Create a new user in the database, and authenticates this instance of the application (from the server perspective, logs you in).
+     * @param username The username chosen
+     * @param password The password chosen
+     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
+     */
+    public void createUser(String username, String password, final ICallbackAdapter<Boolean> callback){
+
+        User myUser = new User(username,password);
+
+        Call<Boolean> call = client.createNewUser(myUser);
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "createUser got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "createUser successful with response: " + response.toString());
+                    if(response.body()!=null && response.body()) {
+                        addCredentials(username, password);
+                    }
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
+    /**
+     * Check log in credentials with the database, and authenticates this instance of the application (from the server perspective, logs you in).
+     * @param username The username chosen
+     * @param password The password chosen
+     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
+     */
+    public void logIn(String username, String password, final ICallbackAdapter<Boolean> callback){
+
+        logOut();
+
+        addCredentials(username,password);
+
+        Call<Boolean> call = client.logIn();
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+
+                if(response.isSuccessful()){
+                    Log.i("NETWORK", "logIn successful with response: " + response.toString());
+                    callback.onResponse(true);
+                }
+                else if(response.code()==401){
+                    Log.i("NETWORK", "logIn got 401 error");
+                    callback.onResponse(false);
+                    logOut();
+                }else{
+                    Log.i("NETWORK", "logIn got onResponse, without success. RESPONSE: " +response.toString());
+                    callback.onResponse(null);
+                    logOut();
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
+
+    /**
+     * When logging on, call this method with the username and password. Will add authentification to the HTTP calls.
+     * @param username The username
+     * @param password The password
+     */
+    private void addCredentials(String username, String password){
+
+        String authToken = null;
+
+        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
+            authToken = Credentials.basic(username, password);
+        }
+
+        if (!TextUtils.isEmpty(authToken)) { //FIXME: Does this handle null?
+            AuthenticationInterceptor interceptor =
+                    new AuthenticationInterceptor(authToken);
+
+            if (!httpClient.interceptors().contains(interceptor)) {
+                httpClient.addInterceptor(interceptor);
+
+                builder.client(httpClient.build());
+                retrofit = builder.build();
+            }
+        }
+
+        client = retrofit.create(Client.class);
+    }
+
+    public void logOut(){
+
+        if(isAuthenticated()){
+            for (int i = httpClient.interceptors().size()-1; i >=0; i--) {
+                if( httpClient.interceptors().get(i) instanceof AuthenticationInterceptor){
+                    httpClient.interceptors().remove(i);
+                }
+            }
+        }
+
+    }
 
     /**
      * Checks to see if the client is already authenticated. And thus does not need to log in.
@@ -611,5 +634,7 @@ public class NetworkManager {
             return chain.proceed(request);
         }
     }
+
+    //endregion
 
 }
