@@ -39,7 +39,7 @@ public class StartupMenu extends AppCompatActivity{
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
+        //user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
@@ -61,6 +61,11 @@ public class StartupMenu extends AppCompatActivity{
 
     public void orientering(View v){
         Intent intent = new Intent(StartupMenu.this,OrientationSelector.class);
+        startActivity(intent);
+    }
+
+    public void createUserButton(View v){
+        Intent intent = new Intent(StartupMenu.this,CreateUserActivity.class);
         startActivity(intent);
     }
 

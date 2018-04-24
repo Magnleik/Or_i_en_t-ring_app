@@ -10,4 +10,11 @@
         android:layout_height="wrap_content"
         android:onClick="orientering"
         android:text="Orientering" />
+
+    <Button
+        android:id="@+id/create_user_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="createUserButton"
+        android:text="Create New User" />
 </LinearLayout>
