@@ -55,9 +55,8 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         tabLayout.bringToFront();
         tabLayout.setupWithViewPager(mViewPager);
 
-
-
     }
+
 
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
@@ -78,8 +77,10 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case (android.R.id.home):
+                finish();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

@@ -83,38 +83,40 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                             @Override
                             public void onResponse(ArrayList<Point> object) {
                                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                                for (Point point : object) {
-                                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
-                                    builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
-                                }
-                                Toast.makeText(getApplicationContext(), "Select points you wish to add", Toast.LENGTH_SHORT).show();
-                                LatLngBounds bounds = builder.build();
+                                if(object!=null) {
+                                    for (Point point : object) {
+                                        mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
+                                        builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
+                                    }
+                                    Toast.makeText(getApplicationContext(), "Select points you wish to add", Toast.LENGTH_SHORT).show();
+                                    LatLngBounds bounds = builder.build();
 
-                                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                                    @Override
-                                    public void onMapLoaded() {
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-                                        mMap.setLatLngBoundsForCameraTarget(bounds);
-                                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                                    }
-                                });
-                                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                    @Override
-                                    public boolean onMarkerClick(Marker marker) {
-                                        if (selectedPoints.contains(marker.getPosition())) {
-                                            selectedPoints.remove(marker.getPosition());
-                                            marker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                                            return false;
-                                        } else {
-                                            if (selectedMarker != null) {
-                                                selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                                            }
-                                            selectedMarker = marker;
-                                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                                            return true;
+                                    mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                                        @Override
+                                        public void onMapLoaded() {
+                                            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                                            mMap.setLatLngBoundsForCameraTarget(bounds);
+                                            mMap.moveCamera(CameraUpdateFactory.zoomOut());
                                         }
-                                    }
-                                });
+                                    });
+                                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                        @Override
+                                        public boolean onMarkerClick(Marker marker) {
+                                            if (selectedPoints.contains(marker.getPosition())) {
+                                                selectedPoints.remove(marker.getPosition());
+                                                marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                                                return false;
+                                            } else {
+                                                if (selectedMarker != null) {
+                                                    selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                                                }
+                                                selectedMarker = marker;
+                                                selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                                                return true;
+                                            }
+                                        }
+                                    });
+                                }
                             }
 
                             @Override

@@ -171,7 +171,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addExistingMarker(Intent data) {
-
+        ArrayList<LatLng> positions = data.getParcelableArrayListExtra("selectedPositions");
+        for (LatLng position:positions){
+            mMap.addMarker(new MarkerOptions().position(position));
+        }
+        Toast.makeText(getApplicationContext(),"Added " + positions.size() + " points.",Toast.LENGTH_SHORT).show();
     }
 
     /**
