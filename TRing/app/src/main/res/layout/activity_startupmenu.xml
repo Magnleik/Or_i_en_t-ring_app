@@ -12,6 +12,19 @@
         android:text="Orientering" />
 
     <Button
+        android:id="@+id/log_in_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="logInButton"
+        android:text="Log In" />
+
+    <Button
+        android:id="@+id/log_out_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log out" />
+
+    <Button
         android:id="@+id/create_user_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

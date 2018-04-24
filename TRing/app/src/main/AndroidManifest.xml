@@ -54,6 +54,10 @@
             android:label="Create User" />
 
         <activity
+            android:name=".activities.LogInActivity"
+            android:label="Log In" />
+
+        <activity
             android:name=".activities.ListOfSavedEvents"
             android:label="@string/title_activity_list_of_saved_events">
         </activity>
