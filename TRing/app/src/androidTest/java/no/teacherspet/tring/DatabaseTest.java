@@ -111,10 +111,10 @@ public class DatabaseTest {
             return testRoomUser1.getId() == user.getId();
         });
         userDAO.getPersonalUser().test().assertValue(user -> {
-            return testRoomUser1.getId() == user.getId();
+            return testRoomUser1.getId() == user.get(0).getId();
         });
         userDAO.getPersonalUser().test().assertValue(user -> {
-            return testRoomUser1.getFullName().equals(user.getFullName());
+            return testRoomUser1.getFullName().equals(user.get(0).getFullName());
         });
         userDAO.getMaxID().test().assertValue(integer -> {
             return testRoomUser1.getId() == integer;

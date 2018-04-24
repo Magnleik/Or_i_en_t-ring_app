@@ -147,6 +147,7 @@ public class MyEvents extends Fragment {
             for(RoomOEvent oEvent:oEvents){
                 joinViewModel.getPointsForOEvent(oEvent.getId()).subscribe(roomPoints -> createEvent(oEvent, roomPoints));
             }
+            updateList();
         }
         else{
             listItems = null;
@@ -173,8 +174,12 @@ public class MyEvents extends Fragment {
             listItems.add(event);
         }
     }
+    private void updateList() {
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
+    }
 
-    // TODO: Rename method, update argument and hook method into UI event
+        // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

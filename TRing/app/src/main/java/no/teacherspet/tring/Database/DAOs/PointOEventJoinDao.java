@@ -36,6 +36,15 @@ public interface PointOEventJoinDao {
             " WHERE point_oevent_join.pointID = :pointID")
     Maybe<List<RoomOEvent>> getOEventsForPoint(int pointID);
 
+    @Query("SELECT * FROM point_oevent_join WHERE pointID = :pointID")
+    Maybe<List<PointOEventJoin>> getJoinsForPoint(int pointID);
+
+    @Query("SELECT * FROM point_oevent_join WHERE oEventID = :oEventID")
+    Maybe<List<PointOEventJoin>> getJoinsForOEvent(int oEventID);
+
+    @Query("SELECT * FROM point_oevent_join")
+    Maybe<List<PointOEventJoin>> getAll();
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(PointOEventJoin... pointOEventJoins);
 

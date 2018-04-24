@@ -46,10 +46,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient lm;
     private LatLng position;
     private NetworkManager networkManager;
-    LocalDatabase localDatabase;
-    PointViewModel pointViewModel;
-    OEventViewModel oEventViewModel;
-    PointOEventJoinViewModel pointOEventJoinViewModel;
+
+    private LocalDatabase localDatabase;
+    private PointViewModel pointViewModel;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel pointOEventJoinViewModel;
+    private boolean savedAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,7 +217,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         //Reset
     }
     /**
-     * Saves the Event and Points, and adds connections between them in the Room database
+     * Saves the Event and corresponding Points, and adds connections between them in the Room database
      */
     private void saveEventToRoom(Event event){
         localDatabase = LocalDatabase.getInstance(this);
@@ -224,6 +226,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
+        savedAll = true;
         oEventViewModel.addOEvents(newevent).subscribe(longs -> checkSave(longs));
 
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
@@ -242,22 +245,19 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             joins[i] = join;
         }
         pointViewModel.addPoints(roomPoints).subscribe(longs -> checkSave(longs));
-        pointOEventJoinViewModel.addJoin(joins).subscribe(longs -> checkSave(longs));
-
-    }
-
-    private void checkSave(long[] longs) {
-        boolean allSaved= true;
-        for (int i = 0; i < longs.length; i++) {
-            if(longs[i] < 0){
-                allSaved = false;
-            }
-        }
-        if(allSaved){
-            Toast.makeText(this, "Save successfully", Toast.LENGTH_LONG).show();
+        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
+        if(savedAll){
+            Toast.makeText(this, "Save to phone successfull", Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void checkSave(long[] longs) {
+        for (long aLong : longs) {
+            if (aLong < 0) {
+                savedAll = false;
+            }
         }
     }
 
