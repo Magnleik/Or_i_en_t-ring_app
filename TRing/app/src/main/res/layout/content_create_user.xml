@@ -17,23 +17,41 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/first_name"
+            android:id="@+id/create_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/first_name"
+            android:hint="Username"
             android:inputType="textPersonName"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/last_name"
+            android:id="@+id/create_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/last_name"
-            android:inputType="textPersonName"
-            app:layout_constraintTop_toBottomOf="@+id/first_name" />
+            android:hint="Password"
+            android:inputType="textPassword"
+            app:layout_constraintTop_toBottomOf="@+id/create_username" />
 
+        <EditText
+            android:id="@+id/password_check_edittext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Repeat password"
+            android:inputType="textPassword"
+            app:layout_constraintTop_toBottomOf="@+id/create_password"/>
+
+        <ProgressBar
+            android:id="@+id/create_user_progressbar"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
     </LinearLayout>
 
     <Button
@@ -42,14 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:text="@string/save"
-        app:layout_constraintBottom_toBottomOf="parent" />
-<!--
-    <TextView
-        android:id="@+id/testingtext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
--->
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </android.support.constraint.ConstraintLayout>

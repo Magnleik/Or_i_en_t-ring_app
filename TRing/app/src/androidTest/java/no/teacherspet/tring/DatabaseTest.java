@@ -13,7 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,17 +20,13 @@ import no.teacherspet.tring.Database.DAOs.OEventDao;
 import no.teacherspet.tring.Database.DAOs.PointDao;
 import no.teacherspet.tring.Database.DAOs.PointOEventJoinDao;
 import no.teacherspet.tring.Database.DAOs.UserDao;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by Hermann on 15.02.2018.

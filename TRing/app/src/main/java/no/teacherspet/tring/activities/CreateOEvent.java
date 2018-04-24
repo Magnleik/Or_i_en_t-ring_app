@@ -105,8 +105,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     else{
                         position = new LatLng(10.416136, 10.405297);
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                 }
             });
         }
@@ -115,18 +115,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             for (LatLng latlgn : latLngArrayList) {
                 Marker Point = mMap.addMarker(new MarkerOptions().position(latlgn).title("Punkt " + (arrayListWithCoords.size() + 1)));
                 arrayListWithCoords.add(Point);
-                this.createPoints(findViewById(R.id.map_under_creation));
             }
         }
-    }
-
-    /**
-     * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
-     * @param v
-     */
-    public void createPoints(View v) {
-
-        Toast.makeText(getApplicationContext(), "Klikk på kartet for å legge til punkter.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Klikk på kartet for å legge til punkter.", Toast.LENGTH_SHORT).show();
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             public void onMapClick(LatLng latLng) {
@@ -140,7 +131,35 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+    }
 
+    /**
+     * Enables the user to add markers to the map for creating a new event. The markers later get converted to Point objects. Method gets called when the "Legg til punkter" button is pressed
+     * @param v
+     */
+    public void addExistingPoints(View v) {
+        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getApplicationContext(),"App needs permission to access location services on phone to run",Toast.LENGTH_LONG).show();
+            finish();
+        }
+        else {
+            lm.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    NetworkManager.getInstance().getNearbyPoints(location.getLatitude(), location.getLongitude(), 200, new ICallbackAdapter<ArrayList<Point>>() {
+                        @Override
+                        public void onResponse(ArrayList<Point> object) {
+                            //TODO: visualize the points on screen which can be chosen
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(getApplicationContext(),"Could not find any points nearby.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -150,13 +169,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             if (requestCode == 1) {
                 if (resultCode == RESULT_OK) {
                     if (name != null) {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name));
+                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name).draggable(true));
                         arrayListWithCoords.add(point);
                     } else {
-                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title("Punkt " + (arrayListWithCoords.size() + 1)));
+                        Marker point = mMap.addMarker(new MarkerOptions().position(position).title("Punkt " + (arrayListWithCoords.size() + 1)).draggable(true));
                         arrayListWithCoords.add(point);
                     }
-
                 }
             }
         }

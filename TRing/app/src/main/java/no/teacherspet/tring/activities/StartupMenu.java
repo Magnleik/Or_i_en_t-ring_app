@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
+import connection.NetworkManager;
 import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
@@ -62,6 +63,20 @@ public class StartupMenu extends AppCompatActivity{
     public void orientering(View v){
         Intent intent = new Intent(StartupMenu.this,OrientationSelector.class);
         startActivity(intent);
+    }
+
+    public void createUserButton(View v){
+        Intent intent = new Intent(StartupMenu.this,CreateUserActivity.class);
+        startActivity(intent);
+    }
+
+    public void logInButton(View v){
+        Intent intent = new Intent(StartupMenu.this,LogInActivity.class);
+        startActivity(intent);
+    }
+
+    public void logOutButton(View v){
+        NetworkManager.getInstance().logOut();
     }
 
     private boolean requestAccess(){

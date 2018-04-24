@@ -136,7 +136,7 @@ public class MyEvents extends Fragment {
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
 
-        oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
+        //oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
     }
     private void loadPoints(List<RoomOEvent> oEvents){
         if(oEvents.size() > 0){
