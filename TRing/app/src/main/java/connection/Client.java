@@ -82,6 +82,9 @@ public interface Client {
             @Path("time") String time
     );
 
+    @POST("/api/login")
+    Call<Boolean> logIn();
+
     @DELETE("/api/events/{eventID}/points/{pointID}")
 
     Call<Void> removePointFromEvent(
@@ -138,11 +141,6 @@ public interface Client {
 
             @Path("ID") int ID
 
-    );
-
-    @GET("/api/users")
-    Call<Boolean> logIn(
-            @Body User user
     );
 
 }
