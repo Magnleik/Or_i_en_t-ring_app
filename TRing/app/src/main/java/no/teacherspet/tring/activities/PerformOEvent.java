@@ -199,7 +199,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         double longitude = location.getLongitude();
                         double latitude = location.getLatitude();
                         LatLng latlng = new LatLng(latitude, longitude);
-                        final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
+                        final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).icon(BitmapDescriptorFactory.fromResource(R.drawable.person_bitmap)).title("HER ER DU"));
                         //Zoomer til posisjon
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
                         positionViewed++;
