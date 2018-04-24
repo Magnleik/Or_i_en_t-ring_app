@@ -7,36 +7,33 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Map;
+
 /**
  * Created by Hermann on 13.02.2018.
  */
 @Entity(tableName = "point", indices = @Index(value = "id", unique = true))
-public class Point {
+public class RoomPoint {
 
-    public Point(int id, String description, LatLng latLng) {
+    public RoomPoint(int id, Map<String, String> properties, LatLng latLng) {
         this.id = id;
-        this.description = description;
+        this.properties = properties;
         this.latLng = latLng;
+        this.visited = false;
     }
 
     @PrimaryKey //(autoGenerate = true)
-    public int id;
+    private int id;
 
-    private String description;
     private LatLng latLng;
+    private Map<String, String> properties;
+    private boolean visited;
 
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public LatLng getLatLng() {
@@ -46,5 +43,17 @@ public class Point {
         this.latLng = latLng;
     }
 
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
 
+    public boolean isVisited() {
+        return visited;
+    }
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+    }
 }

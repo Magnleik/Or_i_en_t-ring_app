@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+
+import no.teacherspet.tring.R;
 
 public class OrientationSelector extends AppCompatActivity {
 
@@ -17,11 +19,19 @@ public class OrientationSelector extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * Moves to the lists of available events. Method gets called when the "Gjennomfør løp" button is pressed
+     * @param v
+     */
     public void goToOrientationList (View v){
         Intent intent = new Intent(OrientationSelector.this,ListOfSavedEvents.class);
         startActivity(intent);
     }
 
+    /**
+     * Goes to the screen for creating new events. Method gets called when the "Lag nytt løp" button is pressed
+     * @param v
+     */
     public void createEvent (View v){
         Intent intent = new Intent(OrientationSelector.this, CreateOEvent.class);
         startActivity(intent);

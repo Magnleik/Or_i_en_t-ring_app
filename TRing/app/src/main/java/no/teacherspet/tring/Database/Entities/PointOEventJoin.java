@@ -10,11 +10,11 @@ import android.arch.persistence.room.Index;
 @Entity(tableName = "point_oevent_join",
         primaryKeys = {"pointID", "oEventID"},
         foreignKeys = {
-                @ForeignKey(entity = Point.class,
+                @ForeignKey(entity = RoomPoint.class,
                         parentColumns = "id",
                         childColumns = "pointID",
                         onDelete = ForeignKey.CASCADE),
-                @ForeignKey(entity = OEvent.class,
+                @ForeignKey(entity = RoomOEvent.class,
                         parentColumns = "id",
                         childColumns = "oEventID",
                         onDelete = ForeignKey.CASCADE)

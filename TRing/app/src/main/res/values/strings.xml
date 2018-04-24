@@ -4,6 +4,9 @@
 
     <string name="title_activity_create_user">CreateUserActivity</string>
     <string name ="create">create</string>
+    <string name="save">Save</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

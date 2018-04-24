@@ -1,3 +1,4 @@
+
 package connection;
 
 import android.support.annotation.NonNull;
@@ -76,7 +77,6 @@ public class NetworkManager {
     }
 
     private void init(){
-
         httpClient = new OkHttpClient.Builder();
         String URL = "http://10.22.19.155";
         builder = new Retrofit.Builder()
@@ -388,7 +388,7 @@ public class NetworkManager {
      * Finds all points within a circle with radius maxDist from the given location
      * @param latitude The latitude of given position
      * @param longitude The longitude of given position
-     * @param maxDist The radius of search
+     * @param maxDist The radius of search in metres
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets an ArrayList of Points within the given circle
      */
     public void getNearbyPoints(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Point>> callback){

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="no.teacherspet.tring.CreateOEvent">
+    tools:context="no.teacherspet.tring.activities.CreateOEvent">
 
     <EditText
         android:id="@+id/create_event_name"
@@ -33,7 +33,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/create_event_name"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context="no.teacherspet.tring.MapsActivity" />
+        tools:context="no.teacherspet.tring.activities.MapsActivity" />
 
     <Button
         android:id="@+id/add_point_btn"

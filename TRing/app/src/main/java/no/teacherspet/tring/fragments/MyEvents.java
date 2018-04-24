@@ -1,35 +1,37 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import connection.Event;
+import connection.NetworkManager;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointViewModel;
+import no.teacherspet.tring.activities.ListOfSavedEvents;
+import no.teacherspet.tring.activities.PerformOEvent;
+import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.EventAdapter;
 
 
 /**
@@ -51,11 +53,15 @@ public class MyEvents extends Fragment {
     private String mParam2;
     private Event selectedEvent;
     private ListView mListView;
-    private HashMap<Integer,Event> theEventReceived;
-    ///////
-
-
-    ///////
+    private HashMap<Integer, Event> theEventReceived;
+    private NetworkManager networkManager;
+    private FusedLocationProviderClient lm;
+    private LatLng position;
+    private LocalDatabase database;
+    private PointViewModel pointViewModel;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel joinViewModel;
+    private ArrayList<Event> listItems;
 
     private OnFragmentInteractionListener mListener;
 
@@ -85,92 +91,88 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HashMap<Integer,Event> theEventReceived = new HashMap<>();
+        HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_events, container, false);
-
         return view;
-
     }
 
-
-
-
-
-    //////////////TEST
-
-
-    public ArrayList<Event> initList1() {
-        theEventReceived = new StartupMenu().getTestEvents();
-        int i=0;
-        ArrayList<Event> listItems = new ArrayList<>();
-
-        for (Event ev : theEventReceived.values()) {
-            listItems.add(ev);
-            i++;
-        }
-        return listItems;
-    }
-
-
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
-
-        final ArrayList<Event> listItems = initList1();
-
-        //TITTEL
-        TextView textView = new TextView(this.getContext());
-        textView.setText("Mine løp");
-        textView.setTextSize(25);
-        textView.setTypeface(Typeface.MONOSPACE);
-        textView.setGravity(Gravity.CENTER);
-        textView.setHeight(150);
-
-        mListView.addHeaderView(textView);
-        /////
-
-
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
+        loadData();
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
         final Context context = this.getContext();
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position >0) {
+                if (position > 0) {
                     // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
                     Event selectedEvent = listItems.get(position - 1);
-
                     // 2
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
-
                     // 3
                     detailIntent.putExtra("MyEvent", selectedEvent);
-
                     // 4
                     startActivity(detailIntent);
                 }
             }
-
         });
-
-
     }
-/////////////
+    /**
+     * loadData, loadPoints and createEvent work together get all relevant data out of the
+     * room database and create a new event from it
+     */
+    public void loadData() {
+        listItems = new ArrayList<>();
+        database = LocalDatabase.getInstance(this.getContext());
+        pointViewModel = new PointViewModel(database.pointDAO());
+        oEventViewModel = new OEventViewModel(database.oEventDAO());
+        joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
+
+        //oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
+    }
+    private void loadPoints(List<RoomOEvent> oEvents){
+        if(oEvents.size() > 0){
+            for(RoomOEvent oEvent:oEvents){
+                joinViewModel.getPointsForOEvent(oEvent.getId()).subscribe(roomPoints -> createEvent(oEvent, roomPoints));
+            }
+        }
+        else{
+            listItems = null;
+        }
+    }
+    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints){
+        if(roomPoints.size() > 0){
+            ArrayList<Point> points = new ArrayList<>();
+            for(RoomPoint roomPoint : roomPoints){
+                Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, roomPoint.getProperties().get("description"));
+                point._setId(roomPoint.getId());
+                for(String key : roomPoint.getProperties().keySet()){
+                    point.addProperty(key, roomPoint.getProperties().get(key));
+                }
+                points.add(point);
+            }
+            double minDist = Double.parseDouble(oEvent.getProperties().get("dist"));
+            Event event = new Event(oEvent.getId(), points, minDist, oEvent.getProperties().get("avg_time"));
+            for(String key : oEvent.getProperties().keySet()){
+                event.addProperty(key, oEvent.getProperties().get(key));
+            }
+            listItems.add(event);
+        }
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -211,3 +213,4 @@ public class MyEvents extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 }
+

@@ -7,10 +7,11 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Maybe;
-import no.teacherspet.tring.Database.Entities.Point;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
 
 /**
  * Created by Hermann on 13.02.2018.
@@ -19,21 +20,21 @@ import no.teacherspet.tring.Database.Entities.Point;
 public interface PointDao {
 
     @Query("SELECT * FROM point")
-    Maybe<List<Point>> getAll();
+    Maybe<List<RoomPoint>> getAll();
 
     @Query("SELECT * FROM point WHERE id LIKE :id")
-    Maybe<Point> findById(int id);
+    Maybe<RoomPoint> findById(int id);
 
     @Query("SELECT MAX(id) FROM point")
     Maybe<Integer> getMaxID();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long[] insert(Point... points);
+    long[] insert(RoomPoint... roomPoints);
 
     @Update
-    void update(Point... points);
+    void update(RoomPoint... roomPoints);
 
     @Delete
-    int delete(Point... points);
+    int delete(RoomPoint... roomPoints);
 
 }

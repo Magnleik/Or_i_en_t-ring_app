@@ -12,26 +12,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.internal.matchers.And;
 
+import java.util.HashMap;
+import java.util.Map;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.DAOs.OEventDao;
 import no.teacherspet.tring.Database.DAOs.PointDao;
 import no.teacherspet.tring.Database.DAOs.PointOEventJoinDao;
 import no.teacherspet.tring.Database.DAOs.UserDao;
-import no.teacherspet.tring.Database.Entities.OEvent;
-import no.teacherspet.tring.Database.Entities.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertTrue;
 
 /**
  * Created by Hermann on 15.02.2018.
@@ -39,11 +34,11 @@ import static junit.framework.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class DatabaseTest {
 
-    LocalDatabase db;
-    PointDao pointDAO;
-    UserDao userDAO;
-    OEventDao oEventDAO;
-    PointOEventJoinDao pointOEventJoinDAO;
+    private LocalDatabase db;
+    private PointDao pointDAO;
+    private UserDao userDAO;
+    private OEventDao oEventDAO;
+    private PointOEventJoinDao pointOEventJoinDAO;
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule() ;
@@ -66,22 +61,30 @@ public class DatabaseTest {
     @Test
     public void pointTest(){
         LatLng latlng = createLatLng();
-        String description = "testPoint";
+        Map<String, String> properties = new HashMap<>();
+        properties.put("name", "testRoomPoint");
 
         pointDAO.getAll().test().assertValue(points -> {
             return points.size() == 0;
         });
 
-        Point testPoint = new Point(0, description, latlng);
-        assertNotSame(-1, pointDAO.insert(testPoint));
-        pointDAO.findById(testPoint.getId()).test().assertValue(point -> {
-            return testPoint.getId() == point.getId();
+        RoomPoint testRoomPoint = new RoomPoint(0, properties, latlng);
+        assertNotSame(-1, pointDAO.insert(testRoomPoint));
+        pointDAO.findById(testRoomPoint.getId()).test().assertValue(point -> {
+            return testRoomPoint.getId() == point.getId();
         });
+        pointDAO.findById(testRoomPoint.getId()).test().assertValue(point -> {
+            return point.getProperties().get("name").equals(properties.get("name"));
+        });
+        pointDAO.getAll().test().assertValue(roomPoints -> {
+            return roomPoints.get(0).getLatLng().equals(latlng);
+        });
+
         pointDAO.getMaxID().test().assertValue(integer -> {
-            return testPoint.getId() == integer;
+            return testRoomPoint.getId() == integer;
         });
-        pointDAO.delete(testPoint);
-        pointDAO.findById(testPoint.getId()).test().assertNoValues();
+        pointDAO.delete(testRoomPoint);
+        pointDAO.findById(testRoomPoint.getId()).test().assertNoValues();
 
     }
     private LatLng createLatLng(){
@@ -93,38 +96,45 @@ public class DatabaseTest {
         String firstname = "firstname";
         String lastname = "lastname";
 
-        User testUser1 = new User(0, true, firstname, lastname);
+        RoomUser testRoomUser1 = new RoomUser(0, true, firstname, lastname);
         userDAO.getAll().test().assertValue(users -> {
             return users.size() == 0;
         });
-        assertNotSame(-1, userDAO.insert(testUser1));
+        assertNotSame(-1, userDAO.insert(testRoomUser1));
 
-        userDAO.findById(testUser1.getId()).test().assertValue(user -> {
-            return testUser1.getId() == user.getId();
+        userDAO.findById(testRoomUser1.getId()).test().assertValue(user -> {
+            return testRoomUser1.getId() == user.getId();
         });
         userDAO.getPersonalUser().test().assertValue(user -> {
-            return testUser1.getId() == user.getId();
+            return testRoomUser1.getId() == user.get(0).getId();
+        });
+        userDAO.getPersonalUser().test().assertValue(user -> {
+            return testRoomUser1.getFullName().equals(user.get(0).getFullName());
         });
         userDAO.getMaxID().test().assertValue(integer -> {
-            return testUser1.getId() == integer;
+            return testRoomUser1.getId() == integer;
         });
-        userDAO.delete(testUser1);
+        userDAO.delete(testRoomUser1);
         userDAO.getAll().test().assertValue(users -> {
             return users.size() == 0;
         });
     }
     @Test
     public void oEventTest(){
-        String testname = "testname";
-        OEvent testoEvent = new OEvent(0, testname);
+        Map<String, String> properties = new HashMap<>();
+        properties.put("name", "testname");
+        RoomOEvent testoEventRoom = new RoomOEvent(0, properties);
         oEventDAO.getAll().test().assertValue(oEvents -> {
             return oEvents.size() == 0;
         });
-        assertNotSame(-1, oEventDAO.insert(testoEvent));
-        oEventDAO.findById(testoEvent.getId()).test().assertValue(oEvent -> {
-            return testoEvent.getId() == oEvent.getId();
+        assertNotSame(-1, oEventDAO.insert(testoEventRoom));
+        oEventDAO.findById(testoEventRoom.getId()).test().assertValue(oEvent -> {
+            return testoEventRoom.getId() == oEvent.getId();
         });
-        oEventDAO.delete(testoEvent);
+        oEventDAO.findById(testoEventRoom.getId()).test().assertValue(oEvent -> {
+            return properties.get("name").equals(oEvent.getProperties().get("name"));
+        });
+        oEventDAO.delete(testoEventRoom);
 
         oEventDAO.getAll().test().assertValue(oEvents -> {
             return oEvents.size() == 0;
@@ -134,45 +144,53 @@ public class DatabaseTest {
     @Test
     public void joinTest(){
         LatLng latlng = createLatLng();
-        String description = "testPoint";
-        Point testPoint1 = new Point(0, description, latlng);
-        Point testPoint2 = new Point(1, description, latlng);
-        assertNotSame(-1, pointDAO.insert(testPoint1));
-        assertNotSame(-1, pointDAO.insert(testPoint2));
+        Map<String, String> properties = new HashMap<>();
+        properties.put("name", "testname");
 
-        String testname = "testoEvent";
-        OEvent testoEvent = new OEvent(0, testname);
-        assertNotSame(-1, oEventDAO.insert(testoEvent));
-        assertNotSame(testPoint1.getId(), testPoint2.getId());
+        RoomPoint testRoomPoint1 = new RoomPoint(0, properties, latlng);
+        RoomPoint testRoomPoint2 = new RoomPoint(1, properties, latlng);
+        assertNotSame(-1, pointDAO.insert(testRoomPoint1));
+        assertNotSame(-1, pointDAO.insert(testRoomPoint2));
 
-        PointOEventJoin testJoin1 = new PointOEventJoin(testPoint1.getId(), testoEvent.getId(), true);
-        PointOEventJoin testJoin2 = new PointOEventJoin(testPoint2.getId(), testoEvent.getId(), false);
+        String testname = "testoEventRoom";
+        RoomOEvent testoEventRoom = new RoomOEvent(0, properties);
+        assertNotSame(-1, oEventDAO.insert(testoEventRoom));
+        assertNotSame(testRoomPoint1.getId(), testRoomPoint2.getId());
+
+        PointOEventJoin testJoin1 = new PointOEventJoin(testRoomPoint1.getId(), testoEventRoom.getId(), true);
+        PointOEventJoin testJoin2 = new PointOEventJoin(testRoomPoint2.getId(), testoEventRoom.getId(), false);
 
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin1));
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin2));
 
-        pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).test().assertValue(points -> {
-            return points.size() == 2 && (points.get(0).getId() == testPoint1.getId() || points.get(0).getId() == testPoint2.getId());
+        pointOEventJoinDAO.getPointsForOEvent(testoEventRoom.getId()).test().assertValue(points -> {
+            return points.size() == 2 && (points.get(0).getId() == testRoomPoint1.getId() || points.get(0).getId() == testRoomPoint2.getId());
         });
-        pointOEventJoinDAO.getStartPoint(testoEvent.getId()).test().assertValue(point -> {
-            return testPoint1.getId() == point.getId();
+        pointOEventJoinDAO.getStartPoint(testoEventRoom.getId()).test().assertValue(point -> {
+            return testRoomPoint1.getId() == point.getId();
         });
-        pointOEventJoinDAO.getPointsNotStart(testoEvent.getId()).test().assertValue(points -> {
-            return testPoint2.getId() == points.get(0).getId();
+        pointOEventJoinDAO.getPointsNotStart(testoEventRoom.getId()).test().assertValue(points -> {
+            return testRoomPoint2.getId() == points.get(0).getId();
         });
-        pointOEventJoinDAO.getOEventsForPoint(testPoint2.getId()).test().assertValue(oEvents -> {
-            return testoEvent.getId() == oEvents.get(0).getId();
+        pointOEventJoinDAO.getOEventsForPoint(testRoomPoint2.getId()).test().assertValue(oEvents -> {
+            return testoEventRoom.getId() == oEvents.get(0).getId();
         });
-        pointDAO.delete(testPoint1);
-        //Point should not be there
-        //pointOEventJoinDAO.getStartPoint(testoEvent.getId()).test().assertValue()
+        pointDAO.delete(testRoomPoint1);
+        oEventDAO.findById(testoEventRoom.getId()).test().assertValue(roomOEvent -> {
+            return testoEventRoom.getId() == roomOEvent.getId();
+        });
+
+        pointOEventJoinDAO.getStartPoint(testoEventRoom.getId())
+                .defaultIfEmpty(new RoomPoint(-1, properties, latlng)).test().assertValue(roomPoint -> {
+                    return -1 == roomPoint.getId();
+        });
 
         assertNotSame(-1, pointOEventJoinDAO.delete(testJoin1));
-        pointOEventJoinDAO.getOEventsForPoint(testPoint1.getId()).test().assertValue(oEvents -> {
+        pointOEventJoinDAO.getOEventsForPoint(testRoomPoint1.getId()).test().assertValue(oEvents -> {
             return oEvents.size() == 0;
         });
-        assertNotSame(-1, pointOEventJoinDAO.delete(testPoint2.getId(), testoEvent.getId()));
-        pointOEventJoinDAO.getPointsForOEvent(testoEvent.getId()).test().assertValue(points -> {
+        assertNotSame(-1, pointOEventJoinDAO.delete(testRoomPoint2.getId(), testoEventRoom.getId()));
+        pointOEventJoinDAO.getPointsForOEvent(testoEventRoom.getId()).test().assertValue(points -> {
             return points.size() == 0;
         });
     }

@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,10 +11,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.disposables.Disposable;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
+import no.teacherspet.tring.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -30,9 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         localDatabase = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
-        user = userViewModel.getPersonalUser()
-                .defaultIfEmpty(new User(-1,false, "", ""))
-                .subscribe(user1 -> createUser(user1));
+        user = userViewModel.getPersonalUser().subscribe(roomUsers -> createUser(roomUsers));
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -44,8 +46,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
     //Changes to createUserActivity if a user has not been created
-    private void createUser(User user){
-        if(user.getId() < 0){
+    private void createUser(List<RoomUser> users){
+        if(!(users.size() > 0)){
             startActivity(new Intent(this, CreateUserActivity.class));
         }
         else{

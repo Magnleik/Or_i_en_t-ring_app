@@ -2,15 +2,15 @@ package no.teacherspet.tring.Database.ViewModels;
 
 import android.arch.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import no.teacherspet.tring.Database.DAOs.PointDao;
-import no.teacherspet.tring.Database.Entities.Point;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
 
 /**
  * Created by Hermann on 05.03.2018.
@@ -24,13 +24,13 @@ public class PointViewModel extends ViewModel {
         this.pointDao = pointDao;
     }
 
-    public Maybe<List<Point>> getAllPoints(){
+    public Maybe<List<RoomPoint>> getAllPoints(){
         return pointDao.getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<Point> getPointByID(int pointID){
+    public Maybe<RoomPoint> getPointByID(int pointID){
         return pointDao.findById(pointID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -41,14 +41,14 @@ public class PointViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
     }
 
-    public Single<Integer> deletePoints(Point... points){
-        return Single.fromCallable(()->pointDao.delete(points))
+    public Single<Integer> deletePoints(RoomPoint... roomPoints){
+        return Single.fromCallable(()->pointDao.delete(roomPoints))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<long[]> addPoints(Point... points){
-        return Single.fromCallable(()->pointDao.insert(points))
+    public Single<long[]> addPoints(RoomPoint... roomPoints){
+        return Single.fromCallable(()->pointDao.insert(roomPoints))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

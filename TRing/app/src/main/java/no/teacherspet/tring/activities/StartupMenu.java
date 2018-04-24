@@ -1,4 +1,4 @@
-package no.teacherspet.tring;
+package no.teacherspet.tring.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -11,9 +11,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.List;
 
 import connection.Event;
-import connection.NetworkManager;
+import io.reactivex.disposables.Disposable;
+import no.teacherspet.tring.Database.Entities.RoomUser;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.UserViewModel;
+import no.teacherspet.tring.R;
 
 
 /**
@@ -24,14 +29,33 @@ public class StartupMenu extends AppCompatActivity{
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
     private static HashMap<Integer, Event> testEvents;
+    LocalDatabase localDatabase;
+    Disposable user;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
+
+        localDatabase = LocalDatabase.getInstance(this);
+        UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
+
+        //Checks if we should start createUserActivity
+        user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
+
         super.onCreate(savedInstanceState);
         if(testEvents==null){
             testEvents=new HashMap<>();
         }
         setContentView(R.layout.activity_startupmenu);
+    }
+
+    //Changes to createUserActivity if a roomUser has not been created
+    private void createUser(List<RoomUser> roomUser){
+        if(roomUser.size() > 0 && roomUser.get(0).getId() >= 0){
+            this.user.dispose();
+        }
+        else{
+            startActivity(new Intent(this, CreateUserActivity.class));
+        }
     }
 
 

@@ -11,17 +11,17 @@ import no.teacherspet.tring.Database.DAOs.OEventDao;
 import no.teacherspet.tring.Database.DAOs.PointDao;
 import no.teacherspet.tring.Database.DAOs.PointOEventJoinDao;
 import no.teacherspet.tring.Database.DAOs.UserDao;
-import no.teacherspet.tring.Database.Entities.OEvent;
-import no.teacherspet.tring.Database.Entities.Point;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.User;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 
 /**
  * Created by Hermann on 13.02.2018.
  */
 
-@Database(entities = {User.class, Point.class, OEvent.class, PointOEventJoin.class}, version = 4, exportSchema = false)
-@TypeConverters(LatLngConverter.class)
+@Database(entities = {RoomUser.class, RoomPoint.class, RoomOEvent.class, PointOEventJoin.class}, version = 7, exportSchema = false)
+@TypeConverters(DataConverters.class)
 public abstract class LocalDatabase extends RoomDatabase {
 
     private static volatile LocalDatabase INSTANCE;

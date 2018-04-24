@@ -2,12 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="no.teacherspet.tring.MostPopularEvents">
+    tools:context="no.teacherspet.tring.fragments.MostPopularEvents">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <ListView
+        android:id="@+id/popular_events_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Most popular events" />
+        android:layout_height="match_parent" />
+
 
 </FrameLayout>
+
