@@ -31,7 +31,7 @@ public class PointOEventJoinViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Maybe<RoomPoint> getStartPoint(int oEventID){
+    public Maybe<List<RoomPoint>> getStartPoint(int oEventID){
         return pointOEventJoinDao.getStartPoint(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

@@ -130,48 +130,57 @@ public class MyEvents extends Fragment {
      * loadData, loadPoints and createEvent work together get all relevant data out of the
      * room database and create a new event from it
      */
-    public void loadData() {
+    private void loadData() {
         listItems = new ArrayList<>();
         database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
 
-        //oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
+        oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
     }
+
     private void loadPoints(List<RoomOEvent> oEvents){
-        if(oEvents.size() > 0){
-            for(RoomOEvent oEvent:oEvents){
-                joinViewModel.getPointsForOEvent(oEvent.getId()).subscribe(roomPoints -> createEvent(oEvent, roomPoints));
+        if(oEvents.size()>0) {
+            for (RoomOEvent event : oEvents) {
+                joinViewModel.getStartPoint(event.getId()).subscribe(startPoints -> {
+                    if(startPoints.size() > 0){
+                        joinViewModel.getPointsNotStart(event.getId()).subscribe(points -> createEvent(event, startPoints.get(0), points));
+                    }
+                });
             }
-            updateList();
         }
         else{
             listItems = null;
-            Toast.makeText(this.getContext(), "Found no local events", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), "Found no locally saved events", Toast.LENGTH_SHORT).show();
         }
     }
-    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints){
-        if(roomPoints.size() > 0){
-            ArrayList<Point> points = new ArrayList<>();
-            for(RoomPoint roomPoint : roomPoints){
-                Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
-                point._setId(roomPoint.getId());
-                for(String key : roomPoint.getProperties().keySet()){
-                    point.addProperty(key, roomPoint.getProperties().get(key));
-                }
-                points.add(point);
-            }
-            Event event = new Event();
-            event._setId(oEvent.getId());
-            event.setStartPoint(points.get(0));
-            event.addPosts(points);
-            for(String key : oEvent.getProperties().keySet()){
-                event.addProperty(key, oEvent.getProperties().get(key));
-            }
-            listItems.add(event);
-            updateList();
+    private void createEvent(RoomOEvent oEvent, RoomPoint startPoint, List<RoomPoint> roomPoints){
+        ArrayList<Point> points = new ArrayList<>();
+        Event event = new Event();
+        event._setId(oEvent.getId());
+
+        event.setStartPoint(setupPoint(startPoint));
+
+        for(RoomPoint roomPoint : roomPoints){
+            points.add(setupPoint(roomPoint));
         }
+        event.addPosts(points);
+        for(String key : oEvent.getProperties().keySet()){
+            event.addProperty(key, oEvent.getProperties().get(key));
+        }
+
+        listItems.add(event);
+        updateList();
     }
+    private Point setupPoint(RoomPoint roomPoint){
+        Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
+        point._setId(roomPoint.getId());
+        for(String key : roomPoint.getProperties().keySet()){
+            point.addProperty(key, roomPoint.getProperties().get(key));
+        }
+        return point;
+    }
+
     private void updateList() {
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);

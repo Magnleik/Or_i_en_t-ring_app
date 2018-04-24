@@ -26,7 +26,7 @@ public interface PointOEventJoinDao {
 
     @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 1")
-    Maybe<RoomPoint> getStartPoint(int oEventID);
+    Maybe<List<RoomPoint>> getStartPoint(int oEventID);
 
     @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 0")
