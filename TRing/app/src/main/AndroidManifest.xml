@@ -43,9 +43,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.PopupPointDesc"
-            android:theme="@style/AppTheme.PopupTheme" />
         <activity android:name=".activities.CreateOEvent" />
         <activity android:name=".activities.PerformOEvent"
         android:configChanges="keyboardHidden|screenSize" />
