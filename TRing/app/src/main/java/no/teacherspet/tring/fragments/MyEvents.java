@@ -108,7 +108,7 @@ public class MyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        loadData();
+        //loadData();
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
