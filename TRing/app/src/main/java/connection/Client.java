@@ -37,7 +37,6 @@ import retrofit2.http.Query;
 public interface Client {
 
 
-
     @POST("/api/points")
 
     Call<List<Point>> addPoints(@Body Point... points);
@@ -72,6 +71,17 @@ public interface Client {
 
     );
 
+
+    @POST("/api/users")
+    Call<Boolean> createNewUser(
+            @Body User user
+    );
+
+    @POST("/api/events/{eventID}/time/{time}")
+    Call<Event> postTime(
+            @Path("eventID") int eventID,
+            @Path("time") String time
+    );
 
 
     @DELETE("/api/events/{eventID}/points/{pointID}")
@@ -133,5 +143,10 @@ public interface Client {
     );
 
 
+    @GET("/api/users")
+    Call<Boolean> logIn(
+            @Body User user
+    );
 
 }
+
