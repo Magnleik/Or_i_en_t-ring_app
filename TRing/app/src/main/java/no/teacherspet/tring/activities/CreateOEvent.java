@@ -182,12 +182,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         Event event = new Event();
         String eventTitle = eventTitleField.getText().toString();
-        event.addProperty("event_name",eventTitle);
-        for(Marker marker:arrayListWithCoords){
-            if(event.getPoints()==null){
-                event.setStartPoint(new Point(marker.getPosition().latitude,marker.getPosition().longitude,marker.getTitle()));
-            }
-            else {
+        event.addProperty("event_name", eventTitle);
+        for (Marker marker : arrayListWithCoords) {
+            if (event.getPoints() == null) {
+                event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+            } else {
                 event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
             }
         }
@@ -216,6 +215,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
     /**
      * Saves the Event and corresponding Points, and adds connections between them in the Room database
+     * Makes sure that events and points are saved before the connections are saved. The next step
+     * is only called after the previous is finished.
      */
     private void saveEventToRoom(Event event){
         localDatabase = LocalDatabase.getInstance(this);
@@ -223,8 +224,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
 
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent);
-
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
+    }
+    private void savePoints(Event event){
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
             Point point = event.getPoints().get(i);

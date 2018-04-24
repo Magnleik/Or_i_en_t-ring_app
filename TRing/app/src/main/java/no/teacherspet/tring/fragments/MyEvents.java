@@ -119,16 +119,10 @@ public class MyEvents extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
-                    // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
-                    Event selectedEvent = listItems.get(position - 1);
-                    // 2
-                    Intent detailIntent = new Intent(context, PerformOEvent.class);
-                    // 3
-                    detailIntent.putExtra("MyEvent", selectedEvent);
-                    // 4
-                    startActivity(detailIntent);
-                }
+                Event selectedEvent = listItems.get(position);
+                Intent detailIntent = new Intent(context, PerformOEvent.class);
+                detailIntent.putExtra("MyEvent", selectedEvent);
+                startActivity(detailIntent);
             }
         });
     }
@@ -153,7 +147,7 @@ public class MyEvents extends Fragment {
         }
         else{
             listItems = null;
-            Toast.makeText(this.getContext(), "Found no events", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), "Found no local events", Toast.LENGTH_SHORT).show();
         }
     }
     private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints){
@@ -176,10 +170,6 @@ public class MyEvents extends Fragment {
             }
             listItems.add(event);
             updateList();
-            Toast.makeText(this.getContext(), "Added event to listItems", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Toast.makeText(this.getContext(), "Found no points", Toast.LENGTH_SHORT).show();
         }
     }
     private void updateList() {
