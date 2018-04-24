@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -46,6 +47,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient lm;
     private LatLng position;
     private NetworkManager networkManager;
+    private LocationRequest locationRequest;
     LocalDatabase localDatabase;
     PointViewModel pointViewModel;
     OEventViewModel oEventViewModel;
@@ -160,7 +162,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addNewMarker(Intent data) {
-        String name = data.getStringExtra("MarkerName");
+        String name = "";
+        if (data!=null) {
+            name = data.getStringExtra("MarkerName");
+        }
         if (name != null) {
             Marker point = mMap.addMarker(new MarkerOptions().position(position).title(name).draggable(true));
             arrayListWithCoords.add(point);
@@ -169,6 +174,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             arrayListWithCoords.add(point);
         }
     }
+
 
     private void addExistingMarker(Intent data) {
         ArrayList<LatLng> positions = data.getParcelableArrayListExtra("selectedPositions");
@@ -188,6 +194,37 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Marker lastMarker = arrayListWithCoords.get(arrayListWithCoords.size() - 1);
             lastMarker.remove();
             arrayListWithCoords.remove(lastMarker);
+        }
+    }
+
+    //Adds marker on the users location
+
+    private void createLocationRequest(){
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void addMarkerMyPosition(View v) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            createLocationRequest();
+
+            lm.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+
+                        position=new LatLng(location.getLatitude(), location.getLongitude());
+                        addNewMarker(null);
+                    }
+                }
+            });
+
+        } else {
+            Toast.makeText(getApplicationContext(), "Du må gi appen tilgang til bruk av GPS." , Toast.LENGTH_LONG).show();
+
         }
     }
 

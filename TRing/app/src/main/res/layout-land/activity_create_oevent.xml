@@ -16,7 +16,7 @@
         android:ems="10"
         android:hint="Løypenavn"
         android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/add_point_btn"
+        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
         app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
         tools:context="no.teacherspet.tring.activities.MapsActivity" />
 
     <Button
-        android:id="@+id/add_point_btn"
+        android:id="@+id/delete_last_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

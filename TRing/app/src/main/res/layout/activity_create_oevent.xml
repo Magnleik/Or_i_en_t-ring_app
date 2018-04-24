@@ -25,7 +25,6 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="356dp"
         android:layout_height="360dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginTop="12dp"
         app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,16 +36,17 @@
         tools:context="no.teacherspet.tring.activities.MapsActivity" />
 
     <Button
-        android:id="@+id/add_point_btn"
+        android:id="@+id/delete_last_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:onClick="addExistingPoints"
-        android:text="Finn punkter"
-        app:layout_constraintEnd_toStartOf="@+id/delete_last_point_btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/delete_last_point_btn" />
+        android:layout_marginBottom="28dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="12dp"
+        android:onClick="deleteLastPoint"
+        android:text="Angre"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/map_under_creation" />
 
     <Button
         android:id="@+id/done_creating_btn"
@@ -54,26 +54,48 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
         android:onClick="saveEvent"
         android:text="Ferdig"
+        app:layout_constraintBottom_toBottomOf="@+id/delete_last_point_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/delete_last_point_btn"
-        app:layout_constraintTop_toTopOf="@+id/delete_last_point_btn" />
+        app:layout_constraintHorizontal_bias="0.152"
+        app:layout_constraintStart_toEndOf="@+id/delete_last_point_btn" />
 
-    <Button
-        android:id="@+id/delete_last_point_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/floatingActionMenu"
+        android:layout_width="307dp"
+        android:layout_height="193dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginStart="12dp"
-        android:onClick="deleteLastPoint"
-        android:text="Slett forrige"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/done_creating_btn"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/add_point_btn"
-        app:layout_constraintTop_toBottomOf="@+id/map_under_creation" />
+        app:layout_constraintEnd_toEndOf="@+id/map_under_creation"
+        app:layout_constraintRight_toRightOf="parent"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/add_point_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/place"
+            android:onClick="addExistingPoints"
+            app:fab_label="Existing points"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/my_location_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/my_location"
+            android:onClick="addMarkerMyPosition"
+            app:fab_label="Add marker on my location"
+            app:fab_size="mini" />
+
+
+    </com.github.clans.fab.FloatingActionMenu>
+
 
 </android.support.constraint.ConstraintLayout>

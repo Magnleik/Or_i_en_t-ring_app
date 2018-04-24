@@ -151,44 +151,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             createLocationRequest();
-            /*
-            mFusedLocationClient.requestLocationUpdates(locationRequest,new LocationCallback(){
-                @Override
-                public void onLocationResult(LocationResult locationResult){
-                    // Got last known location. In some rare situations this can be null.
-                    Location location = (Location) locationResult.getLastLocation();
-                    if (location != null) {
-                        //Oppretter og viser en markor der hvor bruker er
-                        double longitude = location.getLongitude();
-                        double latitude = location.getLatitude();
-                        LatLng latlng = new LatLng(latitude, longitude);
-                        final Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(latlng).title("HER ER DU"));
-                        //Zoomer til posisjon
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-                        positionViewed++;
-                        mFusedLocationClient.removeLocationUpdates(this);
 
-
-                        //Markor fjernes etter 5 sekund
-                        CountDownTimer synlig = new CountDownTimer(5000, 1000) {
-                            int sek = 5;
-                            @Override
-                            public void onTick(long l) {
-                                sek--;
-                                Toast.makeText(getApplicationContext(), "Dette er " + positionViewed + ".gang posisjonen vises, markor fjernes om " + sek+  " sekunder" , Toast.LENGTH_SHORT).show();
-
-                            }
-
-                            @Override
-                            public void onFinish() {
-                                posisjonsmarkor.remove();
-
-                            }
-                        }.start();
-                    }
-                }
-            }, null);
-            */
             mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
