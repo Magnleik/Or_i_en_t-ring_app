@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/place"
             android:onClick="addExistingPoints"
-            app:fab_label="Existing points"
+            app:fab_label="Hent lagrede punkt"
             app:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/my_location"
             android:onClick="addMarkerMyPosition"
-            app:fab_label="Add marker on my location"
+            app:fab_label="Lag punkt på min posisjon"
             app:fab_size="mini" />
 
 

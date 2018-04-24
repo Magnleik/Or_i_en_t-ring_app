@@ -17,35 +17,22 @@
         android:hint="Løypenavn"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
-        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.477" />
 
     <fragment
         android:id="@+id/map_under_creation"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="356dp"
         android:layout_height="360dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/create_event_name"
+        app:layout_constraintEnd_toStartOf="@+id/create_event_name"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:context="no.teacherspet.tring.activities.MapsActivity" />
-
-    <Button
-        android:id="@+id/delete_last_point_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="12dp"
-        android:onClick="createPoints"
-        android:text="Legg til punkter"
-        app:layout_constraintBottom_toTopOf="@+id/delete_last_point_btn"
-        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
-        app:layout_constraintLeft_toLeftOf="parent" />
 
     <Button
         android:id="@+id/done_creating_btn"
@@ -57,8 +44,8 @@
         android:onClick="saveEvent"
         android:text="Ferdig"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/map_under_creation" />
 
     <Button
         android:id="@+id/delete_last_point_btn"
@@ -66,10 +53,45 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:onClick="deleteLastPoint"
-        android:text="Slett forrige"
+        android:text="Angre"
         app:layout_constraintBottom_toTopOf="@+id/done_creating_btn"
-        app:layout_constraintEnd_toStartOf="@+id/map_under_creation"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/map_under_creation" />
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/floatingActionMenu"
+        android:layout_width="307dp"
+        android:layout_height="193dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/map_under_creation"
+        app:layout_constraintRight_toRightOf="parent"
+        app:menu_backgroundColor="@android:color/transparent"
+        app:menu_fab_label=""
+        app:menu_openDirection="up"
+        app:menu_showShadow="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/add_point_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="addExistingPoints"
+            android:src="@drawable/place"
+            app:fab_label="Hent lagrede punkt"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/my_location_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="addMarkerMyPosition"
+            android:src="@drawable/my_location"
+            app:fab_label="Lag punkt på min posisjon"
+            app:fab_size="mini" />
+
+
+    </com.github.clans.fab.FloatingActionMenu>
 
 </android.support.constraint.ConstraintLayout>
