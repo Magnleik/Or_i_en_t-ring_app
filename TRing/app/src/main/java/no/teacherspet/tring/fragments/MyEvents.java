@@ -54,6 +54,7 @@ public class MyEvents extends Fragment {
     private String mParam1;
     private String mParam2;
     private ListView mListView;
+    private boolean changeEvent;
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
@@ -91,6 +92,7 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -118,16 +120,19 @@ public class MyEvents extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Event selectedEvent = listItems.get(position);
-                Intent detailIntent = new Intent(context, PerformOEvent.class);
-                detailIntent.putExtra("MyEvent", selectedEvent);
-                startActivity(detailIntent);
+                if(changeEvent) {
+                    Event selectedEvent = listItems.get(position);
+                    Intent detailIntent = new Intent(context, PerformOEvent.class);
+                    detailIntent.putExtra("MyEvent", selectedEvent);
+                    startActivity(detailIntent);
+                }
             }
         });
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Event selectedEvent = listItems.get(position-1);
+                changeEvent = false;
+                Event selectedEvent = listItems.get(position);
                 openSettingsDialog(selectedEvent);
                 return false;
             }
@@ -144,8 +149,11 @@ public class MyEvents extends Fragment {
                 switch (which) {
                     case 0:
                         //TODO remove event from database
+                        changeEvent = true;
+                        dialog.dismiss();
                         break;
                     case 1:
+                        changeEvent = true;
                         dialog.dismiss();
                 }
             }

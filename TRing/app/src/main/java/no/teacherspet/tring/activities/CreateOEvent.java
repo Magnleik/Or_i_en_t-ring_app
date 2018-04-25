@@ -155,7 +155,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     marker.setTitle(input.getText().toString());
                 }
                 else {
-                    addNewMarker(input.getText().toString());
+                    if(!input.getText().toString().isEmpty()) {
+                        addNewMarker(input.getText().toString());
+                    }
+                    else{
+                        addNewMarker(null);
+                    }
                 }
                 dialog.dismiss();
             }
