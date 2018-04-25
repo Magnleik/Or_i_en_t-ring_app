@@ -1,27 +1,8 @@
 package no.teacherspet.tring;
 
-import android.app.Activity;
-import android.app.Instrumentation;
-import android.support.test.espresso.assertion.ViewAssertions;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import no.teacherspet.tring.activities.CreateOEvent;
-import no.teacherspet.tring.activities.ListOfSavedEvents;
-import no.teacherspet.tring.activities.OrientationSelector;
-
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static junit.framework.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 /**
  * Created by petterbjorkaas on 13/02/2018.
@@ -29,6 +10,7 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(AndroidJUnit4.class)
 public class TestOrientationSelector {
+    /*
     @Rule
     public final ActivityTestRule<OrientationSelector> main = new ActivityTestRule<OrientationSelector>(OrientationSelector.class);
 
@@ -69,4 +51,5 @@ public class TestOrientationSelector {
 
 
 
+*/
 }
