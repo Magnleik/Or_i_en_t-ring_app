@@ -162,7 +162,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     }
 
     //Dialog opens when event is finnished
-    public void openFinnishDialog() {
+    public void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -314,33 +314,25 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     public void startEventBtnPressed(View v) {
         // Check if user is on startpoint
-        View addEventButton = findViewById(R.id.start_event_btn);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            createLocationRequest();
-            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    LatLng userLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
-                    if (distance < 20) {
-                        addEventButton.setVisibility(View.GONE);
-                } else {
-                        Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_LONG).show();
 
-            };
-        };
-        } );
+        View addEventButton = findViewById(R.id.start_event_btn);
+        if (currentLocation == null) {
+            Toast.makeText(getApplicationContext(), "Prøv igjen om 5 sekunder", Toast.LENGTH_SHORT).show();
+            return;
         }
-        if (addEventButton.getVisibility() == View.GONE) {
+        LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+        float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
+        if (distance < 20) {
+            addEventButton.setVisibility(View.GONE);
             this.startTime = System.currentTimeMillis();
             this.eventTime = -1;
+        } else {
+            Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     public void endEvent() {
-        openFinnishDialog();
+        openFinishDialog();
     }
 
 
