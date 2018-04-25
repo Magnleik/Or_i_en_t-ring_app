@@ -20,21 +20,30 @@ import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 @Dao
 public interface PointOEventJoinDao {
 
-    @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID")
     Maybe<List<RoomPoint>> getPointsForOEvent(int oEventID);
 
-    @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 1")
-    Maybe<RoomPoint> getStartPoint(int oEventID);
+    Maybe<List<RoomPoint>> getStartPoint(int oEventID);
 
-    @Query("SELECT * FROM point INNER JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 0")
     Maybe<List<RoomPoint>> getPointsNotStart(int oEventID);
 
-    @Query("SELECT * FROM o_event INNER JOIN point_oevent_join ON o_event.id = point_oevent_join.oEventID" +
+    @Query("SELECT * FROM o_event LEFT JOIN point_oevent_join ON o_event.id = point_oevent_join.oEventID" +
             " WHERE point_oevent_join.pointID = :pointID")
     Maybe<List<RoomOEvent>> getOEventsForPoint(int pointID);
+
+    @Query("SELECT * FROM point_oevent_join WHERE pointID = :pointID")
+    Maybe<List<PointOEventJoin>> getJoinsForPoint(int pointID);
+
+    @Query("SELECT * FROM point_oevent_join WHERE oEventID = :oEventID")
+    Maybe<List<PointOEventJoin>> getJoinsForOEvent(int oEventID);
+
+    @Query("SELECT * FROM point_oevent_join")
+    Maybe<List<PointOEventJoin>> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(PointOEventJoin... pointOEventJoins);
