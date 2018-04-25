@@ -37,43 +37,17 @@ import retrofit2.http.Query;
 public interface Client {
 
     @POST("/api/points")
-
     Call<List<Point>> addPoints(@Body Point... points);
 
-
-
     @POST("/api/events")
-
     Call<Event> addEvent(@Body Event events);
 
-
-
-    @PUT("/api/events/{eventID}/properties")
-
-    Call<Event> updateEventProperties(
-
-            @Path("eventID") int id,
-
-            @Body Map<String,String> properties
-
-    );
 
     @PUT("/api/events")
     Call<Event> updateEvent(
             @Body Event event
     );
 
-
-
-    @POST("/api/events/{ID}/points")
-
-    Call<Void> addPointsToEvent(
-
-            @Path("ID") int eventID,
-
-            @Body Point... points
-
-    );
     @POST("/api/users")
     Call<Boolean> createNewUser(
             @Body User user
@@ -94,62 +68,32 @@ public interface Client {
     @POST("/api/login")
     Call<Boolean> logIn();
 
-    @DELETE("/api/events/{eventID}/points/{pointID}")
-
-    Call<Void> removePointFromEvent(
-
-            @Path("eventID") int eventID,
-
-            @Path("pointID") int pointID
-
-    );
-
-
-
     @PUT ("/api/points")
-
     Call<Point> updatePoint(
-
             @Body Point point
-
     );
-
-
 
     @GET("/api/points/nearby")
-
     Call<List<Point>> getNearbyPoints (
-
             @Query("lat") double latitude,
-
             @Query("lng") double longitude,
-
             @Query("dist") double radius
-
     );
 
 
 
     @GET("/api/events/nearby")
-
     Call<List<Event>> getNearbyEvents (
-
             @Query("lat") double latitude,
-
             @Query("lng") double longitude,
-
             @Query("dist") double radius
-
     );
 
 
 
     @GET("/api/events/{ID}/points")
-
     Call<Event> getEventById(
-
             @Path("ID") int ID
-
     );
   
 
