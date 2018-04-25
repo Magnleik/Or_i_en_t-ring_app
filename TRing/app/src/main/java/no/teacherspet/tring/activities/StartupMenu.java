@@ -40,7 +40,7 @@ public class StartupMenu extends AppCompatActivity{
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        //user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
+        user = userViewModel.getAllUsers().subscribe(users -> createUser(users));
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
@@ -51,7 +51,7 @@ public class StartupMenu extends AppCompatActivity{
 
     //Changes to createUserActivity if a roomUser has not been created
     private void createUser(List<RoomUser> roomUser){
-        if(roomUser.size() > 0 && roomUser.get(0).getId() >= 0){
+        if(roomUser.size() > 0){
             this.user.dispose();
         }
         else{

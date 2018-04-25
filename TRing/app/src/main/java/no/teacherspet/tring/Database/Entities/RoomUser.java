@@ -9,51 +9,18 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "user")
 public class RoomUser {
 
-    public RoomUser(int id, boolean personalProfile, String firstName, String lastName) {
-        this.id = id;
-        this.personalProfile = personalProfile;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public RoomUser(String token) {
+        this.token = token;
     }
 
-    @PrimaryKey //(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    private String token;
 
-    private boolean personalProfile;
-    private String firstName;
-    private String lastName;
-
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
+    public String getToken() {
+        return token;
     }
 
-    public boolean isPersonalProfile(){
-        return personalProfile;
+    public void setToken(String token) {
+        this.token = token;
     }
-    public void setPersonalProfile(boolean personalProfile){
-        this.personalProfile = personalProfile;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
-
 }

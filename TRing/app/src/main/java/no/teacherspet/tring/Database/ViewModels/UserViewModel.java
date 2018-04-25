@@ -30,29 +30,6 @@ public class UserViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<RoomUser> getUserByID(int userID){
-        return userDao.findById(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Maybe<List<RoomUser>> getOtherUsers(){
-        return userDao.getOtherUsers()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Maybe<List<RoomUser>> getPersonalUser(){
-        return userDao.getPersonalUser()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Maybe<Integer> getMaxID(){
-        return userDao.getMaxID().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
-    }
-
     public Single<Integer> deleteUsers(RoomUser... roomUsers){
         return Single.fromCallable(()->userDao.delete(roomUsers))
                 .subscribeOn(Schedulers.io())

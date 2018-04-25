@@ -30,8 +30,8 @@ public class OEventViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Maybe<RoomOEvent> getOEventByID(int id){
-        return oEventDao.findById(id)
+    public Maybe<RoomOEvent> getOEventByID(int oEventID){
+        return oEventDao.findById(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -39,6 +39,12 @@ public class OEventViewModel extends ViewModel {
     public Maybe<Integer> getMaxID(){
         return oEventDao.getMaxID().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
+    }
+
+    public Single<Integer> deleteOEvent(int oEventID){
+        return Single.fromCallable(() -> oEventDao.deleteOEvent(oEventID))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<Integer> deleteOEvents(RoomOEvent... roomOEvents){

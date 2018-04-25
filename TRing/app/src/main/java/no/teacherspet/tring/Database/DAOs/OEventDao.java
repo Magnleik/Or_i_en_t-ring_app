@@ -34,6 +34,9 @@ public interface OEventDao {
     @Update
     void update(RoomOEvent... roomOEvents);
 
+    @Query("DELETE FROM o_event WHERE id = :oEventID")
+    int deleteOEvent(int oEventID);
+
     @Delete
     int delete(RoomOEvent... roomOEvents);
 }
