@@ -63,6 +63,7 @@ public class DatabaseTest {
         LatLng latlng = createLatLng();
         Map<String, String> properties = new HashMap<>();
         properties.put("name", "testRoomPoint");
+        properties.put("description","");
 
         pointDAO.getAll().test().assertValue(points -> {
             return points.size() == 0;
