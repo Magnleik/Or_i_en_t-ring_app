@@ -190,7 +190,6 @@ public class NearbyEvents extends Fragment {
                                         }
                                         updateList();
                                     }
-
                                 }
 
                                 @Override

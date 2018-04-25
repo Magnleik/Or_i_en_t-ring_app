@@ -31,7 +31,7 @@ public class PointOEventJoinViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-    public Maybe<RoomPoint> getStartPoint(int oEventID){
+    public Maybe<List<RoomPoint>> getStartPoint(int oEventID){
         return pointOEventJoinDao.getStartPoint(oEventID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -46,8 +46,23 @@ public class PointOEventJoinViewModel extends ViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
+    public Maybe<List<PointOEventJoin>> getJoinsForPoint(int pointID){
+        return pointOEventJoinDao.getJoinsForPoint(pointID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    public Maybe<List<PointOEventJoin>> getJoinsForOEvent(int oEventID){
+        return pointOEventJoinDao.getJoinsForOEvent(oEventID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    public Maybe<List<PointOEventJoin>> getAll(){
+        return pointOEventJoinDao.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
 
-    public Single<long[]> addJoin(PointOEventJoin... pointOEventJoins){
+    public Single<long[]> addJoins(PointOEventJoin... pointOEventJoins){
         return Single.fromCallable(()->pointOEventJoinDao.insert(pointOEventJoins))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

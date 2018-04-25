@@ -167,7 +167,7 @@ public class DatabaseTest {
             return points.size() == 2 && (points.get(0).getId() == testRoomPoint1.getId() || points.get(0).getId() == testRoomPoint2.getId());
         });
         pointOEventJoinDAO.getStartPoint(testoEventRoom.getId()).test().assertValue(point -> {
-            return testRoomPoint1.getId() == point.getId();
+            return testRoomPoint1.getId() == point.get(0).getId();
         });
         pointOEventJoinDAO.getPointsNotStart(testoEventRoom.getId()).test().assertValue(points -> {
             return testRoomPoint2.getId() == points.get(0).getId();
@@ -180,9 +180,8 @@ public class DatabaseTest {
             return testoEventRoom.getId() == roomOEvent.getId();
         });
 
-        pointOEventJoinDAO.getStartPoint(testoEventRoom.getId())
-                .defaultIfEmpty(new RoomPoint(-1, properties, latlng)).test().assertValue(roomPoint -> {
-                    return -1 == roomPoint.getId();
+        pointOEventJoinDAO.getStartPoint(testoEventRoom.getId()).test().assertValue(roomPoints -> {
+                    return !(roomPoints.size() >0);
         });
 
         assertNotSame(-1, pointOEventJoinDAO.delete(testJoin1));

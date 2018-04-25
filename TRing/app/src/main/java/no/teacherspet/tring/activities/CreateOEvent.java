@@ -52,10 +52,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private NetworkManager networkManager;
     private LocationRequest locationRequest;
     private Marker startPoint;
-    LocalDatabase localDatabase;
-    PointViewModel pointViewModel;
-    OEventViewModel oEventViewModel;
-    PointOEventJoinViewModel pointOEventJoinViewModel;
+
+    private LocalDatabase localDatabase;
+    private PointViewModel pointViewModel;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel pointOEventJoinViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +155,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     marker.setTitle(input.getText().toString());
                 }
                 else {
-                    addNewMarker(input.getText().toString());
+                    if(!input.getText().toString().isEmpty()) {
+                        addNewMarker(input.getText().toString());
+                    }
+                    else{
+                        addNewMarker(null);
+                    }
                 }
                 dialog.dismiss();
             }
@@ -297,85 +303,95 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      */
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
-        Event event = new Event();
-        String eventTitle = eventTitleField.getText().toString();
-        event.addProperty("event_name", eventTitle);
-        for (Marker marker : arrayListWithCoords) {
-            if (event.getPoints() == null) {
-                event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
-            } else {
-                event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
-            }
-        }
-        networkManager = NetworkManager.getInstance();
-        networkManager.addEvent(event, new ICallbackAdapter<Event>() {
-            @Override
-            public void onResponse(Event object) {
-                if (object == null) {
-                    Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+        if (eventTitleField.getText().toString().isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Du må gi løpet et navn!", Toast.LENGTH_SHORT).show();
+        } else {
+            Event event = new Event();
+            String eventTitle = eventTitleField.getText().toString();
+            event.addProperty("event_name", eventTitle);
+            for (Marker marker : arrayListWithCoords) {
+                if (event.getPoints() == null) {
+                    event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                 } else {
-                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
-                    finish();
+                    event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                 }
             }
+            networkManager = NetworkManager.getInstance();
+            networkManager.addEvent(event, new ICallbackAdapter<Event>() {
+                @Override
+                public void onResponse(Event object) {
+                    if (object == null) {
+                        Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
+                        saveEventToRoom(object);
+                        finish();
+                    }
+                }
 
-            @Override
-            public void onFailure(Throwable t) {
-                Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
-            }
-        });
-        saveEventToRoom(event);
-        //StartupMenu.addEvent(event);
-        //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
-        //LAGRE
-        //Reset
+                @Override
+                public void onFailure(Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+                }
+            });
+            //StartupMenu.addEvent(event);
+            //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+            //LAGRE
+            //Reset
+        }
     }
 
     /**
-     * Saves the Event and Points, and adds connections between them in the Room database
+     * Saves the Event and corresponding Points, and adds connections between them in the Room database
+     * Makes sure that events and points are saved before the connections are saved. The next step
+     * is only called after the previous is finished.
      */
     private void saveEventToRoom(Event event) {
         localDatabase = LocalDatabase.getInstance(this);
         pointViewModel = new PointViewModel(localDatabase.pointDAO());
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
-        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> checkSave(longs));
-
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
+    }
+    private void savePoints(Event event){
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
-        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
-        RoomPoint roomPoint;
-        PointOEventJoin join;
-        Point point;
         for (int i = 0; i < event.getPoints().size(); i++) {
-            point = event.getPoints().get(i);
-            roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            Point point = event.getPoints().get(i);
+            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            roomPoints[i] = roomPoint;
+        }
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
+    }
+    private void joinPointsToEvent(Event event){
+        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
-            if (i > 0) {
+        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
+            PointOEventJoin join;
+            if(i > 0){
                 join = new PointOEventJoin(point.getId(), event.getId(), false);
             } else {
                 join = new PointOEventJoin(point.getId(), event.getId(), true);
             }
-            roomPoints[i] = roomPoint;
             joins[i] = join;
         }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> checkSave(longs));
-        pointOEventJoinViewModel.addJoin(joins).subscribe(longs -> checkSave(longs));
-
+        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
 
     private void checkSave(long[] longs) {
-        boolean allSaved = true;
-        for (int i = 0; i < longs.length; i++) {
-            if (longs[i] < 0) {
-                allSaved = false;
+        boolean savedAll = true;
+        for (long aLong : longs) {
+            if (aLong < 0) {
+                savedAll = false;
             }
         }
-        if (allSaved) {
-            Toast.makeText(this, "Save successfully", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
+        if(savedAll){
+            Toast.makeText(this, "Save to phone successfull", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(this, "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -1,6 +1,8 @@
 package no.teacherspet.tring.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,10 +30,9 @@ import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
+import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
-import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.EventAdapter;
 
 
@@ -51,14 +53,13 @@ public class MyEvents extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private Event selectedEvent;
     private ListView mListView;
+    private boolean changeEvent;
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
     private LocalDatabase database;
-    private PointViewModel pointViewModel;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private ArrayList<Event> listItems;
@@ -91,6 +92,7 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -108,7 +110,7 @@ public class MyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        //loadData();
+        loadData();
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
@@ -118,63 +120,109 @@ public class MyEvents extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
-                    // 1 Header takes one position --> Make sure not to start event when header is clicked and no events are available
-                    Event selectedEvent = listItems.get(position - 1);
-                    // 2
+                if(changeEvent) {
+                    Event selectedEvent = listItems.get(position);
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
-                    // 3
                     detailIntent.putExtra("MyEvent", selectedEvent);
-                    // 4
                     startActivity(detailIntent);
                 }
             }
         });
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                changeEvent = false;
+                Event selectedEvent = listItems.get(position);
+                openSettingsDialog(selectedEvent);
+                return false;
+            }
+        });
     }
+
+    private void openSettingsDialog(Event selectedEvent){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle(selectedEvent.getProperty("Title"));
+        CharSequence[] elements = {"Slett", "Avbryt"};
+        builder.setItems(elements, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        //TODO remove event from database
+                        changeEvent = true;
+                        dialog.dismiss();
+                        break;
+                    case 1:
+                        changeEvent = true;
+                        dialog.dismiss();
+                }
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     /**
      * loadData, loadPoints and createEvent work together get all relevant data out of the
      * room database and create a new event from it
      */
-    public void loadData() {
+    private void loadData() {
         listItems = new ArrayList<>();
         database = LocalDatabase.getInstance(this.getContext());
-        pointViewModel = new PointViewModel(database.pointDAO());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
 
-        //oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
+        oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
     }
+
     private void loadPoints(List<RoomOEvent> oEvents){
-        if(oEvents.size() > 0){
-            for(RoomOEvent oEvent:oEvents){
-                joinViewModel.getPointsForOEvent(oEvent.getId()).subscribe(roomPoints -> createEvent(oEvent, roomPoints));
+        if(oEvents.size()>0) {
+            for (RoomOEvent event : oEvents) {
+                joinViewModel.getStartPoint(event.getId()).subscribe(startPoints -> {
+                    if(startPoints.size() > 0){
+                        joinViewModel.getPointsNotStart(event.getId()).subscribe(points -> createEvent(event, startPoints.get(0), points));
+                    }
+                });
             }
         }
         else{
             listItems = null;
+            Toast.makeText(this.getContext(), "Found no locally saved events", Toast.LENGTH_SHORT).show();
         }
     }
-    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints){
-        if(roomPoints.size() > 0){
-            ArrayList<Point> points = new ArrayList<>();
-            for(RoomPoint roomPoint : roomPoints){
-                Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, roomPoint.getProperties().get("description"));
-                point._setId(roomPoint.getId());
-                for(String key : roomPoint.getProperties().keySet()){
-                    point.addProperty(key, roomPoint.getProperties().get(key));
-                }
-                points.add(point);
-            }
-            double minDist = Double.parseDouble(oEvent.getProperties().get("dist"));
-            Event event = new Event(oEvent.getId(), points, minDist, oEvent.getProperties().get("avg_time"));
-            for(String key : oEvent.getProperties().keySet()){
-                event.addProperty(key, oEvent.getProperties().get(key));
-            }
-            listItems.add(event);
+    private void createEvent(RoomOEvent oEvent, RoomPoint startPoint, List<RoomPoint> roomPoints){
+        ArrayList<Point> points = new ArrayList<>();
+        Event event = new Event();
+        event._setId(oEvent.getId());
+
+        event.setStartPoint(setupPoint(startPoint));
+
+        for(RoomPoint roomPoint : roomPoints){
+            points.add(setupPoint(roomPoint));
         }
+        event.addPosts(points);
+        for(String key : oEvent.getProperties().keySet()){
+            event.addProperty(key, oEvent.getProperties().get(key));
+        }
+
+        listItems.add(event);
+        updateList();
+    }
+    private Point setupPoint(RoomPoint roomPoint){
+        Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
+        point._setId(roomPoint.getId());
+        for(String key : roomPoint.getProperties().keySet()){
+            point.addProperty(key, roomPoint.getProperties().get(key));
+        }
+        return point;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    private void updateList() {
+        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
+    }
+
+        // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
