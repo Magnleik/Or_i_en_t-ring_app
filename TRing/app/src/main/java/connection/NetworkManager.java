@@ -309,7 +309,7 @@ public class NetworkManager {
      * @param callback The callback to handle results. onResponse gets passed the updated event - so time can be compared to the updated avgTime.
      */
     public void postScore(int eventID, int score, ICallbackAdapter<Event> callback){
-        Call<Event> call = client.postTime(eventID, score);
+        Call<Event> call = client.postScore(eventID, score);
 
         call.enqueue(new Callback<Event>() {
             @Override
