@@ -1,6 +1,8 @@
 package no.teacherspet.tring.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -42,6 +45,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
+    Boolean returnToStart = false;
 
 
     @Override
@@ -140,6 +144,32 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
         });
         }
+    }
+
+    //Dialog opens when event is finnished
+    public void openFinnishDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+
+        builder.setView(inflater.inflate(R.layout.event_finished_dialog, null));
+
+        builder.setPositiveButton("Lagre", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+               //Lagre event (Tid, score og avstand?)
+
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 
@@ -270,15 +300,24 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                             visitedPoints.add(point);
                             Toast.makeText(getApplicationContext(),"You arrived at a previously unvisited point!",Toast.LENGTH_LONG).show();
                             mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                            if(visitedPoints.size()==points.size()){
+                            if(visitedPoints.size()==points.size() && returnToStart == false){
                                 //TODO: get the user back to the start point
                                 Toast.makeText(getApplicationContext(),"You have visited all the points! Get to the finish line!",Toast.LENGTH_SHORT).show();
+                                returnToStart = true;
                             }
                             break;
                         }
                     }
-                    if(prevsize==visitedPoints.size()){
-                        Toast.makeText(getApplicationContext(),"There is no new point here to be visited",Toast.LENGTH_LONG).show();
+                    if(prevsize==visitedPoints.size() && returnToStart == true){
+                        float distance = startedEvent.getStartPoint().getDistanceFromPoint(position);
+                        if (distance < 20) {
+                            //Event finnished!
+                            openFinnishDialog();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
+                        }
+                    } else if (prevsize==visitedPoints.size()){
+                        Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
                     }
                 }
             });
