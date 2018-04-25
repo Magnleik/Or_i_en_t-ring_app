@@ -93,27 +93,18 @@ public class DatabaseTest {
 
     @Test
     public void userTest(){
-        String firstname = "firstname";
-        String lastname = "lastname";
+        String token = "token";
 
-        RoomUser testRoomUser1 = new RoomUser(0, true, firstname, lastname);
+        RoomUser testRoomUser1 = new RoomUser(token);
         userDAO.getAll().test().assertValue(users -> {
             return users.size() == 0;
         });
         assertNotSame(-1, userDAO.insert(testRoomUser1));
 
-        userDAO.findById(testRoomUser1.getId()).test().assertValue(user -> {
-            return testRoomUser1.getId() == user.getId();
+        userDAO.getAll().test().assertValue(user -> {
+            return user.size() == 1 && testRoomUser1.getToken().equals(user.get(0).getToken());
         });
-        userDAO.getPersonalUser().test().assertValue(user -> {
-            return testRoomUser1.getId() == user.get(0).getId();
-        });
-        userDAO.getPersonalUser().test().assertValue(user -> {
-            return testRoomUser1.getFullName().equals(user.get(0).getFullName());
-        });
-        userDAO.getMaxID().test().assertValue(integer -> {
-            return testRoomUser1.getId() == integer;
-        });
+
         userDAO.delete(testRoomUser1);
         userDAO.getAll().test().assertValue(users -> {
             return users.size() == 0;

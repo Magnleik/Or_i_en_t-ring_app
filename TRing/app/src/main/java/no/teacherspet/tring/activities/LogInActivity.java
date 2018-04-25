@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.Database.Entities.RoomUser;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
 
 /**
@@ -83,7 +86,22 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     private void saveCredentialsToLocal(){
-        //TODO: Make sure log in credentials is saved to local database from here. Token can be gotten from NetworkManager.getInstance.getToken().
+        String token =  NetworkManager.getInstance().getToken();
+        LocalDatabase database = LocalDatabase.getInstance(this);
+        UserViewModel userViewModel = new UserViewModel(database.userDAO());
+        userViewModel.getAllUsers().subscribe(roomUsers -> {
+            if (roomUsers.size() == 0) {
+                userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
+            }
+        });
+
+
+    }
+    private void checkResult(long[] longs){
+        if(longs[0] < 0){
+            Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
+            //saveCredentialsToLocal();
+        }
     }
 
 

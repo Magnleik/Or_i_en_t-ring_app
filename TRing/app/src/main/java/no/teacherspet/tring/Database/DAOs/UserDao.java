@@ -22,18 +22,6 @@ public interface UserDao {
     @Query("SELECT * FROM user")
     Maybe<List<RoomUser>> getAll();
 
-    @Query("SELECT * FROM user WHERE personalProfile LIKE 0")
-    Maybe<List<RoomUser>> getOtherUsers();
-
-    @Query("SELECT * FROM user WHERE personalProfile LIKE 1")
-    Maybe<List<RoomUser>> getPersonalUser();
-
-    @Query("SELECT * FROM user WHERE id LIKE :id")
-    Maybe<RoomUser> findById(int id);
-
-    @Query("SELECT MAX(id) FROM user")
-    Maybe<Integer> getMaxID();
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(RoomUser... roomUsers);
 

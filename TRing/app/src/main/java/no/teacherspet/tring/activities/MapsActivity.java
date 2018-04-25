@@ -34,7 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         localDatabase = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
 
-        user = userViewModel.getPersonalUser().subscribe(roomUsers -> createUser(roomUsers));
+        //user = userViewModel.getPersonalUser().subscribe(roomUsers -> createUser(roomUsers));
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);

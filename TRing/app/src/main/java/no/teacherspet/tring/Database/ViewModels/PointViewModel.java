@@ -41,6 +41,12 @@ public class PointViewModel extends ViewModel {
                 .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
     }
 
+    public Single<Integer> deletePoint(int pointID){
+        return Single.fromCallable(()->pointDao.deletePoint(pointID))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Single<Integer> deletePoints(RoomPoint... roomPoints){
         return Single.fromCallable(()->pointDao.delete(roomPoints))
                 .subscribeOn(Schedulers.io())

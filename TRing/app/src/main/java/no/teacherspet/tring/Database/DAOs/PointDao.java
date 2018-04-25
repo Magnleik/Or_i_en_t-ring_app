@@ -34,6 +34,9 @@ public interface PointDao {
     @Update
     void update(RoomPoint... roomPoints);
 
+    @Query("DELETE FROM point WHERE id = :pointID")
+    int deletePoint(int pointID);
+
     @Delete
     int delete(RoomPoint... roomPoints);
 

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.RoomUser;
@@ -31,16 +32,17 @@ public class StartupMenu extends AppCompatActivity{
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
     private static HashMap<Integer, Event> testEvents;
     LocalDatabase localDatabase;
+    UserViewModel userViewModel;
     Disposable user;
 
     protected void onCreate(Bundle savedInstanceState) {
         requestAccess();
 
         localDatabase = LocalDatabase.getInstance(this);
-        UserViewModel userViewModel = new UserViewModel(localDatabase.userDAO());
+        userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        //user = userViewModel.getPersonalUser().subscribe(users -> createUser(users));
+        user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
@@ -50,12 +52,36 @@ public class StartupMenu extends AppCompatActivity{
     }
 
     //Changes to createUserActivity if a roomUser has not been created
-    private void createUser(List<RoomUser> roomUser){
-        if(roomUser.size() > 0 && roomUser.get(0).getId() >= 0){
-            this.user.dispose();
+    private void checkUser(List<RoomUser> roomUser){
+        if(roomUser.size() > 0){
+            NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+                @Override
+                public void onResponse(Boolean object) {
+                    if(object != null){
+                        if(object) {
+                            Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
+                        }
+                        else{
+                            userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                    startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                        }
+                    }
+                    else{
+                        userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                    startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                            startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                }
+            });
         }
         else{
-            startActivity(new Intent(this, CreateUserActivity.class));
+            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
         }
     }
 
