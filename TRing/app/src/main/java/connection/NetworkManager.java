@@ -286,6 +286,35 @@ public class NetworkManager {
         });
     }
 
+    /**
+     * subscribe to event
+     * @param eventID The id of the event you wish to subscribe to
+     * @param callback onResponse gets passed the full subscription list.
+     */
+    public void subscribeToEvent(int eventID, final ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.subscribeToEvent(eventID);
+
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "subscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "subscribeToEvent successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
     //endregion
 
     //region GET-methods
@@ -388,6 +417,36 @@ public class NetworkManager {
 
     }
 
+
+    /**
+     * Get all your subscribed events
+     * @param callback onResponse gets passed the full subscription list.
+     */
+    public void getSubscribedEvents(final ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.getSubscribedEvents();
+
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "getSubscribedEvents got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "getSubscribedEvents successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+
+    }
+
     //endregion
 
     //region PUT-methods
@@ -457,6 +516,35 @@ public class NetworkManager {
     //endregion
 
     //region DELETE-methods
+
+    /**
+     * Delete an Event from your subscriptions.
+     * @param eventID The id of the event you want removed
+     * @param callback onResponse gets passed the full subscription list.
+     */
+    public void unsubscribeFromEvent(int eventID, ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.unsubscribeFromEvent(eventID);
+
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "unsubscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "unsubscribeToEvent successfull with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
 
     //endregion
 

@@ -48,7 +48,7 @@ public interface Client {
             @Body Event event
     );
 
-    @POST("/api/users")
+    @POST("/api/user")
     Call<Boolean> createNewUser(
             @Body User user
     );
@@ -89,10 +89,21 @@ public interface Client {
             @Query("dist") double radius
     );
 
-
-
     @GET("/api/events/{ID}/points")
     Call<Event> getEventById(
+            @Path("ID") int ID
+    );
+
+    @GET("/api/user/events")
+    Call<List<Event>> getSubscribedEvents();
+
+    @POST("/api/user/events/{ID}")
+    Call<List<Event>> subscribeToEvent(
+            @Path("ID") int ID
+    );
+
+    @DELETE("/api/user/events/{ID}")
+    Call<List<Event>> unsubscribeFromEvent(
             @Path("ID") int ID
     );
   
