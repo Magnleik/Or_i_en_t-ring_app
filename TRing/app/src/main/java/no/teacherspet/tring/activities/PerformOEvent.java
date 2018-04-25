@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -45,7 +46,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
-    Boolean returnToStart = false;
+    boolean returnToStart = false;
+    long startTime;
+    long eventTime;
+    boolean savedResults = false;
 
 
     @Override
@@ -151,14 +155,28 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
+        View inflator = inflater.inflate(R.layout.event_finished_dialog, null);
+        builder.setView(inflator);
 
-        builder.setView(inflater.inflate(R.layout.event_finished_dialog, null));
+        //Viser tiden brukt under eventet
+        double eventTime = getEventTime();
+        String eventTimeString = Double.toString(eventTime);
+        TextView timeTextView = (TextView)inflator.findViewById(R.id.timeTextView);
+        timeTextView.setText("Tid: " + eventTimeString + " minutter");
+
+        //Viser score oppnådd under eventet
+        double eventScore = getEventScore();
+        String eventScoreString = Double.toString(eventScore);
+        TextView scoreTextView = (TextView)inflator.findViewById(R.id.scoreTextView);
+        scoreTextView.setText("Total score: " + eventScoreString);
+
+
+
 
         builder.setPositiveButton("Lagre", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                //Lagre event (Tid, score og avstand?)
-
                 dialog.dismiss();
             }
         });
@@ -170,6 +188,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
     }
 
 
@@ -312,7 +331,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         float distance = startedEvent.getStartPoint().getDistanceFromPoint(position);
                         if (distance < 20) {
                             //Event finnished!
-                            openFinnishDialog();
+                            endEvent();
                         } else {
                             Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
                         }
@@ -331,5 +350,60 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public ArrayList<Point> getPoints() {
         return points;
     }
+
+    public double getEventTime() {
+        if (this.eventTime == -1 ) {
+            long difference = System.currentTimeMillis() - this.startTime;
+            this.eventTime = (difference / 1000) / 60; //minutes
+        }
+        return eventTime;
+    }
+
+    public double getEventScore() {
+        //TODO må lage ordentlig funksjon
+
+
+        double eventTime = getEventTime();
+        double eventScore=0;
+
+
+        return eventScore;
+    }
+
+    public void startEventBtnPressed(View v) {
+        // Check if user is on startpoint
+        View addEventButton = findViewById(R.id.start_event_btn);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            createLocationRequest();
+            mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    LatLng userLocationLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
+                    if (distance < 20) {
+                        addEventButton.setVisibility(View.GONE);
+                } else {
+                        Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_LONG).show();
+
+            };
+        };
+        } );
+        }
+        if (addEventButton.getVisibility() == View.GONE) {
+            this.startTime = System.currentTimeMillis();
+            this.eventTime = -1;
+        }
+
+
+    }
+
+    public void endEvent() {
+        openFinnishDialog();
+    }
+
+
+
+
+
 }
 
