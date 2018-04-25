@@ -359,7 +359,7 @@ public class NetworkManager {
      * Finds and returns all events with starting location within a radius maxDist from the given location
      * @param latitude The latitude of given position
      * @param longitude The longitude of given position
-     * @param maxDist The radius of search
+     * @param maxDist The radius of search in meters
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets all events starting within the given circle
      */
     public void getNearbyEvents(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Event>> callback){
