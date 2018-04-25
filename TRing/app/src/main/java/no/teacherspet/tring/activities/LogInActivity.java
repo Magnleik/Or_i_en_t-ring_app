@@ -56,6 +56,9 @@ public class LogInActivity extends AppCompatActivity {
 
                     if(NetworkManager.getInstance().isAuthenticated()) {
                         Toast.makeText(LogInActivity.this, "Successfully logged in", Toast.LENGTH_LONG).show();
+
+                        saveCredentialsToLocal();
+
                     }else{
                         Toast.makeText(LogInActivity.this, "User verified, but log in failed", Toast.LENGTH_LONG).show();
                     }
@@ -77,6 +80,10 @@ public class LogInActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void saveCredentialsToLocal(){
+        //TODO: Make sure log in credentials is saved to local database from here. Token can be gotten from NetworkManager.getInstance.getToken().
     }
 
 
