@@ -193,6 +193,18 @@ public class MyEvents extends Fragment {
         }
     }
 
+    private void deleteEvent(Event event){
+        oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
+            if(integer != -1){
+                Toast.makeText(this.getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+            updateList();
+        });
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
