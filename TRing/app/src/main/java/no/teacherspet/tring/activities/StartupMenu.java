@@ -59,6 +59,7 @@ public class StartupMenu extends AppCompatActivity{
                 public void onResponse(Boolean object) {
                     if(object != null){
                         if(object) {
+                            Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
                         }
                         else{
@@ -79,7 +80,9 @@ public class StartupMenu extends AppCompatActivity{
                 }
             });
         }
-        Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+        else{
+            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
