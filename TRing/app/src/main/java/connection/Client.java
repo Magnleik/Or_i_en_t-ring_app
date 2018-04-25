@@ -58,6 +58,11 @@ public interface Client {
 
     );
 
+    @PUT("/api/events")
+    Call<Event> updateEvent(
+            @Body Event event
+    );
+
 
 
     @POST("/api/events/{ID}/points")

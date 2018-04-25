@@ -468,6 +468,36 @@ public class NetworkManager {
 
     }
 
+    /**
+     * Updates the existing Event if it exists in the database, and returns the updated Event.
+     * @param event The state the Event in the database should be updated to.
+     * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the updated Event
+     */
+    public void updateEvent(Event event, final ICallbackAdapter<Event> callback){
+
+        Call<Event> call = client.updateEvent(event);
+
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "updateEvent got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "updateEvent successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+
+    }
 
     /**
      * Updates the existing Point if it exists in the database, and returns the updated Point.
