@@ -89,6 +89,9 @@ public class CreateUserActivity extends AppCompatActivity {
 
                     if (NetworkManager.getInstance().isAuthenticated()){
                         Toast.makeText(CreateUserActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+
+                        saveCredentialsToLocal();
+
                     }else{
                         Toast.makeText(CreateUserActivity.this, "Failed to log in", Toast.LENGTH_LONG).show();
                     }
@@ -123,6 +126,10 @@ public class CreateUserActivity extends AppCompatActivity {
             Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
             saveButton.setEnabled(true);
         }
+    }
+
+    private void saveCredentialsToLocal(){
+        //TODO: Make sure log in credentials is saved to local database from here. Token can be gotten from NetworkManager.getInstance.getToken().
     }
 
     @Override

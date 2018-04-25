@@ -587,6 +587,48 @@ public class NetworkManager {
         });
     }
 
+    /**
+     * Check log in credentials with the database, and authenticates this instance of the application (from the server perspective, logs you in).
+     * @param token The authorization token
+     * @param callback The callback to handle results. onResponse gets a Boolean - true if the registration was successful, false otherwise.
+     */
+    public void logInWithToken(String token, final ICallbackAdapter<Boolean> callback){
+
+        logOut();
+
+        addCredentialsWithToken(token);
+
+        Call<Boolean> call = client.logIn();
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+
+                if(response.isSuccessful()){
+                    Log.i("NETWORK", "logIn successful with response: " + response.toString());
+                    callback.onResponse(true);
+                }
+                else if(response.code()==401){
+                    Log.i("NETWORK", "logIn got 401 error");
+                    callback.onResponse(false);
+                    logOut();
+                }else{
+                    Log.i("NETWORK", "logIn got onResponse, without success. RESPONSE: " +response.toString());
+                    callback.onResponse(null);
+                    logOut();
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
 
     /**
      * When logging on, call this method with the username and password. Will add authentification to the HTTP calls.
@@ -601,6 +643,11 @@ public class NetworkManager {
             authToken = Credentials.basic(username, password);
         }
 
+        addCredentialsWithToken(authToken);
+    }
+
+    private void addCredentialsWithToken(String authToken){
+
         if (!TextUtils.isEmpty(authToken)) { //FIXME: Does this handle null?
             AuthenticationInterceptor interceptor =
                     new AuthenticationInterceptor(authToken);
@@ -614,6 +661,7 @@ public class NetworkManager {
         }
 
         client = retrofit.create(Client.class);
+
     }
 
     public void logOut(){
@@ -626,6 +674,24 @@ public class NetworkManager {
             }
         }
 
+    }
+
+    /**
+     * Get the authentication token of of the current login.
+     * @return Returns a string representing the current token. Returns null if no such token exists.
+     */
+    public String getToken(){
+        if(!isAuthenticated()){
+            return null;
+        }
+
+        for (Interceptor i : httpClient.interceptors()) {
+            if ( i instanceof AuthenticationInterceptor){
+                return ((AuthenticationInterceptor) i).authToken;
+            }
+        }
+
+        return null;
     }
 
     /**
