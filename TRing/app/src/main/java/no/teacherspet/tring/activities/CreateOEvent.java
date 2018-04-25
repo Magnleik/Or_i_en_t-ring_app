@@ -146,17 +146,19 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             lm.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    NetworkManager.getInstance().getNearbyPoints(location.getLatitude(), location.getLongitude(), 200, new ICallbackAdapter<ArrayList<Point>>() {
-                        @Override
-                        public void onResponse(ArrayList<Point> object) {
-                            //TODO: visualize the points on screen which can be chosen
-                        }
+                    if(location != null){
+                        NetworkManager.getInstance().getNearbyPoints(location.getLatitude(), location.getLongitude(), 200, new ICallbackAdapter<ArrayList<Point>>() {
+                            @Override
+                            public void onResponse(ArrayList<Point> object) {
+                                //TODO: visualize the points on screen which can be chosen
+                            }
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(),"Could not find any points nearby.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Toast.makeText(getApplicationContext(),"Could not find any points nearby.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             });
         }
