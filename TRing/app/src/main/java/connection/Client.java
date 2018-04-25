@@ -81,7 +81,7 @@ public interface Client {
     );
 
     @POST("/api/events/{eventID}/score/{score}")
-    Call<Event> postTime(
+    Call<Event> postScore(
             @Path("eventID") int eventID,
             @Path("score") int score
     );
