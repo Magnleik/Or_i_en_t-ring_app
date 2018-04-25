@@ -301,7 +301,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "subscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "subscribeToEvent successfull with response: " + response.toString());
+                    Log.i("NETWORK", "subscribeToEvent successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -339,7 +339,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getNearbyPoints got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getNearbyPoints successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getNearbyPoints successful with response: " + response.toString());
                 }
 
                 callback.onResponse((ArrayList<Point>) response.body());
@@ -372,7 +372,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getNearbyEvents got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getNearbyEvents successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getNearbyEvents successful with response: " + response.toString());
                 }
 
                 callback.onResponse((ArrayList<Event>) response.body());
@@ -402,7 +402,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getEventById got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getEventById successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getEventById successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -432,7 +432,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getSubscribedEvents got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getSubscribedEvents successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getSubscribedEvents successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -532,7 +532,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "unsubscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "unsubscribeToEvent successfull with response: " + response.toString());
+                    Log.i("NETWORK", "unsubscribeToEvent successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
