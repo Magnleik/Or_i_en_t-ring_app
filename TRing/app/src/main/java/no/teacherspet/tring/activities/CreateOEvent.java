@@ -263,10 +263,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Point point = event.getPoints().get(i);
             PointOEventJoin join;
             if(i > 0){
-                join = new PointOEventJoin(point.getId(), event.getId(), false);
+                join = new PointOEventJoin(point.getId(), event.getId(), false, false);
             }
             else{
-                join = new PointOEventJoin(point.getId(), event.getId(), true);
+                join = new PointOEventJoin(point.getId(), event.getId(), true, false);
             }
             joins[i] = join;
         }

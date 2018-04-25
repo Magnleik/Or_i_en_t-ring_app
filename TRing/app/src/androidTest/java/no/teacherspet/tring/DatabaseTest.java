@@ -148,8 +148,8 @@ public class DatabaseTest {
         assertNotSame(-1, oEventDAO.insert(testoEventRoom));
         assertNotSame(testRoomPoint1.getId(), testRoomPoint2.getId());
 
-        PointOEventJoin testJoin1 = new PointOEventJoin(testRoomPoint1.getId(), testoEventRoom.getId(), true);
-        PointOEventJoin testJoin2 = new PointOEventJoin(testRoomPoint2.getId(), testoEventRoom.getId(), false);
+        PointOEventJoin testJoin1 = new PointOEventJoin(testRoomPoint1.getId(), testoEventRoom.getId(), true, false);
+        PointOEventJoin testJoin2 = new PointOEventJoin(testRoomPoint2.getId(), testoEventRoom.getId(), false, false);
 
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin1));
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin2));

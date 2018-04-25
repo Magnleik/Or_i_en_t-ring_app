@@ -107,6 +107,9 @@ public class LogInActivity extends AppCompatActivity {
             Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
             //saveCredentialsToLocal();
         }
+        else{
+            Toast.makeText(this, "User saved locally", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
