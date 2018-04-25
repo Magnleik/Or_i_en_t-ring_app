@@ -88,7 +88,7 @@ public class Point implements Serializable {
     }
 
     /**
-     * Determines the distance between this point and a given position.
+     * Determines the distance between this point and a given position in meters.
      * @param position The position to find the distance to
      * @return The distance between point and position
      */

@@ -85,10 +85,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     System.out.println(locationResult.getLastLocation().getAccuracy());
                     if (locationResult.getLastLocation().getAccuracy() <= 700) {
                         currentLocation = locationResult.getLastLocation();
-                        if (prevMarker != null) {
-                            prevMarker.remove();
-                        }
-                        prevMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Her"));
                     }
                 }
             };
@@ -273,16 +269,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 break;
             }
         }
-        if (prevsize == visitedPoints.size() && returnToStart) {
-            float distance = startedEvent.getStartPoint().getDistanceFromPoint(position);
-            if (distance < 20) {
-                //Event finnished!
-                endEvent();
-            } else {
-                Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
-            }
-        } else if (prevsize == visitedPoints.size()) {
+
+        if (prevsize == visitedPoints.size()) {
             Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
+        }
+        if (points.size() == visitedPoints.size()) {
+            //Event finnished!
+            endEvent();
         }
     }
 
@@ -304,9 +297,25 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public double getEventScore() {
         //TODO må lage ordentlig funksjon
 
+        double distance = 0;
+        // Kalkuler distanse
+        for (Point point: points) {
+            int index = points.indexOf(point);
+            if (index == points.size()-1) {
+                break;
+            }
+            distance += point.getDistanceFromPoint(new LatLng(points.get(index+1).getLatitude(), points.get(index+1).getLongitude()));
+        }
+
+        //This must be changed based on the users level
+        //Now using avrg jogging spead (Mid-levelsish?) 8kmph
+
+        double avrageTimeBasedOnDistance = distance / 8000; //minutes
+
+
 
         double eventTime = getEventTime();
-        double eventScore=0;
+        double eventScore=avrageTimeBasedOnDistance/eventTime;
 
 
         return eventScore;
