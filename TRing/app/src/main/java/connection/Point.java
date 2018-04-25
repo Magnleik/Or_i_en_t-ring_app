@@ -1,7 +1,6 @@
 package connection;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
