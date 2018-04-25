@@ -66,7 +66,8 @@ public class NetworkManager {
 
         //updatePointTest();
         //addPointsTest();
-        addEventTest();
+        //addEventTest();
+        //eventsNearbyTest();
         //updateEventPropertiesTest();
 
     }
@@ -107,6 +108,26 @@ public class NetworkManager {
                 System.out.println(t.getMessage());
             }
         }, testPoint1,testPoint2,testPoint3);
+
+    }
+
+    private void eventsNearbyTest(){
+
+        getNearbyEvents(63.43, 10.50, 20000, new ICallbackAdapter<ArrayList<Event>>() {
+            @Override
+            public void onResponse(ArrayList<Event> object) {
+                if(object!=null){
+                    System.out.println("Got a list of " + object.size() + " events");
+                }else{
+                    System.out.println("Received NULL from eventsNearbyTest");
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                System.out.println("EventsNearbyTest failed");
+            }
+        });
 
     }
 
