@@ -298,38 +298,42 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      */
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
-        Event event = new Event();
-        String eventTitle = eventTitleField.getText().toString();
-        event.addProperty("event_name", eventTitle);
-        for (Marker marker : arrayListWithCoords) {
-            if (event.getPoints() == null) {
-                event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
-            } else {
-                event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
-            }
-        }
-        networkManager = NetworkManager.getInstance();
-        networkManager.addEvent(event, new ICallbackAdapter<Event>() {
-            @Override
-            public void onResponse(Event object) {
-                if (object == null) {
-                    Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+        if (eventTitleField.getText().toString().isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Du må gi løpet et navn!", Toast.LENGTH_SHORT).show();
+        } else {
+            Event event = new Event();
+            String eventTitle = eventTitleField.getText().toString();
+            event.addProperty("event_name", eventTitle);
+            for (Marker marker : arrayListWithCoords) {
+                if (event.getPoints() == null) {
+                    event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                 } else {
-                    Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
-                    saveEventToRoom(object);
-                    finish();
+                    event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                 }
             }
+            networkManager = NetworkManager.getInstance();
+            networkManager.addEvent(event, new ICallbackAdapter<Event>() {
+                @Override
+                public void onResponse(Event object) {
+                    if (object == null) {
+                        Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
+                        saveEventToRoom(object);
+                        finish();
+                    }
+                }
 
-            @Override
-            public void onFailure(Throwable t) {
-                Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
-            }
-        });
-        //StartupMenu.addEvent(event);
-        //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
-        //LAGRE
-        //Reset
+                @Override
+                public void onFailure(Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+                }
+            });
+            //StartupMenu.addEvent(event);
+            //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+            //LAGRE
+            //Reset
+        }
     }
 
     /**
