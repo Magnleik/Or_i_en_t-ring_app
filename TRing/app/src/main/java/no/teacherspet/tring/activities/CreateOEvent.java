@@ -109,6 +109,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(getApplicationContext(), "App needs permission to access location services on phone to run", Toast.LENGTH_LONG).show();
             finish();
         } else {
+            //TODO remove lm.getlastlocation and replace with currentLocation
             lm.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
