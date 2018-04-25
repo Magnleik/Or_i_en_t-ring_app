@@ -80,6 +80,12 @@ public interface Client {
             @Path("time") String time
     );
 
+    @POST("/api/events/{eventID}/score/{score}")
+    Call<Event> postTime(
+            @Path("eventID") int eventID,
+            @Path("score") int score
+    );
+
     @POST("/api/login")
     Call<Boolean> logIn();
 
