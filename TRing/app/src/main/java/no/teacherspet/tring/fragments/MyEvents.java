@@ -155,16 +155,14 @@ public class MyEvents extends Fragment {
         }
     }
     private void createEvent(RoomOEvent oEvent, RoomPoint startPoint, List<RoomPoint> roomPoints){
-        ArrayList<Point> points = new ArrayList<>();
         Event event = new Event();
         event._setId(oEvent.getId());
 
         event.setStartPoint(setupPoint(startPoint));
-
         for(RoomPoint roomPoint : roomPoints){
-            points.add(setupPoint(roomPoint));
+            event.addPost(setupPoint(roomPoint));
         }
-        event.addPosts(points);
+
         for(String key : oEvent.getProperties().keySet()){
             event.addProperty(key, oEvent.getProperties().get(key));
         }
