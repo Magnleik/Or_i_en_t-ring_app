@@ -42,7 +42,9 @@ public class StartupMenu extends AppCompatActivity{
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        if(NetworkManager.getInstance().isAuthenticated()){
+            user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        }
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
