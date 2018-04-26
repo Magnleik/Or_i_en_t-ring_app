@@ -63,6 +63,7 @@ public class DatabaseTest {
         LatLng latlng = createLatLng();
         Map<String, String> properties = new HashMap<>();
         properties.put("name", "testRoomPoint");
+        properties.put("description","");
 
         pointDAO.getAll().test().assertValue(points -> {
             return points.size() == 0;
@@ -148,8 +149,8 @@ public class DatabaseTest {
         assertNotSame(-1, oEventDAO.insert(testoEventRoom));
         assertNotSame(testRoomPoint1.getId(), testRoomPoint2.getId());
 
-        PointOEventJoin testJoin1 = new PointOEventJoin(testRoomPoint1.getId(), testoEventRoom.getId(), true);
-        PointOEventJoin testJoin2 = new PointOEventJoin(testRoomPoint2.getId(), testoEventRoom.getId(), false);
+        PointOEventJoin testJoin1 = new PointOEventJoin(testRoomPoint1.getId(), testoEventRoom.getId(), true, false);
+        PointOEventJoin testJoin2 = new PointOEventJoin(testRoomPoint2.getId(), testoEventRoom.getId(), false, false);
 
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin1));
         assertNotSame(-1, pointOEventJoinDAO.insert(testJoin2));
@@ -175,15 +176,21 @@ public class DatabaseTest {
                     return !(roomPoints.size() >0);
         });
 
-        assertNotSame(-1, pointOEventJoinDAO.delete(testJoin1));
-        pointOEventJoinDAO.getOEventsForPoint(testRoomPoint1.getId()).test().assertValue(oEvents -> {
-            return oEvents.size() == 0;
+        assertNotSame(-1, pointDAO.delete(testRoomPoint1));
+        oEventDAO.getAll().test().assertValue(roomOEvents -> {
+           return roomOEvents.size() > 0;
         });
+        pointOEventJoinDAO.getPointsForOEvent(testoEventRoom.getId()).test().assertValue(points -> {
+            return points.size() == 1;
+        });
+        pointOEventJoinDAO.getAll().test().assertValue(joins -> {
+           return joins.size() == 1;
+        });
+
         assertNotSame(-1, pointOEventJoinDAO.delete(testRoomPoint2.getId(), testoEventRoom.getId()));
         pointOEventJoinDAO.getPointsForOEvent(testoEventRoom.getId()).test().assertValue(points -> {
             return points.size() == 0;
         });
     }
-
 
 }

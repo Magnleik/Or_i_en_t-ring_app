@@ -148,7 +148,7 @@ public class MyEvents extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        //TODO remove event from database
+                        deleteEvent(selectedEvent);
                         changeEvent = true;
                         dialog.dismiss();
                         break;
@@ -191,16 +191,14 @@ public class MyEvents extends Fragment {
         }
     }
     private void createEvent(RoomOEvent oEvent, RoomPoint startPoint, List<RoomPoint> roomPoints){
-        ArrayList<Point> points = new ArrayList<>();
         Event event = new Event();
         event._setId(oEvent.getId());
 
         event.setStartPoint(setupPoint(startPoint));
-
         for(RoomPoint roomPoint : roomPoints){
-            points.add(setupPoint(roomPoint));
+            event.addPost(setupPoint(roomPoint));
         }
-        event.addPosts(points);
+
         for(String key : oEvent.getProperties().keySet()){
             event.addProperty(key, oEvent.getProperties().get(key));
         }
@@ -227,6 +225,19 @@ public class MyEvents extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    private void deleteEvent(Event event){
+        oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
+            if(integer != -1){
+                Toast.makeText(this.getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
+                listItems.remove(event);
+                updateList();
+            }
+            else{
+                Toast.makeText(this.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

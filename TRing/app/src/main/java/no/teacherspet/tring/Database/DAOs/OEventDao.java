@@ -7,7 +7,6 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Maybe;
@@ -22,11 +21,14 @@ public interface OEventDao {
     @Query("SELECT * FROM o_event")
     Maybe<List<RoomOEvent>> getAll();
 
-    @Query("SELECT * FROM o_event WHERE id LIKE :id")
+    @Query("SELECT * FROM o_event WHERE id = :id")
     Maybe<RoomOEvent> findById(int id);
 
     @Query("SELECT MAX(id) FROM o_event")
     Maybe<Integer> getMaxID();
+
+    @Query("SELECT * FROM o_event WHERE active = 1")
+    Maybe<List<RoomOEvent>> getActiveEvent();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insert(RoomOEvent... roomOEvents);

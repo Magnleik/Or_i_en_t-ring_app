@@ -14,10 +14,13 @@ public class RoomOEvent {
     public RoomOEvent(int id, Map<String, String> properties) {
         this.id = id;
         this.properties = properties;
+        active = false;
     }
 
     @PrimaryKey //(autoGenerate = true)
     private int id;
+
+    private boolean active;
 
     private Map<String, String> properties;
 
@@ -26,6 +29,14 @@ public class RoomOEvent {
     }
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public Map<String, String> getProperties() {

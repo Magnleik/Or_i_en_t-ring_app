@@ -42,7 +42,9 @@ public class StartupMenu extends AppCompatActivity{
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        }
 
         super.onCreate(savedInstanceState);
         if(testEvents==null){
@@ -106,8 +108,12 @@ public class StartupMenu extends AppCompatActivity{
 
         if(!NetworkManager.getInstance().isAuthenticated()){
             Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+            userViewModel.getAllUsers().subscribe(roomUsers -> {
+                for(RoomUser user : roomUsers){
+                    userViewModel.deleteUsers(user);
+                }
+            });
         }
-
     }
 
     private boolean requestAccess(){

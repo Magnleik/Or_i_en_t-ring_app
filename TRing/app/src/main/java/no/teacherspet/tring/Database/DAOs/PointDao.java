@@ -22,7 +22,7 @@ public interface PointDao {
     @Query("SELECT * FROM point")
     Maybe<List<RoomPoint>> getAll();
 
-    @Query("SELECT * FROM point WHERE id LIKE :id")
+    @Query("SELECT * FROM point WHERE id = :id")
     Maybe<RoomPoint> findById(int id);
 
     @Query("SELECT MAX(id) FROM point")
