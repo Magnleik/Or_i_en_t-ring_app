@@ -17,6 +17,7 @@ public class Point implements Serializable {
     private int id = -1;
     private Map<String, String> properties;
     private Geometry geometry;
+    private boolean isVisited;
 
     /**
      *  Constructor to use when creating a new point on the app - when ID is unknown.
@@ -29,6 +30,7 @@ public class Point implements Serializable {
         geometry.coordinates = new double[]{latitude,longitude};
         properties = new HashMap<>();
         properties.put("description",description);
+        isVisited=false;
     }
 
     /**
@@ -37,6 +39,7 @@ public class Point implements Serializable {
     public Point(){
         geometry = new Geometry();
         properties = new HashMap<>();
+        isVisited = false;
     }
 
     public int getId() {
@@ -115,4 +118,18 @@ public class Point implements Serializable {
         double[] coordinates;
     }
 
+    /**
+     * Tags the point as visited by the user
+     */
+    public void visit(){
+        isVisited=true;
+    }
+
+    /**
+     *
+     * @return Whether the point has been visited
+     */
+    public boolean isVisited(){
+        return isVisited;
+    }
 }
