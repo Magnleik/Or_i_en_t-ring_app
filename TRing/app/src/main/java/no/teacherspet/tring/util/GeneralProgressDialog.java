@@ -1,14 +1,19 @@
 package no.teacherspet.tring.util;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
-import android.support.constraint.ConstraintLayout;
-import android.text.Layout;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
+import no.teacherspet.tring.R;
 
 /**
  * Created by Eirik on 26-Apr-18.
@@ -16,37 +21,56 @@ import android.widget.RelativeLayout;
 
 public class GeneralProgressDialog {
 
-    ProgressBar progressBar;
-    Context context;
-    Activity activity;
-    ViewGroup layout;
+    private ProgressBar progressBar;
+    private Context context;
+    private Activity activity;
+    private FragmentManager fm;
+    private MyDialogFragment dialogFragment;
+    boolean blocking = false;
 
-    public GeneralProgressDialog(Context context, Activity activity,ViewGroup layout) {
+    public GeneralProgressDialog(Context context, Activity activity, boolean blocking) {
         this.context = context;
         this.activity = activity;
-        this.layout = layout;
+        this.blocking = blocking;
         progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleLarge);
+        fm = activity.getFragmentManager();
+        dialogFragment = new MyDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("blocking", blocking);
+        dialogFragment.setArguments(bundle);
+        //show();
+    }
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100,100);
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        layout.addView(progressBar, params);
-        hide();
+    public GeneralProgressDialog(Context context, Activity activity){
+        this(context,activity,false);
     }
 
     public void show(){
-        progressBar.setVisibility(View.VISIBLE);
+
+        if(dialogFragment.isAdded()) {
+            dialogFragment.dismiss();
+        }
+        dialogFragment.show(fm, "loading");
+        //setTouchable(!blocking);
     }
 
     public void hide(){
-        progressBar.setVisibility(View.GONE);
-        setTouchable(true);
+        dialogFragment.dismiss();
     }
 
-    public void setTouchable(boolean bool){
-        if(bool){
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        }else{
-            activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
+    }
+
+
+    public static class MyDialogFragment extends DialogFragment{
+
+        @Nullable
+        @Override
+        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_progressbar_dialog,container,false);
+            getDialog().setCanceledOnTouchOutside(!this.getArguments().getBoolean("blocking",false));
+            return rootView;
         }
     }
 }

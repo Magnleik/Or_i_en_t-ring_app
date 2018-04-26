@@ -31,7 +31,6 @@ public class LogInActivity extends AppCompatActivity {
     EditText password;
     Button logInBtn;
     Button createUserBtn;
-    RelativeLayout layout;
     GeneralProgressDialog progressDialog;
 
     @Override
@@ -40,13 +39,12 @@ public class LogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        layout = (RelativeLayout) findViewById(R.id.log_in_layout);
         username = (EditText) findViewById(R.id.login_username);
         password = (EditText) findViewById(R.id.login_password);
         logInBtn = (Button) findViewById(R.id.login_btn);
         createUserBtn = (Button) findViewById(R.id.login_create_btn);
 
-        progressDialog = new GeneralProgressDialog(this,this,layout);
+        progressDialog = new GeneralProgressDialog(this,this, true);
 
     }
 

@@ -41,7 +41,7 @@ public class CreateUserActivity extends AppCompatActivity {
         createPassword = (EditText) findViewById(R.id.create_password);
         passwordCheck = (EditText) findViewById(R.id.password_check_edittext);
         saveButton = (Button) findViewById(R.id.create_user_save_btn);
-        progressDialog = new GeneralProgressDialog(this, this, (ViewGroup) findViewById(R.id.create_user_layout));
+        progressDialog = new GeneralProgressDialog(this, this, true);
 
     }
 

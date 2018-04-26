@@ -43,7 +43,7 @@ public class StartupMenu extends AppCompatActivity{
         setContentView(R.layout.activity_startupmenu);
         requestAccess();
 
-        progressDialog = new GeneralProgressDialog(this, this, (ViewGroup) findViewById(R.id.startup_layout));
+        progressDialog = new GeneralProgressDialog(this, this);
 
         localDatabase = LocalDatabase.getInstance(this);
         userViewModel = new UserViewModel(localDatabase.userDAO());
@@ -60,7 +60,6 @@ public class StartupMenu extends AppCompatActivity{
     private void checkUser(List<RoomUser> roomUser){
         if(!NetworkManager.getInstance().isAuthenticated()) {
             progressDialog.show();
-            progressDialog.setTouchable(false);
             if (roomUser.size() > 0) {
                 NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
                     @Override
