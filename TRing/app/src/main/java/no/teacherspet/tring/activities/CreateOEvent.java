@@ -326,10 +326,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
-            Point sp = new Point();
-            sp.setDescription(startPoint.getTitle());
-            sp.setLatitude(startPoint.getPosition().latitude);
-            sp.setLongitude(startPoint.getPosition().longitude);
+            Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
             event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
                 if(marker!=startPoint) {

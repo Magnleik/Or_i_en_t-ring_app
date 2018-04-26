@@ -34,7 +34,10 @@ public class Point implements Serializable {
     /**
      * Constructor ONLY for the server calls. NO NOT use this constructor from the app.
      */
-    public Point(){}
+    public Point(){
+        geometry = new Geometry();
+        properties = new HashMap<>();
+    }
 
     public int getId() {
         return id;
