@@ -301,7 +301,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if(longs[0] != -1){
-                updatePoints(startedEvent);
+                updatePoints(startedEvent, starting);
             }
         });
     }
@@ -310,13 +310,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Method for saving which points have been visited to room
      * @param event
      */
-    private void updatePoints(Event event){
+    private void updatePoints(Event event, boolean starting){
         PointOEventJoin[] joins = new PointOEventJoin[points.size()];
         Point startPoint = event.getStartPoint();
         for (int i = 0; i < points.size(); i++) {
             boolean start = startPoint.equals(points.get(i));
-            if(visitedPoints.contains(points.get(i))){
-                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, true);
+            if(starting){
+                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited());
             }
             else{
                 joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, false);
