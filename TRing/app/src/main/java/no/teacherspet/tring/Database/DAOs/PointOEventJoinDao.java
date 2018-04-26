@@ -20,19 +20,19 @@ import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 @Dao
 public interface PointOEventJoinDao {
 
-    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID")
     Maybe<List<RoomPoint>> getPointsForOEvent(int oEventID);
 
-    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 1")
     Maybe<List<RoomPoint>> getStartPoint(int oEventID);
 
-    @Query("SELECT * FROM point LEFT JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
+    @Query("SELECT * FROM point JOIN point_oevent_join ON point.id = point_oevent_join.pointID" +
             " WHERE point_oevent_join.oEventID = :oEventID AND point_oevent_join.isStart = 0")
     Maybe<List<RoomPoint>> getPointsNotStart(int oEventID);
 
-    @Query("SELECT * FROM o_event LEFT JOIN point_oevent_join ON o_event.id = point_oevent_join.oEventID" +
+    @Query("SELECT * FROM o_event JOIN point_oevent_join ON o_event.id = point_oevent_join.oEventID" +
             " WHERE point_oevent_join.pointID = :pointID")
     Maybe<List<RoomOEvent>> getOEventsForPoint(int pointID);
 
