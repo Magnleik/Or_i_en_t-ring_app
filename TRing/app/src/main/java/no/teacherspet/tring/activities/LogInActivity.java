@@ -1,11 +1,13 @@
 package no.teacherspet.tring.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -26,6 +28,8 @@ public class LogInActivity extends AppCompatActivity {
     ProgressBar progressBar;
     EditText username;
     EditText password;
+    Button logInBtn;
+    Button createUserBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,8 @@ public class LogInActivity extends AppCompatActivity {
         password = (EditText) findViewById(R.id.login_password);
         progressBar = (ProgressBar) findViewById(R.id.login_progressBar);
         progressBar.setVisibility(View.GONE);
+        logInBtn = (Button) findViewById(R.id.login_btn);
+        createUserBtn = (Button) findViewById(R.id.login_create_btn);
     }
 
     @Override
@@ -47,6 +53,8 @@ public class LogInActivity extends AppCompatActivity {
 
     public void logInBtn(View v){
         progressBar.setVisibility(View.VISIBLE);
+
+        logInBtn.setEnabled(false);
 
         NetworkManager.getInstance().logIn(username.getText().toString(), password.getText().toString(), new ICallbackAdapter<Boolean>() {
 
@@ -62,14 +70,22 @@ public class LogInActivity extends AppCompatActivity {
 
                         saveCredentialsToLocal();
 
+                        finish();
+
                     }else{
                         Toast.makeText(LogInActivity.this, "User verified, but log in failed", Toast.LENGTH_LONG).show();
+
+                        logInBtn.setEnabled(true);
                     }
 
                 }else if(object==null){
                     Toast.makeText(LogInActivity.this, "Something went wrong on the server", Toast.LENGTH_LONG).show();
+
+                    logInBtn.setEnabled(true);
                 }else{
                     Toast.makeText(LogInActivity.this, "Wrong log in credentials", Toast.LENGTH_LONG).show();
+
+                    logInBtn.setEnabled(true);
                 }
 
             }
@@ -78,6 +94,7 @@ public class LogInActivity extends AppCompatActivity {
             public void onFailure(Throwable t) {
 
                 progressBar.setVisibility(View.GONE);
+                logInBtn.setEnabled(true);
 
                 Toast.makeText(LogInActivity.this, "FAILURE: Something went wrong on the server, please try again", Toast.LENGTH_LONG).show();
 
@@ -112,5 +129,9 @@ public class LogInActivity extends AppCompatActivity {
         }
     }
 
+    public void createUserClick(View v){
+        Intent intent = new Intent(LogInActivity.this,CreateUserActivity.class);
+        startActivity(intent);
+    }
 
 }

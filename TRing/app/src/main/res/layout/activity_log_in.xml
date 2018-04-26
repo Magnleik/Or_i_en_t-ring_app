@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="Username"
         android:inputType="textPersonName"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/login_username"
         android:layout_below="@+id/login_username"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop= "@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword" />
@@ -35,9 +35,9 @@
         android:id="@+id/login_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/login_password"
         android:layout_below="@+id/login_password"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:onClick="logInBtn"
         android:text="Log In" />
 
@@ -48,6 +48,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/login_btn"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp" />
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        />
+
+    <Button
+        android:id="@+id/login_create_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/login_password"
+        android:layout_below="@+id/login_password"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:onClick="createUserClick"
+        android:text="Create new" />
 
 </android.widget.RelativeLayout>

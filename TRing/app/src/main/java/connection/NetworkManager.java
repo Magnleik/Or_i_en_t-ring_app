@@ -72,7 +72,6 @@ public class NetworkManager {
         //addPointsTest();
         //addEventTest();
         //eventsNearbyTest();
-        //updateEventPropertiesTest();
 
     }
 
@@ -167,27 +166,6 @@ public class NetworkManager {
 
     }
 
-    private void updateEventPropertiesTest(){
-        Point testPoint1 =  new Point(10.324, 20.420, "This is a test point");
-        Event testEvent = new Event();
-        testEvent._setId(2);
-        testEvent.setStartPoint(testPoint1);
-        testEvent.addProperty("name", "edited_test_property");
-        testEvent.addProperty("name", "edited_test_property2");
-        testEvent.addProperty("avg_time", "00:00:01");
-
-        updateEventProperties(testEvent, new ICallbackAdapter<Event>() {
-            @Override
-            public void onResponse(Event object) {
-                System.out.println("Recieved event with ID " + object.getId());
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                System.out.println("FAILED! : " + t.getMessage());
-            }
-        });
-    }
     //endregion
 
     //region POST-methods
@@ -216,30 +194,6 @@ public class NetworkManager {
 
             @Override
             public void onFailure(@NonNull Call<List<Point>> call, @NonNull Throwable t) {
-                Log.e("NETWORK", t.getMessage(), t);
-                callback.onFailure(t);
-            }
-        });
-    }
-
-    public void addPointsToEvent(final ICallbackAdapter<Void> callback, int eventID, Point... points){
-        Call<Void> call = client.addPointsToEvent(eventID, points);
-
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if(!response.isSuccessful()){
-                    Log.i("NETWORK", "addPointsToEvent got onResponse, without success. RESPONSE: " +response.toString());
-                }
-                else {
-                    Log.i("NETWORK", "addPointsToEvent successful with response: " + response.toString());
-                }
-
-                callback.onResponse(response.body());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }
@@ -336,6 +290,35 @@ public class NetworkManager {
         });
     }
 
+    /**
+     * subscribe to event
+     * @param eventID The id of the event you wish to subscribe to
+     * @param callback onResponse gets passed the full subscription list.
+     */
+    public void subscribeToEvent(int eventID, final ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.subscribeToEvent(eventID);
+
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "subscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "subscribeToEvent successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
     //endregion
 
     //region GET-methods
@@ -360,7 +343,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getNearbyPoints got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getNearbyPoints successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getNearbyPoints successful with response: " + response.toString());
                 }
 
                 callback.onResponse((ArrayList<Point>) response.body());
@@ -380,7 +363,7 @@ public class NetworkManager {
      * Finds and returns all events with starting location within a radius maxDist from the given location
      * @param latitude The latitude of given position
      * @param longitude The longitude of given position
-     * @param maxDist The radius of search
+     * @param maxDist The radius of search in meters
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets all events starting within the given circle
      */
     public void getNearbyEvents(double latitude, double longitude, double maxDist, final ICallbackAdapter<ArrayList<Event>> callback){
@@ -393,7 +376,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getNearbyEvents got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getNearbyEvents successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getNearbyEvents successful with response: " + response.toString());
                 }
 
                 callback.onResponse((ArrayList<Event>) response.body());
@@ -423,7 +406,7 @@ public class NetworkManager {
                     Log.i("NETWORK", "getEventById got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "getEventById successfull with response: " + response.toString());
+                    Log.i("NETWORK", "getEventById successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -431,6 +414,36 @@ public class NetworkManager {
 
             @Override
             public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+
+    }
+
+
+    /**
+     * Get all your subscribed events
+     * @param callback onResponse gets passed the full subscription list.
+     */
+    public void getSubscribedEvents(final ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.getSubscribedEvents();
+
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "getSubscribedEvents got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "getSubscribedEvents successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }
@@ -441,23 +454,24 @@ public class NetworkManager {
     //endregion
 
     //region PUT-methods
+
     /**
-     * Updates the existing Events properties if it exists in the database, and returns the updated Event. Ignores points.
-     * @param event The state the Event in the database should be updated to (ingnoring Points)
+     * Updates the existing Event if it exists in the database, and returns the updated Event.
+     * @param event The state the Event in the database should be updated to.
      * @param callback The callback to handle results. Override its methods to get what you need. onResponse gets the updated Event
      */
-    public void updateEventProperties(Event event, final ICallbackAdapter<Event> callback){
+    public void updateEvent(Event event, final ICallbackAdapter<Event> callback){
 
-        Call<Event> call = client.updateEventProperties(event.getId(), event._getAllProperties());
+        Call<Event> call = client.updateEvent(event);
 
         call.enqueue(new Callback<Event>() {
             @Override
             public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "updateEventProperties got onResponse, without success. RESPONSE: " +response.toString());
+                    Log.i("NETWORK", "updateEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "updateEventProperties successful with response: " + response.toString());
+                    Log.i("NETWORK", "updateEvent successful with response: " + response.toString());
                 }
 
                 callback.onResponse(response.body());
@@ -471,7 +485,6 @@ public class NetworkManager {
         });
 
     }
-
 
     /**
      * Updates the existing Point if it exists in the database, and returns the updated Point.
@@ -509,29 +522,28 @@ public class NetworkManager {
     //region DELETE-methods
 
     /**
-     * Removes the Point with the given pointID from the Event with the given eventID.
-     * @param eventID The int ID of the Event
-     * @param pointID The int ID of the Point
-     * @param callback The callback to handle results. Override its methods to check for validity of the response. onResponse returns Void
+     * Delete an Event from your subscriptions.
+     * @param eventID The id of the event you want removed
+     * @param callback onResponse gets passed the full subscription list.
      */
-    public void removePointFromEvent(int eventID, int pointID, final ICallbackAdapter<Void> callback){
+    public void unsubscribeFromEvent(int eventID, ICallbackAdapter<List<Event>> callback){
+        Call<List<Event>> call = client.unsubscribeFromEvent(eventID);
 
-        Call<Void> call = client.removePointFromEvent(eventID,pointID);
-
-        call.enqueue(new Callback<Void>() {
+        call.enqueue(new Callback<List<Event>>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+            public void onResponse(@NonNull Call<List<Event>> call, @NonNull Response<List<Event>> response) {
                 if(!response.isSuccessful()){
-                    Log.i("NETWORK", "removePointFromEvent got onResponse, without success. RESPONSE: " +response.toString());
+                    Log.i("NETWORK", "unsubscribeToEvent got onResponse, without success. RESPONSE: " +response.toString());
                 }
                 else {
-                    Log.i("NETWORK", "removePointFromEvent was successful with response: " + response.toString());
+                    Log.i("NETWORK", "unsubscribeToEvent successful with response: " + response.toString());
                 }
+
                 callback.onResponse(response.body());
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<List<Event>> call, @NonNull Throwable t) {
                 Log.e("NETWORK", t.getMessage(), t);
                 callback.onFailure(t);
             }

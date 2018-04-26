@@ -105,6 +105,11 @@ public class StartupMenu extends AppCompatActivity{
 
     public void logOutButton(View v){
         NetworkManager.getInstance().logOut();
+
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private boolean requestAccess(){
