@@ -52,7 +52,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
-    boolean returnToStart = false;
     long startTime;
     long eventTime;
     boolean savedResults = false;
