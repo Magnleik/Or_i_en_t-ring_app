@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 
 
 /**
@@ -34,54 +36,63 @@ public class StartupMenu extends AppCompatActivity{
     LocalDatabase localDatabase;
     UserViewModel userViewModel;
     Disposable user;
+    GeneralProgressDialog progressDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_startupmenu);
         requestAccess();
+
+        progressDialog = new GeneralProgressDialog(this, this, (ViewGroup) findViewById(R.id.startup_layout));
 
         localDatabase = LocalDatabase.getInstance(this);
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
         user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
-
-        super.onCreate(savedInstanceState);
         if(testEvents==null){
             testEvents=new HashMap<>();
         }
-        setContentView(R.layout.activity_startupmenu);
+
     }
 
     //Changes to createUserActivity if a roomUser has not been created
     private void checkUser(List<RoomUser> roomUser){
-        if(roomUser.size() > 0){
-            NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
-                @Override
-                public void onResponse(Boolean object) {
-                    if(object != null){
-                        if(object) {
-                            Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
-                        }
-                        else{
+        if(!NetworkManager.getInstance().isAuthenticated()) {
+            progressDialog.show();
+            progressDialog.setTouchable(false);
+            if (roomUser.size() > 0) {
+                NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+                    @Override
+                    public void onResponse(Boolean object) {
+                        progressDialog.hide();
+                        if (object != null) {
+                            if (object) {
+                                Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
+                            } else {
+                                userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                        startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                            }
+                        } else {
                             userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
                                     startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
                         }
                     }
-                    else{
-                        userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                                    startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
-                    }
-                }
 
-                @Override
-                public void onFailure(Throwable t) {
-                    userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                            startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
-                }
-            });
-        }
-        else{
-            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                        progressDialog.hide();
+
+                        userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                    }
+                });
+            } else {
+                progressDialog.hide();
+                Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

@@ -39,6 +39,7 @@ public class GeneralProgressDialog {
 
     public void hide(){
         progressBar.setVisibility(View.GONE);
+        setTouchable(true);
     }
 
     public void setTouchable(boolean bool){
