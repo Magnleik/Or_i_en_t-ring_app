@@ -148,7 +148,7 @@ public class MyEvents extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        //TODO remove event from database
+                        deleteEvent(selectedEvent);
                         changeEvent = true;
                         dialog.dismiss();
                         break;

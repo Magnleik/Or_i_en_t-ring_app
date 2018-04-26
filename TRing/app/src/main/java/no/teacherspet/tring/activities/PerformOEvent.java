@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,6 @@ import no.teacherspet.tring.R;
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
     private Marker prevMarker;
     private Location currentLocation;
@@ -72,8 +72,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         actionBar.setDisplayHomeAsUpEnabled(true);
         createLocationRequest();
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient.flushLocations();
 
         localDatabase = LocalDatabase.getInstance(this);
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
@@ -106,8 +104,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             };
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
     }
 
@@ -175,7 +171,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    //Dialog opens when event is finnished
+    //Dialog opens when event is finished
     public void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
