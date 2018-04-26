@@ -1,7 +1,6 @@
 package connection;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -89,7 +88,7 @@ public class Point implements Serializable {
     }
 
     /**
-     * Determines the distance between this point and a given position.
+     * Determines the distance between this point and a given position in meters.
      * @param position The position to find the distance to
      * @return The distance between point and position
      */

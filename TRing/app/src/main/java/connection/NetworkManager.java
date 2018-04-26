@@ -5,7 +5,10 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,7 @@ public class NetworkManager {
     }
 
     private void init(){
+
         httpClient = new OkHttpClient.Builder();
         String URL = "https://tring-tba4250.herokuapp.com";
         builder = new Retrofit.Builder()
@@ -536,6 +540,7 @@ public class NetworkManager {
 
     //endregion
 
+
     //region login-logic
 
     /**
@@ -705,7 +710,6 @@ public class NetworkManager {
         }
 
     }
-
     /**
      * Get the authentication token of of the current login.
      * @return Returns a string representing the current token. Returns null if no such token exists.

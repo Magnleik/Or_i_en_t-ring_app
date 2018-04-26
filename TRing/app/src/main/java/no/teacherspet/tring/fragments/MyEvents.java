@@ -1,6 +1,8 @@
 package no.teacherspet.tring.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,16 +25,14 @@ import java.util.List;
 import connection.Event;
 import connection.NetworkManager;
 import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
+import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
-import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.EventAdapter;
 
 
@@ -53,8 +53,8 @@ public class MyEvents extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private Event selectedEvent;
     private ListView mListView;
+    private boolean changeEvent;
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
@@ -92,6 +92,7 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -119,13 +120,48 @@ public class MyEvents extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(changeEvent) {
+                    Event selectedEvent = listItems.get(position);
+                    Intent detailIntent = new Intent(context, PerformOEvent.class);
+                    detailIntent.putExtra("MyEvent", selectedEvent);
+                    startActivity(detailIntent);
+                }
+            }
+        });
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                changeEvent = false;
                 Event selectedEvent = listItems.get(position);
-                Intent detailIntent = new Intent(context, PerformOEvent.class);
-                detailIntent.putExtra("MyEvent", selectedEvent);
-                startActivity(detailIntent);
+                openSettingsDialog(selectedEvent);
+                return false;
             }
         });
     }
+
+    private void openSettingsDialog(Event selectedEvent){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle(selectedEvent.getProperty("Title"));
+        CharSequence[] elements = {"Slett", "Avbryt"};
+        builder.setItems(elements, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        //TODO remove event from database
+                        changeEvent = true;
+                        dialog.dismiss();
+                        break;
+                    case 1:
+                        changeEvent = true;
+                        dialog.dismiss();
+                }
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     /**
      * loadData, loadPoints and createEvent work together get all relevant data out of the
      * room database and create a new event from it
