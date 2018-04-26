@@ -49,7 +49,10 @@ public class StartupMenu extends AppCompatActivity{
         userViewModel = new UserViewModel(localDatabase.userDAO());
 
         //Checks if we should start createUserActivity
-        user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        }
         if(testEvents==null){
             testEvents=new HashMap<>();
         }
@@ -58,40 +61,38 @@ public class StartupMenu extends AppCompatActivity{
 
     //Changes to createUserActivity if a roomUser has not been created
     private void checkUser(List<RoomUser> roomUser){
-        if(!NetworkManager.getInstance().isAuthenticated()) {
-            progressDialog.show();
-            if (roomUser.size() > 0) {
-                NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
-                    @Override
-                    public void onResponse(Boolean object) {
-                        progressDialog.hide();
-                        if (object != null) {
-                            if (object) {
-                                Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
-                            } else {
-                                userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                                        startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
-                            }
+        progressDialog.show();
+        if (roomUser.size() > 0) {
+            NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+                @Override
+                public void onResponse(Boolean object) {
+                    progressDialog.hide();
+                    if (object != null) {
+                        if (object) {
+                            Toast.makeText(StartupMenu.this, "Logged in", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(StartupMenu.this, OrientationSelector.class));
                         } else {
                             userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
                                     startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-
-                        progressDialog.hide();
-
+                    } else {
                         userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
                                 startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
                     }
-                });
-            } else {
-                progressDialog.hide();
-                Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
-            }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                    progressDialog.hide();
+
+                    userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                            startActivity(new Intent(StartupMenu.this, LogInActivity.class)));
+                }
+            });
+        } else {
+            progressDialog.hide();
+            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -116,8 +117,12 @@ public class StartupMenu extends AppCompatActivity{
 
         if(!NetworkManager.getInstance().isAuthenticated()){
             Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+            userViewModel.getAllUsers().subscribe(roomUsers -> {
+                for(RoomUser user : roomUsers){
+                    userViewModel.deleteUsers(user);
+                }
+            });
         }
-
     }
 
     private boolean requestAccess(){

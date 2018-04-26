@@ -35,7 +35,9 @@ public class DataConverters {
         Map<String, String> properties = new HashMap<>();
         String[] fromString = string.split(stringSplit);
         for (int i = 0; i < fromString.length; i+=2) {
-            properties.put(fromString[i], fromString[i+1]);
+            //if(fromString[i+1].length() > 0){
+                properties.put(fromString[i], fromString[i+1]);
+            //}
         }
         return properties;
     }
@@ -44,7 +46,12 @@ public class DataConverters {
         String properties = "";
         for(String key : map.keySet()){
             String entry = map.get(key);
-            properties = properties.concat(key+ stringSplit + entry + stringSplit);
+            if(entry.length() > 0){
+                properties = properties.concat(key+ stringSplit + entry + stringSplit);
+            }
+            else{
+                properties = properties.concat(key+ stringSplit + " " + stringSplit);
+            }
         }
         return properties;
     }
