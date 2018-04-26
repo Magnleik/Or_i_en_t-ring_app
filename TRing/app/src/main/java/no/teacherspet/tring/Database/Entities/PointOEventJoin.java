@@ -23,15 +23,18 @@ import android.arch.persistence.room.Index;
                    @Index("oEventID")})
 public class PointOEventJoin {
 
-    public PointOEventJoin(int pointID, int oEventID, boolean isStart){
+    public PointOEventJoin(int pointID, int oEventID, boolean isStart, boolean visited){
         this.pointID = pointID;
         this.oEventID = oEventID;
         this.isStart = isStart;
+        this.visited = visited;
     }
 
     public final int pointID;
     public final int oEventID;
     private final boolean isStart;
+    private final boolean visited;
+
 
     public int getPointID() {
         return pointID;
@@ -43,5 +46,9 @@ public class PointOEventJoin {
 
     public boolean isStart() {
         return isStart;
+    }
+
+    public boolean isVisited() {
+        return visited;
     }
 }

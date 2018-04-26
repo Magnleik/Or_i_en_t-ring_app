@@ -37,8 +37,15 @@ public class OEventViewModel extends ViewModel {
     }
 
     public Maybe<Integer> getMaxID(){
-        return oEventDao.getMaxID().subscribeOn(Schedulers.io())
+        return oEventDao.getMaxID()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).defaultIfEmpty(-1);
+    }
+
+    public Maybe<List<RoomOEvent>> getActiveEvent(){
+        return oEventDao.getActiveEvent()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Single<Integer> deleteOEvent(int oEventID){

@@ -107,17 +107,25 @@ public class LogInActivity extends AppCompatActivity {
         LocalDatabase database = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
         userViewModel.getAllUsers().subscribe(roomUsers -> {
-            if (roomUsers.size() == 0) {
-                userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
+            if (roomUsers.size() > 0) {
+                userViewModel.deleteUsers(roomUsers.get(0))
+                        .subscribe(longs->{
+                                userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
+                                });
             }
+            else{
+                userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
+                }
         });
-
 
     }
     private void checkResult(long[] longs){
         if(longs[0] < 0){
             Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
             //saveCredentialsToLocal();
+        }
+        else{
+            Toast.makeText(this, "User saved locally", Toast.LENGTH_SHORT).show();
         }
     }
 

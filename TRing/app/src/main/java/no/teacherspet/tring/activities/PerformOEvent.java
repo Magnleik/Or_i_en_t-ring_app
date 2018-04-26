@@ -29,17 +29,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
 import connection.Event;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.R;
 
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
     private Marker prevMarker;
     private Location currentLocation;
@@ -51,6 +56,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     long eventTime;
     boolean savedResults = false;
 
+    private LocalDatabase localDatabase;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel joinViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +70,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         createLocationRequest();
+
+
+        localDatabase = LocalDatabase.getInstance(this);
+        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
+        joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+
+        // 1
+        //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
         if (startedEvent != null) {
@@ -87,8 +103,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             };
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            mFusedLocationClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
     }
 
@@ -156,7 +170,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    //Dialog opens when event is finnished
+    //Dialog opens when event is finished
     public void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -277,6 +291,56 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             endEvent();
         }
     }
+
+    /**
+     * Method for updating the event to Room. To be called when starting and when finishing
+     * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
+     */
+    private void updateEvent(boolean starting){
+        RoomOEvent event = new RoomOEvent(startedEvent.getId(), startedEvent._getAllProperties());
+        event.setActive(starting);
+        oEventViewModel.addOEvents(event).subscribe(longs -> {
+            if(longs[0] != -1){
+                updatePoints(startedEvent);
+            }
+        });
+    }
+
+    /**
+     * Method for saving which points have been visited to room
+     * @param event
+     */
+    private void updatePoints(Event event){
+        PointOEventJoin[] joins = new PointOEventJoin[points.size()];
+        Point startPoint = event.getStartPoint();
+        for (int i = 0; i < points.size(); i++) {
+            boolean start = startPoint.equals(points.get(i));
+            if(visitedPoints.contains(points.get(i))){
+                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, true);
+            }
+            else{
+                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, false);
+            }
+        }
+        joinViewModel.addJoins(joins).subscribe(longs -> {
+            if(longs[0] != -1){
+                //TODO For testing purposes
+                Toast.makeText(this, "Event updated", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Updates a single point to "visited" in the local database
+     * @param point
+     */
+    //TODO Should be called every time a point is changed
+    private void updatePoint(Point point){
+        boolean start = startedEvent.getStartPoint().equals(point);
+        PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
+        joinViewModel.addJoins(join);
+    }
+
 
     /**
      * @return The points of the event to be performed
