@@ -80,8 +80,7 @@ public class OrientationSelector extends AppCompatActivity {
     private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
         point._setId(roomPoint.getId());
-        //TODO Add visited field to Point
-        //point.setVisited(visited);
+        point.setVisited(visited);
         for(String key : roomPoint.getProperties().keySet()){
             point.addProperty(key, roomPoint.getProperties().get(key));
         }

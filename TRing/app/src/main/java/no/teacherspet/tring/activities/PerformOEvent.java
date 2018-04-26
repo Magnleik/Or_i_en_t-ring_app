@@ -315,12 +315,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         Point startPoint = event.getStartPoint();
         for (int i = 0; i < points.size(); i++) {
             boolean start = startPoint.equals(points.get(i));
-            if(starting){
-                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited());
-            }
-            else{
-                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, false);
-            }
+            joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited() && starting);
         }
         joinViewModel.addJoins(joins).subscribe(longs -> {
             if(longs[0] != -1){

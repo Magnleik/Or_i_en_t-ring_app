@@ -121,8 +121,8 @@ public class Point implements Serializable {
     /**
      * Tags the point as visited by the user
      */
-    public void visit(){
-        isVisited=true;
+    public void setVisited(boolean visited){
+        isVisited = visited;
     }
 
     /**
