@@ -18,6 +18,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,7 +27,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 
@@ -62,6 +62,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createLocationRequest();
         setContentView(R.layout.activity_create_oevent);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -71,7 +72,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map_under_creation);
         mapFragment.getMapAsync(this);
 
-        createLocationRequest();
         if (savedInstanceState != null) {
             latLngArrayList = savedInstanceState.getParcelableArrayList("points");
         }
@@ -96,32 +96,21 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        Boolean hasPosition = false;
-        while (!hasPosition) {
-            if (currentLocation != null) {
-                position = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                hasPosition = true;
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-            }
-        }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), "App needs permission to access location services on phone to run", Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            //TODO remove lm.getlastlocation and replace with currentLocation
-            lm.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        position = new LatLng(location.getLatitude(), location.getLongitude());
-                    } else {
-                        position = new LatLng(10.416136, 10.405297);
-                    }
 
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                Boolean hasPosition = false;
+                while (!hasPosition) {
+                    if (currentLocation != null) {
+                        position = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        hasPosition = true;
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+                    }
                 }
-            });
-        }
+            }
+        });
 
         if ((latLngArrayList.size() > 0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlng : latLngArrayList) {
@@ -277,9 +266,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * creates a locationRequest to update the CurrentLocation variable as often as possible. If a reading is to inaccurate, it will discard it
      */
     private void createLocationRequest() {
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
+            locationRequest = new LocationRequest();
+            locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             LocationCallback mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -290,6 +280,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             };
+            lm.requestLocationUpdates(locationRequest,mLocationCallback,null);
         } else {
             Toast.makeText(getApplicationContext(), "You need to give the app location permission.", Toast.LENGTH_SHORT).show();
             finish();
