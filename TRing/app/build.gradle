@@ -56,6 +56,9 @@ dependencies {
     androidTestImplementation "android.arch.persistence.room:testing:$rootProject.roomVersion"
     implementation "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
 
+    //Floating action button
+    compile 'com.github.clans:fab:1.6.4'
+
     //Lifecycle dependencies
     annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleCompilerVersion"
     compile "android.arch.lifecycle:runtime:$rootProject.archLifecycleVersion"

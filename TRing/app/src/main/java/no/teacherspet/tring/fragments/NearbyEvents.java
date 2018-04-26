@@ -170,7 +170,7 @@ public class NearbyEvents extends Fragment {
             lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
-                    if(location != null) {
+                    if (location != null) {
                         position = new LatLng(location.getLatitude(), location.getLongitude());
                         if (!(position.longitude == 0.0 || position.latitude == 0.0)) {
                             ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {

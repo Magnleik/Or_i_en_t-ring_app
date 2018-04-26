@@ -5,7 +5,10 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,7 @@ public class NetworkManager {
     }
 
     private void init(){
+
         httpClient = new OkHttpClient.Builder();
         String URL = "https://tring-tba4250.herokuapp.com";
         builder = new Retrofit.Builder()
@@ -302,6 +306,36 @@ public class NetworkManager {
         });
     }
 
+    /**
+     * Post the time taken to complete the event with the given ID. Used to update the avgTime.
+     * @param eventID The int ID of the event you wish to post a score for.
+     * @param score The score
+     * @param callback The callback to handle results. onResponse gets passed the updated event - so time can be compared to the updated avgTime.
+     */
+    public void postScore(int eventID, int score, ICallbackAdapter<Event> callback){
+        Call<Event> call = client.postScore(eventID, score);
+
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(@NonNull Call<Event> call, @NonNull Response<Event> response) {
+                if(!response.isSuccessful()){
+                    Log.i("NETWORK", "postScore got onResponse, without success. RESPONSE: " +response.toString());
+                }
+                else {
+                    Log.i("NETWORK", "postScore successful with response: " + response.toString());
+                }
+
+                callback.onResponse(response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Event> call, @NonNull Throwable t) {
+                Log.e("NETWORK", t.getMessage(), t);
+                callback.onFailure(t);
+            }
+        });
+    }
+
     //endregion
 
     //region GET-methods
@@ -506,6 +540,7 @@ public class NetworkManager {
 
     //endregion
 
+
     //region login-logic
 
     /**
@@ -675,7 +710,6 @@ public class NetworkManager {
         }
 
     }
-
     /**
      * Get the authentication token of of the current login.
      * @return Returns a string representing the current token. Returns null if no such token exists.
