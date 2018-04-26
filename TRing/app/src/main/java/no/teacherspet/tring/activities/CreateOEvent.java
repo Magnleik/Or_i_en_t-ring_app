@@ -388,7 +388,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
-
+//FIXME Noe galt med lagring av startpunkt
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
             Point point = event.getPoints().get(i);
