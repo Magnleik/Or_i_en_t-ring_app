@@ -41,28 +41,27 @@ public class OrientationSelector extends AppCompatActivity {
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
     }
 
-    private void checkActiveEvent(List<RoomOEvent> activeEvents) {
-        if (activeEvents.size() > 0) {
+    private void checkActiveEvent(List<RoomOEvent> activeEvents){
+        if(activeEvents.size() > 0){
             RoomOEvent roomEvent = activeEvents.get(0);
             Event activeEvent = new Event();
             activeEvent._setId(roomEvent.getId());
-            for (String key : roomEvent.getProperties().keySet()) {
+            for(String key : roomEvent.getProperties().keySet()){
                 activeEvent.addProperty(key, roomEvent.getProperties().get(key));
             }
             joinViewModel.getStartPoint(activeEvent.getId()).subscribe(startPoints -> {
-                if (startPoints.size() > 0) {
+                if(startPoints.size() > 0){
                     joinViewModel.getJoinsForOEvent(activeEvent.getId()).subscribe(joins ->
-                            joinViewModel.getStartPoint(activeEvent.getId()).subscribe(points -> addPointsToEvent(activeEvent, startPoints.get(0), points, joins))
+                        joinViewModel.getStartPoint(activeEvent.getId()).subscribe(points -> addPointsToEvent(activeEvent, startPoints.get(0), points, joins))
                     );
                 }
             });
         }
         Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
     }
-
-    private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints, List<PointOEventJoin> joins) {
+    private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         event.setStartPoint(setupPoint(startPoint, getVisited(startPoint, joins)));
-        for (RoomPoint roomPoint : roomPoints) {
+        for(RoomPoint roomPoint : roomPoints){
             event.addPost(setupPoint(roomPoint, getVisited(roomPoint, joins)));
         }
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
@@ -70,22 +69,19 @@ public class OrientationSelector extends AppCompatActivity {
         startActivity(intent);
 
     }
-
-    private boolean getVisited(RoomPoint point, List<PointOEventJoin> joins) {
-        for (PointOEventJoin join : joins) {
-            if (join.getPointID() == point.getId()) {
+    private boolean getVisited(RoomPoint point, List<PointOEventJoin> joins){
+        for(PointOEventJoin join : joins){
+            if(join.getPointID() == point.getId()){
                 return join.isVisited();
             }
         }
         return false;
     }
-
-    private Point setupPoint(RoomPoint roomPoint, boolean visited) {
+    private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
         point._setId(roomPoint.getId());
-        //TODO Add visited field to Point
         point.setVisited(visited);
-        for (String key : roomPoint.getProperties().keySet()) {
+        for(String key : roomPoint.getProperties().keySet()){
             point.addProperty(key, roomPoint.getProperties().get(key));
         }
         return point;
@@ -93,20 +89,18 @@ public class OrientationSelector extends AppCompatActivity {
 
     /**
      * Moves to the lists of available events. Method gets called when the "Gjennomfør løp" button is pressed
-     *
      * @param v
      */
-    public void goToOrientationList(View v) {
-        Intent intent = new Intent(OrientationSelector.this, ListOfSavedEvents.class);
+    public void goToOrientationList (View v){
+        Intent intent = new Intent(OrientationSelector.this,ListOfSavedEvents.class);
         startActivity(intent);
     }
 
     /**
      * Goes to the screen for creating new events. Method gets called when the "Lag nytt løp" button is pressed
-     *
      * @param v
      */
-    public void createEvent(View v) {
+    public void createEvent (View v){
         Intent intent = new Intent(OrientationSelector.this, CreateOEvent.class);
         startActivity(intent);
     }

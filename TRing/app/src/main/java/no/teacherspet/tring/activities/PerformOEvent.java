@@ -307,7 +307,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if (longs[0] != -1) {
-                updatePoints(startedEvent);
+                updatePoints(startedEvent, starting);
             }
         });
     }
@@ -317,19 +317,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      *
      * @param event
      */
-    private void updatePoints(Event event) {
+    private void updatePoints(Event event, boolean starting) {
         PointOEventJoin[] joins = new PointOEventJoin[points.size()];
         Point startPoint = event.getStartPoint();
         for (int i = 0; i < points.size(); i++) {
             boolean start = startPoint.equals(points.get(i));
-            if (visitedPoints.contains(points.get(i))) {
-                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, true);
-            } else {
-                joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, false);
-            }
+            joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited() && starting);
         }
         joinViewModel.addJoins(joins).subscribe(longs -> {
-            if (longs[0] != -1) {
+            if(longs[0] != -1){
                 //TODO For testing purposes
                 Toast.makeText(this, "Event updated", Toast.LENGTH_SHORT).show();
             }
