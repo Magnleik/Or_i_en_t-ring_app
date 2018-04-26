@@ -320,15 +320,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         if (eventTitleField.getText().toString().isEmpty()) {
             Toast.makeText(getApplicationContext(), "Du må gi løpet et navn!", Toast.LENGTH_SHORT).show();
+        } else if (startPoint == null) {
+            Toast.makeText(getApplicationContext(), "Du må velge et startpunkt!", Toast.LENGTH_SHORT).show();
         } else {
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
+            Point sp = new Point();
+            sp.setDescription(startPoint.getTitle());
+            sp.setLatitude(startPoint.getPosition().latitude);
+            sp.setLongitude(startPoint.getPosition().longitude);
+            event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
-                if (event.getPoints() == null) {
-                    event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
-                } else {
-                    event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+                if(marker!=startPoint) {
+                    if (event.getPoints() == null) {
+                        event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+                    } else {
+                        event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+                    }
                 }
             }
             networkManager = NetworkManager.getInstance();
