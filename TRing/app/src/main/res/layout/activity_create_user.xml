@@ -15,7 +15,9 @@
         android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="Username"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        />
 
     <EditText
         android:id="@+id/create_password"
@@ -23,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/create_username"
         android:layout_below="@+id/create_username"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword" />
@@ -34,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/create_password"
         android:layout_below="@+id/create_password"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:ems="10"
         android:hint="Repeat password"
         android:inputType="textPassword" />
@@ -44,8 +46,8 @@
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:indeterminate="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:indeterminateTint="@color/colorPrimary"
         android:layout_centerInParent="true"
         />
@@ -56,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/password_check_edittext"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:onClick="saveButtonClick"
         android:text="Save" />
 </RelativeLayout>
