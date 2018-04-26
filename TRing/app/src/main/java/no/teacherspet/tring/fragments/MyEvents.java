@@ -195,11 +195,12 @@ public class MyEvents extends Fragment {
         oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
             if(integer != -1){
                 Toast.makeText(this.getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
+                listItems.remove(event);
+                updateList();
             }
             else{
                 Toast.makeText(this.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
-            updateList();
         });
     }
 

@@ -12,6 +12,7 @@ import java.util.List;
 
 import connection.Event;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
@@ -36,11 +37,11 @@ public class OrientationSelector extends AppCompatActivity {
         eventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
+        //TODO Start PerformOEvent with this event
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
     }
 
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
-        //TODO Start PerformOEvent with this event
         if(activeEvents.size() > 0){
             RoomOEvent roomEvent = activeEvents.get(0);
             Event activeEvent = new Event();
@@ -48,25 +49,39 @@ public class OrientationSelector extends AppCompatActivity {
             for(String key : roomEvent.getProperties().keySet()){
                 activeEvent.addProperty(key, roomEvent.getProperties().get(key));
             }
-            //TODO Need to get visited/not visited from joins
             joinViewModel.getStartPoint(activeEvent.getId()).subscribe(startPoints -> {
                 if(startPoints.size() > 0){
-                    joinViewModel.getStartPoint(activeEvent.getId()).subscribe(points -> addPointsToEvent(activeEvent, startPoints.get(0), points));
+                    joinViewModel.getJoinsForOEvent(activeEvent.getId()).subscribe(joins ->
+                        joinViewModel.getStartPoint(activeEvent.getId()).subscribe(points -> addPointsToEvent(activeEvent, startPoints.get(0), points, joins))
+                    );
                 }
             });
         }
         Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
     }
-    private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints){
-        event.setStartPoint(setupPoint(startPoint));
+    private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
+        event.setStartPoint(setupPoint(startPoint, getVisited(startPoint, joins)));
         for(RoomPoint roomPoint : roomPoints){
-            event.addPost(setupPoint(roomPoint));
+            event.addPost(setupPoint(roomPoint, getVisited(roomPoint, joins)));
         }
-        //TODO Start PerformOEvent with event
+        Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
+        intent.putExtra("MyEvent", event);
+        startActivity(intent);
+
     }
-    private Point setupPoint(RoomPoint roomPoint){
+    private boolean getVisited(RoomPoint point, List<PointOEventJoin> joins){
+        for(PointOEventJoin join : joins){
+            if(join.getPointID() == point.getId()){
+                return join.isVisited();
+            }
+        }
+        return false;
+    }
+    private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
         point._setId(roomPoint.getId());
+        //TODO Add visited field to Point
+        //point.setVisited(visited);
         for(String key : roomPoint.getProperties().keySet()){
             point.addProperty(key, roomPoint.getProperties().get(key));
         }
