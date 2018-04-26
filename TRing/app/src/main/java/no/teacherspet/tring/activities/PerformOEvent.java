@@ -263,6 +263,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             float distance = point.getDistanceFromPoint(position);
             if ((distance < 20) && !visitedPoints.contains(point)) {
                 visitedPoints.add(point);
+                point.visit();
+                //updatePoint(point);
                 Toast.makeText(getApplicationContext(), "You arrived at a previously unvisited point!", Toast.LENGTH_LONG).show();
                 mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 break;
