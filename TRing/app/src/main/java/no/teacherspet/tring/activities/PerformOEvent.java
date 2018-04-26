@@ -206,7 +206,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param v
      */
     public void showLocationButtonPressed(View v) {
-        Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.person_bitmap)).title("Min posisjon"));
+        Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
         //Markor fjernes etter 5 sekund
         CountDownTimer synlig = new CountDownTimer(5000, 1000) {
             int sek = 5;
