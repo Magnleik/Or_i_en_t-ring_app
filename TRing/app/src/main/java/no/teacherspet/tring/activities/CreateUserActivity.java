@@ -41,26 +41,9 @@ public class CreateUserActivity extends AppCompatActivity {
         createPassword = (EditText) findViewById(R.id.create_password);
         passwordCheck = (EditText) findViewById(R.id.password_check_edittext);
         progressBar = (ProgressBar) findViewById(R.id.create_user_progressbar);
+        saveButton = (Button) findViewById(R.id.create_user_save_btn);
         progressBar.setVisibility(View.GONE);
-        saveButton = (Button) findViewById(R.id.save_button);
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(createPassword.getText().toString().trim().length() > 0 && createUsername.getText().toString().trim().length() > 0 && passwordCheck.getText().toString().trim().length() > 0 ){
-
-                    if(createPassword.getText().toString().equals(passwordCheck.getText().toString())){
-                        createUser();
-                    }
-                    else{
-                        Toast.makeText(CreateUserActivity.this,"Passwords do not match",Toast.LENGTH_LONG).show();
-                    }
-                }
-                else{
-                    Toast.makeText(CreateUserActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     @Override
@@ -76,6 +59,7 @@ public class CreateUserActivity extends AppCompatActivity {
         //TODO: Check for already being logged in? (NetworkManager.getInstance.isAuthenticated())
 
         progressBar.setVisibility(View.VISIBLE);
+        saveButton.setEnabled(false);
 
         NetworkManager.getInstance().createUser(createUsername.getText().toString(), createPassword.getText().toString(), new ICallbackAdapter<Boolean>() {
             @Override
@@ -91,17 +75,21 @@ public class CreateUserActivity extends AppCompatActivity {
                         Toast.makeText(CreateUserActivity.this, "Logged in", Toast.LENGTH_LONG).show();
 
                         saveCredentialsToLocal();
+                        backToMain();
 
                     }else{
                         Toast.makeText(CreateUserActivity.this, "Failed to log in", Toast.LENGTH_LONG).show();
+                        finish(); //Send to log in
                     }
 
 
                 }
                 else if(object==null){
                     Toast.makeText(CreateUserActivity.this,"Something went wrong on the server, please try again",Toast.LENGTH_LONG).show();
+                    saveButton.setEnabled(true);
                 }else{
                     Toast.makeText(CreateUserActivity.this,"Username might be taken, please try another name",Toast.LENGTH_LONG).show();
+                    saveButton.setEnabled(true);
                 }
             }
 
@@ -145,5 +133,28 @@ public class CreateUserActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    public void saveButtonClick(View v) {
+
+        if(createPassword.getText().toString().trim().length() > 0 && createUsername.getText().toString().trim().length() > 0 && passwordCheck.getText().toString().trim().length() > 0 ){
+
+            if(createPassword.getText().toString().equals(passwordCheck.getText().toString())){
+                createUser();
+            }
+            else{
+                Toast.makeText(CreateUserActivity.this,"Passwords do not match",Toast.LENGTH_LONG).show();
+            }
+        }
+        else{
+            Toast.makeText(CreateUserActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void backToMain(){
+        Intent intent = new Intent(this, StartupMenu.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }
