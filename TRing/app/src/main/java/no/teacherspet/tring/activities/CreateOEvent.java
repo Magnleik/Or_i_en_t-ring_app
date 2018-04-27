@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -77,11 +78,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
-        return true;
-    }
 
     /**
      * Manipulates the map once available.
@@ -437,6 +433,48 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         outState.putParcelableArrayList("points", latLngArrayList);
 
         // Save the state of item position
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.general_menu, menu);
+
+        MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
+        logInMenu.setIntent(new Intent(this, LogInActivity.class));
+        if (NetworkManager.getInstance().isAuthenticated()) {
+            logInMenu.setVisible(false);
+        }
+
+        MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            logOutMenu.setVisible(false);
+        }
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case (android.R.id.home):
+                finish();
+                break;
+            case (R.id.log_out_menu):
+                NetworkManager.getInstance().logOut();
+                finish();
+                break;
+        }
+
+        supportInvalidateOptionsMenu();
+        return super.onOptionsItemSelected(item);
     }
 
 
