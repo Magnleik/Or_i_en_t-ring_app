@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="no.teacherspet.tring.activities.CreateUserActivity">
+    tools:context="no.teacherspet.tring.activities.CreateUserActivity"
+    android:id="@+id/create_user_layout">
 
     <EditText
         android:id="@+id/create_username"
@@ -40,17 +41,6 @@
         android:ems="10"
         android:hint="Repeat password"
         android:inputType="textPassword" />
-
-    <ProgressBar
-        android:id="@+id/create_user_progressbar"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:indeterminateTint="@color/colorPrimary"
-        android:layout_centerInParent="true"
-        />
 
     <Button
         android:id="@+id/create_user_save_btn"

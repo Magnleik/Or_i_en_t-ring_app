@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import connection.ICallbackAdapter;
@@ -18,6 +19,7 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 
 /**
  * Created by Eirik on 24-Apr-18.
@@ -25,11 +27,11 @@ import no.teacherspet.tring.R;
 
 public class LogInActivity extends AppCompatActivity {
 
-    ProgressBar progressBar;
     EditText username;
     EditText password;
     Button logInBtn;
     Button createUserBtn;
+    GeneralProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +41,11 @@ public class LogInActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         username = (EditText) findViewById(R.id.login_username);
         password = (EditText) findViewById(R.id.login_password);
-        progressBar = (ProgressBar) findViewById(R.id.login_progressBar);
-        progressBar.setVisibility(View.GONE);
         logInBtn = (Button) findViewById(R.id.login_btn);
         createUserBtn = (Button) findViewById(R.id.login_create_btn);
+
+        progressDialog = new GeneralProgressDialog(this,this, true);
+
     }
 
     @Override
@@ -52,8 +55,7 @@ public class LogInActivity extends AppCompatActivity {
     }
 
     public void logInBtn(View v){
-        progressBar.setVisibility(View.VISIBLE);
-
+        progressDialog.show();
         logInBtn.setEnabled(false);
 
         NetworkManager.getInstance().logIn(username.getText().toString(), password.getText().toString(), new ICallbackAdapter<Boolean>() {
@@ -61,7 +63,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onResponse(Boolean object) {
 
-                progressBar.setVisibility(View.GONE);
+                progressDialog.hide();
 
                 if (object!=null && object){
 
@@ -93,7 +95,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onFailure(Throwable t) {
 
-                progressBar.setVisibility(View.GONE);
+                progressDialog.hide();
                 logInBtn.setEnabled(true);
 
                 Toast.makeText(LogInActivity.this, "FAILURE: Something went wrong on the server, please try again", Toast.LENGTH_LONG).show();
