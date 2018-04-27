@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -57,13 +58,6 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        setResult(RESULT_CANCELED, null);
-        finish();
-        return false;
     }
 
     @Override
@@ -137,5 +131,50 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         finish();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.general_menu, menu);
+
+        MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
+        logInMenu.setIntent(new Intent(this, LogInActivity.class));
+        if (NetworkManager.getInstance().isAuthenticated()) {
+            logInMenu.setVisible(false);
+        }
+
+        MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            logOutMenu.setVisible(false);
+        }
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case (android.R.id.home):
+                setResult(RESULT_CANCELED, null);
+                finish();
+                break;
+            case (R.id.log_out_menu):
+                NetworkManager.getInstance().logOut();
+                Intent intent = new Intent(this, OrientationSelector.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+                break;
+        }
+
+        supportInvalidateOptionsMenu();
+        return super.onOptionsItemSelected(item);
+    }
 
 }

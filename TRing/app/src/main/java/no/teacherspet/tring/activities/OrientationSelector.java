@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import connection.Event;
+import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -107,9 +109,43 @@ public class OrientationSelector extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        finish();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.general_menu, menu);
+
+        MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
+        logInMenu.setIntent(new Intent(this, LogInActivity.class));
+        if (NetworkManager.getInstance().isAuthenticated()) {
+            logInMenu.setVisible(false);
+        }
+
+        MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            logOutMenu.setVisible(false);
+        }
+
+
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case (android.R.id.home):
+                finish();
+                break;
+            case (R.id.log_out_menu):
+                NetworkManager.getInstance().logOut();
+                break;
+        }
+
+        supportInvalidateOptionsMenu();
+        return super.onOptionsItemSelected(item);
+    }
 }

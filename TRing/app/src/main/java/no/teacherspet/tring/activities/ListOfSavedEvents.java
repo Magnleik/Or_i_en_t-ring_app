@@ -1,5 +1,6 @@
 package no.teacherspet.tring.activities;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import connection.NetworkManager;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
@@ -57,6 +59,11 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
     }
 
+    @Override
+    protected void onResume() {
+        supportInvalidateOptionsMenu();
+        super.onResume();
+    }
 
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
@@ -65,7 +72,20 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list_of_saved_events, menu);
+        getMenuInflater().inflate(R.menu.general_menu, menu);
+
+        MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
+        logInMenu.setIntent(new Intent(this, LogInActivity.class));
+        if (NetworkManager.getInstance().isAuthenticated()) {
+            logInMenu.setVisible(false);
+        }
+
+        MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            logOutMenu.setVisible(false);
+        }
+
+
         return true;
     }
 
@@ -81,10 +101,17 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
             case (android.R.id.home):
                 finish();
                 break;
+            case (R.id.log_out_menu):
+                NetworkManager.getInstance().logOut();
+                finish();
+                break;
         }
 
+        supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {
