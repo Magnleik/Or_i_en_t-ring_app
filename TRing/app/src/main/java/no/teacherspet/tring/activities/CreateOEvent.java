@@ -96,13 +96,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                Boolean hasPosition = false;
-                while (!hasPosition) {
-                    if (currentLocation != null) {
-                        hasPosition = true;
-                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
-                    }
+                long startTime = System.currentTimeMillis();
+                if (currentLocation != null) {
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+                }
+                if (System.currentTimeMillis() - startTime >= 5000) {
+                    Toast.makeText(CreateOEvent.this, "Could not find position", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -265,6 +265,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * creates a locationRequest to update the CurrentLocation variable as often as possible. If a reading is to inaccurate, it will discard it
      */
     private void createLocationRequest() {
+        final Boolean[] hasFocused = {true};
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
             locationRequest = new LocationRequest();
@@ -277,9 +278,14 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     if (locationResult.getLastLocation().getAccuracy() <= 500 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
                     }
+                    if (mMap != null && hasFocused[0]) {
+                        hasFocused[0] = false;
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+                    }
                 }
             };
-            lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
+            lm.requestLocationUpdates(locationRequest, mLocationCallback, getMainLooper());
         } else {
             Toast.makeText(getApplicationContext(), "You need to give the app location permission.", Toast.LENGTH_SHORT).show();
             finish();
@@ -292,18 +298,23 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param v Button that fires the method
      */
     public void addMarkerMyPosition(View v) {
-        boolean shouldAdd = true;
-        Location markerLocation;
-        for (Marker marker : arrayListWithCoords) {
-            markerLocation = new Location("");
-            markerLocation.setLatitude(marker.getPosition().latitude);
-            markerLocation.setLongitude(marker.getPosition().longitude);
-            if (currentLocation.distanceTo(markerLocation) <= 5) {
-                shouldAdd = false;
+        if(currentLocation!=null) {
+            boolean shouldAdd = true;
+            Location markerLocation;
+            for (Marker marker : arrayListWithCoords) {
+                markerLocation = new Location("");
+                markerLocation.setLatitude(marker.getPosition().latitude);
+                markerLocation.setLongitude(marker.getPosition().longitude);
+                if (currentLocation.distanceTo(markerLocation) <= 5) {
+                    shouldAdd = false;
+                }
+            }
+            if (shouldAdd) {
+                arrayListWithCoords.add(mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Punkt " + arrayListWithCoords.size() + 1)));
             }
         }
-        if (shouldAdd) {
-            arrayListWithCoords.add(mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Punkt " + arrayListWithCoords.size() + 1)));
+        else{
+            Toast.makeText(getApplicationContext(),"Position not yet found",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -322,10 +333,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
-            Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
+            Point sp = new Point(startPoint.getPosition().latitude, startPoint.getPosition().longitude, startPoint.getTitle());
             event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
-                if(marker!=startPoint) {
+                if (marker != startPoint) {
                     if (event.getPoints() == null) {
                         event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                     } else {
@@ -447,7 +458,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
-        if(!NetworkManager.getInstance().isAuthenticated()){
+        if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
 
