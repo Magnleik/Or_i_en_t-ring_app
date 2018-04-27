@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,11 +58,17 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton.setOnClickListener(v -> continueEvent());
 
         if(!NetworkManager.getInstance().isAuthenticated()){
-            userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+            userViewModel.getAllUsers().subscribe(users -> {
+                Log.d("Room","Started checking users");
+                checkUser(users);
+            });
         }
 
         //TODO Start PerformOEvent with this event
-        eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
+        eventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            Log.d("Room","Started checking active events");
+            checkActiveEvent(roomOEvents);
+        });
     }
     private void continueEvent(){
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
@@ -70,6 +77,7 @@ public class OrientationSelector extends AppCompatActivity {
     }
 
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
+        Log.d("Room",String.format("%d active events found", activeEvents.size()));
         if(activeEvents.size() > 0){
             RoomOEvent roomEvent = activeEvents.get(0);
             Event event = new Event();
@@ -78,6 +86,7 @@ public class OrientationSelector extends AppCompatActivity {
                 event.addProperty(key, roomEvent.getProperties().get(key));
             }
             joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
+                Log.d("Room",String.format("%d points found", roomPoints.size()));
                 if(roomPoints.size() > 0){
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> addPointsToEvent(event, roomPoints, joins));
                 }
@@ -91,6 +100,7 @@ public class OrientationSelector extends AppCompatActivity {
                 if(roomPoint.getId() == join.getPointID()){
                     Point point = setupPoint(roomPoint, join.isVisited());
                     if(join.isStart()){
+                        Log.d("Room",String.format("Start point is point %d", join.getPointID()));
                         event.setStartPoint(point);
                     }
                     else{
@@ -99,6 +109,7 @@ public class OrientationSelector extends AppCompatActivity {
                 }
             }
         }
+        Log.d("Room",String.format("Event %d recreated from Room", event.getId()));
         activeEvent = event;
         continueButton.setEnabled(true);
     }
@@ -114,12 +125,13 @@ public class OrientationSelector extends AppCompatActivity {
     //Changes to createUserActivity if a roomUser has not been created
     private void checkUser(List<RoomUser> roomUsers){
         progressDialog.show();
+        Log.d("Room",String.format("%d users found",roomUsers.size()));
         if (roomUsers.size() > 0) {
             RoomUser[] users = new RoomUser[roomUsers.size()];
             for (int i = 0; i < roomUsers.size(); i++) {
                 users[i] = roomUsers.get(i);
             }
-            NetworkManager.getInstance().logInWithToken(roomUsers.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+            NetworkManager.getInstance().logInWithToken(users[0].getToken(), new ICallbackAdapter<Boolean>() {
                 @Override
                 public void onResponse(Boolean object) {
                     progressDialog.hide();
@@ -127,20 +139,26 @@ public class OrientationSelector extends AppCompatActivity {
                         if (object) {
                             Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
                         } else {
-                            userViewModel.deleteUsers(users).subscribe(integers ->
-                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                            userViewModel.deleteUsers(users).subscribe(integers ->{
+                                    Log.d("Room",String.format("%d users deleted", users.length));
+                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
+                                    });
                         }
                     } else {
-                        userViewModel.deleteUsers(users).subscribe(integers ->
-                                startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                        userViewModel.deleteUsers(users).subscribe(integers ->{
+                            Log.d("Room",String.format("%d users deleted", users.length));
+                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
+                        });
                     }
                 }
 
                 @Override
                 public void onFailure(Throwable t) {
                     progressDialog.hide();
-                    userViewModel.deleteUsers(users).subscribe(integers ->
-                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                    userViewModel.deleteUsers(users).subscribe(integers ->{
+                        Log.d("Room",String.format("%d users deleted", users.length));
+                        startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
+                    });
                 }
             });
         } else {
@@ -183,6 +201,7 @@ public class OrientationSelector extends AppCompatActivity {
                     users[i] = roomUsers.get(i);
                 }
                 userViewModel.deleteUsers(users).subscribe(integer ->{
+                    Log.d("Room",String.format("%d users deleted", users.length));
                     Toast.makeText(this, "Local user deleted", Toast.LENGTH_SHORT).show();
                 });
             });

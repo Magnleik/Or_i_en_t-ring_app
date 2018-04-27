@@ -9,6 +9,7 @@ import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -309,6 +310,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if (longs[0] != -1) {
+                Log.d("Room",String.format("Event %d updated, starting: %b", event.getId(), starting));
                 updatePoints(startedEvent, starting);
             }
         });
@@ -328,8 +330,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
         joinViewModel.addJoins(joins).subscribe(longs -> {
             if(longs[0] != -1){
-                //TODO For testing purposes
-                Toast.makeText(this, "Event updated", Toast.LENGTH_SHORT).show();
+                Log.d("Room",String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
             }
         });
     }
@@ -342,14 +343,23 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void updatePoint(Point point) {
         boolean start = startedEvent.getStartPoint().equals(point);
         PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
-        joinViewModel.addJoins(join);
+        joinViewModel.addJoins(join).subscribe(longs -> {
+            if(longs[0]>0){
+                Log.d("Room",String.format("Point %d saved, code: %d", point.getId(), longs[0]));
+            }
+            else{
+                Log.d("Room",String.format("Point %d not saved, code: %d", point.getId(), longs[0]));
+            }
+        });
     }
 
     /**
      * Set all events in room to not active, set all points to not visited
      */
     private void resetActiveEvents(){
+        Log.d("Room","Started resetting active events");
         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            Log.d("Room",String.format("Found %d active events", roomOEvents.size()));
             for (RoomOEvent event : roomOEvents){
                 if(event.getId() != startedEvent.getId()){
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> resetEvent(event, joins));
@@ -358,12 +368,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         });
     }
     private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
+        Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
         oEventViewModel.addOEvents(event);
         for (PointOEventJoin join : joins){
             PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
             joinViewModel.addJoins(newJoin);
         }
+        Log.d("Room",String.format("Event %d set to not active", event.getId()));
     }
 
     /**

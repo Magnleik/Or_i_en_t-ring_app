@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -368,8 +369,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         pointViewModel = new PointViewModel(localDatabase.pointDAO());
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
 
+        Log.d("Room", "Started saving event");
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
+            Log.d("Room", String.format("Event %d saved", event.getId()));
+            savePoints(event);
+        });
     }
     private void savePoints(Event event) {
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
@@ -378,7 +383,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
             roomPoints[i] = roomPoint;
         }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
+            Log.d("Room", String.format("%d points saved", longs.length));
+            joinPointsToEvent(event);
+        });
     }
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
@@ -399,6 +407,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (savedAll) {
             Toast.makeText(this, "Save to phone successfull", Toast.LENGTH_SHORT).show();
+            Log.d("Room", String.format("%d joins saved", longs.length));
         } else {
             Toast.makeText(this, "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
         }

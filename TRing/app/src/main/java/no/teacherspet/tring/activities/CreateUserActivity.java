@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,15 +119,18 @@ public class CreateUserActivity extends AppCompatActivity {
         String token =  NetworkManager.getInstance().getToken();
         LocalDatabase database = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
+        Log.d("Room","Started saving user");
         userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
 
     }
     private void checkResult(long[] longs){
         if(longs[0] < 0){
+            Log.d("Room",String.format("User not saved, error: %d", longs[0]));
             Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
             //saveCredentialsToLocal();
         }
         else{
+            Log.d("Room","User saved successfully");
             Toast.makeText(this, "User saved locally", Toast.LENGTH_SHORT).show();
         }
     }
