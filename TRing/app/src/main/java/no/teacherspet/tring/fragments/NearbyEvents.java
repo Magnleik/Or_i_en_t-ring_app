@@ -27,6 +27,14 @@ import java.util.HashMap;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -60,6 +68,11 @@ public class NearbyEvents extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private LocalDatabase localDatabase;
+    private PointViewModel pointViewModel;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel pointOEventJoinViewModel;
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -211,6 +224,55 @@ public class NearbyEvents extends Fragment {
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
     }
+
+    /**
+     * Saves the Event and corresponding Points, and adds connections between them in the Room database
+     * Makes sure that events and points are saved before the connections are saved. The next step
+     * is only called after the previous is finished.
+     */
+    //TODO Call when user wants to save event from server to Room
+    private void saveEventToRoom(Event event) {
+        localDatabase = LocalDatabase.getInstance(this.getContext());
+        pointViewModel = new PointViewModel(localDatabase.pointDAO());
+        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
+
+        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
+
+    }
+    private void savePoints(Event event) {
+        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
+            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            roomPoints[i] = roomPoint;
+        }
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
+    }
+    private void joinPointsToEvent(Event event) {
+        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
+            boolean start = i == 0;
+            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
+        }
+        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
+    }
+    private void checkSave(long[] longs) {
+        boolean savedAll = true;
+        for (long aLong : longs) {
+            if (aLong < 0) {
+                savedAll = false;
+            }
+        }
+        if (savedAll) {
+            Toast.makeText(this.getContext(), "Save to phone successfull", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this.getContext(), "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

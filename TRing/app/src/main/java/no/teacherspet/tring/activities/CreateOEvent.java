@@ -375,7 +375,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
         oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
     }
-
     private void savePoints(Event event) {
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
@@ -385,7 +384,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
         pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
     }
-
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
@@ -393,18 +391,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Point point = event.getPoints().get(i);
             boolean start = i == 0;
             joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
-            /*
-            if(point.equals(event.getStartPoint())){
-                joins[i] = new PointOEventJoin(point.getId(), event.getId(), true, false);
-            }
-            else{
-                joins[i] = new PointOEventJoin(point.getId(), event.getId(), false, false);
-            }
-            */
         }
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
-
     private void checkSave(long[] longs) {
         boolean savedAll = true;
         for (long aLong : longs) {
