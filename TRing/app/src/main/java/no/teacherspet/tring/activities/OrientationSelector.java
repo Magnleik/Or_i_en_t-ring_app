@@ -49,33 +49,31 @@ public class OrientationSelector extends AppCompatActivity {
             for(String key : roomEvent.getProperties().keySet()){
                 activeEvent.addProperty(key, roomEvent.getProperties().get(key));
             }
-            joinViewModel.getStartPoint(activeEvent.getId()).subscribe(startPoints -> {
-                if(startPoints.size() > 0){
-                    joinViewModel.getJoinsForOEvent(activeEvent.getId()).subscribe(joins ->
-                        joinViewModel.getStartPoint(activeEvent.getId()).subscribe(points -> addPointsToEvent(activeEvent, startPoints.get(0), points, joins))
-                    );
+            joinViewModel.getPointsForOEvent(activeEvent.getId()).subscribe(roomPoints -> {
+                if(roomPoints.size() > 0){
+                    joinViewModel.getJoinsForOEvent(activeEvent.getId()).subscribe(joins -> addPointsToEvent(activeEvent, roomPoints, joins));
                 }
             });
         }
         Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
     }
-    private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
-        event.setStartPoint(setupPoint(startPoint, getVisited(startPoint, joins)));
-        for(RoomPoint roomPoint : roomPoints){
-            event.addPost(setupPoint(roomPoint, getVisited(roomPoint, joins)));
+    private void addPointsToEvent(Event event, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
+        for (RoomPoint roomPoint : roomPoints){
+            for (PointOEventJoin join : joins){
+                if(roomPoint.getId() == join.getPointID()){
+                    Point point = setupPoint(roomPoint, join.isVisited());
+                    if(join.isStart()){
+                        event.setStartPoint(point);
+                    }
+                    else{
+                        event.addPost(point);
+                    }
+                }
+            }
         }
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
         intent.putExtra("MyEvent", event);
         startActivity(intent);
-
-    }
-    private boolean getVisited(RoomPoint point, List<PointOEventJoin> joins){
-        for(PointOEventJoin join : joins){
-            if(join.getPointID() == point.getId()){
-                return join.isVisited();
-            }
-        }
-        return false;
     }
     private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");

@@ -349,9 +349,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Set all events in room to not active, set all points to not visited
      */
     private void resetActiveEvents(){
-        oEventViewModel.getAllOEvents().subscribe(roomOEvents -> {
-            for (RoomOEvent event : roomOEvents) {
-                if (event.getId() != startedEvent.getId()) {
+        oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            for (RoomOEvent event : roomOEvents){
+                if(event.getId() != startedEvent.getId()){
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> resetEvent(event, joins));
                 }
             }
