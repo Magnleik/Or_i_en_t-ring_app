@@ -303,7 +303,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         if (shouldAdd) {
-            arrayListWithCoords.add(mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Punkt " + arrayListWithCoords.size() + 1)));
+            arrayListWithCoords.add(mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title(R.string.point + " " + arrayListWithCoords.size() + 1)));
         }
     }
 
@@ -340,7 +340,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     if (object == null) {
                         Toast.makeText(getApplicationContext(), R.string.failed_create_event_toast, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getApplicationContext(), getString(R.string.event)+ ": " + event.getProperty("event_name") + (" " + R.string.added + ".").toLowerCase(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
                         saveEventToRoom(object);
                         finish();
                     }

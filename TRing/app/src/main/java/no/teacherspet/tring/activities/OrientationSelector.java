@@ -93,7 +93,7 @@ public class OrientationSelector extends AppCompatActivity {
                 }
             });
         }
-        Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
 
     //Changes to createUserActivity if a roomUser has not been created
@@ -106,7 +106,7 @@ public class OrientationSelector extends AppCompatActivity {
                     progressDialog.hide();
                     if (object != null) {
                         if (object) {
-                            Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(OrientationSelector.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(OrientationSelector.this, OrientationSelector.class));
                         } else {
                             userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
@@ -129,7 +129,7 @@ public class OrientationSelector extends AppCompatActivity {
             });
         } else {
             progressDialog.hide();
-            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_user_found, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -187,7 +187,7 @@ public class OrientationSelector extends AppCompatActivity {
         NetworkManager.getInstance().logOut();
 
         if(!NetworkManager.getInstance().isAuthenticated()){
-            Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.logout_successful, Toast.LENGTH_SHORT).show();
             userViewModel.getAllUsers().subscribe(roomUsers -> {
                 for(RoomUser user : roomUsers){
                     userViewModel.deleteUsers(user);
@@ -264,10 +264,10 @@ public class OrientationSelector extends AppCompatActivity {
         switch (requestCode){
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
                 if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Toast.makeText(getApplicationContext(), "Access granted to TRing", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.access_granted_to_TRing, Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Access denied",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.access_denied,Toast.LENGTH_SHORT).show();
                 }
         }
     }
