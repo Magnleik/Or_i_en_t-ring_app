@@ -114,7 +114,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                         hasPosition = true;
                         mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+
                     }
+                    break;
                 }
             }
         });
@@ -364,7 +366,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
             event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
-                if(marker!=startPoint) {
+                if(!marker.equals(startPoint)) {
                     if (event.getPoints() == null) {
                         event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
                     } else {

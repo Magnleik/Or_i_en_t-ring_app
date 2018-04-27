@@ -3,6 +3,7 @@ package no.teacherspet.tring.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,10 +56,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     long startTime;
     long eventTime;
     boolean savedResults = false;
+    private int eventDifficultyValue;
 
     private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
+
+    private Button easyButton;
+    private Button mediumButton;
+    private Button hardButton;
+    private TextView difficultyTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +77,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         createLocationRequest();
+        openStartDialog();
+
+
 
         visitedPoints = new ArrayList<>();
 
@@ -190,17 +201,75 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         View inflator = inflater.inflate(R.layout.event_started_dialog, null);
         builder.setView(inflator);
 
+        easyButton = (Button) inflator.findViewById(R.id.easy_btn);
+        mediumButton = (Button) inflator.findViewById(R.id.medium_btn);
+        hardButton = (Button) inflator.findViewById(R.id.hard_btn);
+        difficultyTextView = (TextView) inflator.findViewById(R.id.difficulty_textview);
+
+        setEventDifficulty("easy");
+
+        easyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("easy");
+            }
+        });
+
+        mediumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("medium");
+            }
+        });
+
+        hardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("hard");
+            }
+        });
+
+
         builder.setPositiveButton("Start løp", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Lagre event (Tid, score og avstand?)
                 startEventBtnPressed();
-                dialog.dismiss();
+                if (eventTime == -1) {
+                    dialog.dismiss();
+                }
             }
         });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
+
+
+
+    }
+
+    public void setEventDifficulty(String difficulty) {
+        switch (difficulty) {
+            case "easy":
+                this.eventDifficultyValue = 8;
+                this.difficultyTextView.setText("Lett");
+                this.difficultyTextView.setBackgroundColor(Color.GREEN);
+                break;
+
+            case "medium":
+                this.eventDifficultyValue = 12;
+                this.difficultyTextView.setText("Medium");
+                this.difficultyTextView.setBackgroundColor(Color.YELLOW);
+                break;
+
+            case "hard":
+                this.eventDifficultyValue = 16;
+                this.difficultyTextView.setText("Vanskelig");
+                this.difficultyTextView.setBackgroundColor(Color.RED);
+                break;
+
+        }
     }
 
     //Dialog opens when event is finished
@@ -215,7 +284,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         double eventTime = getEventTime();
         String eventTimeString = Double.toString(eventTime);
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText("Tid: " + eventTimeString + " minutter");
+        timeTextView.setText("Tid: " + eventTimeString + " sekunder");
 
         //Viser score oppnådd under eventet
         double eventScore = getEventScore();
@@ -250,6 +319,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param v
      */
     public void showLocationButtonPressed(View v) {
+        positionViewed++;
         Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
         //Markor fjernes etter 5 sekund
         CountDownTimer synlig = new CountDownTimer(5000, 1000) {
@@ -400,7 +470,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public double getEventTime() {
         if (this.eventTime == -1) {
             long difference = System.currentTimeMillis() - this.startTime;
-            this.eventTime = (difference / 1000) / 60; //minutes
+            this.eventTime = (difference / 1000) ; //seconds
         }
         return eventTime;
     }
@@ -417,11 +487,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
             distance += point.getDistanceFromPoint(new LatLng(points.get(index + 1).getLatitude(), points.get(index + 1).getLongitude()));
         }
-
+        distance = distance*1.2; // Multiplying because of the terrain (The route will most likely be longer than the air distance
         //This must be changed based on the users level
         //Now using avrg jogging spead (Mid-levelsish?) 8kmph
 
-        double avrageTimeBasedOnDistance = distance / 8000/60; //minutes
+        double avrageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000)/3600); //
 
         double eventTime = getEventTime();
 
@@ -429,7 +499,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if ( eventScore > 100) {
             eventScore = 100;
         }
-
+        eventScore -= positionViewed*5; // Fjerner poeng for å ha sjekket posisjonen.
 
         return eventScore;
     }
@@ -437,15 +507,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public void startEventBtnPressed() {
         // Check if user is on startpoint
 
-        View addEventButton = findViewById(R.id.start_event_btn);
         if (currentLocation == null) {
             Toast.makeText(getApplicationContext(), "Prøv igjen om 5 sekunder", Toast.LENGTH_SHORT).show();
             return;
         }
+
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
         float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
         if (distance < 20) {
-            addEventButton.setVisibility(View.GONE);
             this.startTime = System.currentTimeMillis();
             this.eventTime = -1;
         } else {
