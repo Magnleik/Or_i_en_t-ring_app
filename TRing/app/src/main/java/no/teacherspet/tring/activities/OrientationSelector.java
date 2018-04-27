@@ -40,6 +40,7 @@ public class OrientationSelector extends AppCompatActivity {
     private OEventViewModel eventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private Button continueButton;
+    private Button logInButton;
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
@@ -59,6 +60,11 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton = (Button) findViewById(R.id.continue_button);
         continueButton.setEnabled(false);
         continueButton.setOnClickListener(v -> continueEvent());
+        logInButton = (Button) findViewById(R.id.selector_log_in_btn);
+
+        if(NetworkManager.getInstance().isAuthenticated()){
+            logInButton.setEnabled(false);
+        }
 
         if(!NetworkManager.getInstance().isAuthenticated()){
             user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
@@ -188,10 +194,15 @@ public class OrientationSelector extends AppCompatActivity {
                 }
             });
         }
+
+        logInButton.setEnabled(true);
     }
 
     @Override
     protected void onResume() {
+
+        logInButton.setEnabled(!NetworkManager.getInstance().isAuthenticated());
+
         if(!NetworkManager.getInstance().isAuthenticated()){
             logout();
         }
