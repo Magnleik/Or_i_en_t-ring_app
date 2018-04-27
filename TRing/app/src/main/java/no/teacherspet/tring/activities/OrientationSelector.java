@@ -44,8 +44,6 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton.setEnabled(false);
         continueButton.setOnClickListener(v -> continueEvent());
 
-
-        //TODO Start PerformOEvent with this event
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
     }
     private void continueEvent(){
