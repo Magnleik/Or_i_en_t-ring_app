@@ -197,7 +197,7 @@ public class NearbyEvents extends Fragment {
                                     Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
                                 }
                             };
-                            networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                            networkManager.getNearbyEvents(position.latitude, position.longitude, 200, adapter);
                         }
                     }
                 }

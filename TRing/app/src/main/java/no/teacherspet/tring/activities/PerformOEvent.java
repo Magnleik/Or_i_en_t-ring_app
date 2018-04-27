@@ -177,6 +177,28 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
+    //Dialog opens when event starts
+
+    public void openStartDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View inflator = inflater.inflate(R.layout.event_started_dialog, null);
+        builder.setView(inflator);
+
+        builder.setPositiveButton("Start løp", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Lagre event (Tid, score og avstand?)
+                startEventBtnPressed();
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     //Dialog opens when event is finished
     public void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -375,17 +397,20 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         //This must be changed based on the users level
         //Now using avrg jogging spead (Mid-levelsish?) 8kmph
 
-        double avrageTimeBasedOnDistance = distance / 8000; //minutes
+        double avrageTimeBasedOnDistance = distance / 8000/60; //minutes
 
 
         double eventTime = getEventTime();
-        double eventScore = avrageTimeBasedOnDistance / eventTime;
+        double eventScore = avrageTimeBasedOnDistance *100 / eventTime;
+        if ( eventScore > 100) {
+            eventScore = 100;
+        }
 
 
         return eventScore;
     }
 
-    public void startEventBtnPressed(View v) {
+    public void startEventBtnPressed() {
         // Check if user is on startpoint
 
         View addEventButton = findViewById(R.id.start_event_btn);
