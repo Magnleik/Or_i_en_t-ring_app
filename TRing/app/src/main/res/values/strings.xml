@@ -18,7 +18,7 @@
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
     <string name="username">Username</string>
-    <string name="log_in">Log In</string>
+    <string name="log_in">Log in</string>
     <string name="create_new">Create new</string>
     <string name="perform_event">Perform event</string>
     <string name="create_new_event">Create new event</string>

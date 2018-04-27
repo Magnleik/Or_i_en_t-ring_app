@@ -38,9 +38,9 @@
     <string name="delete">Slett</string>
     <string name="event_startpoint_prompt_toast">Du må velge et startpunkt!</string>
     <string name="try_again_in_5_sec">Prøv igjen om 5 sekunder</string>
-    <string name="move_to_start">Beveg deg til startpunktet for å starte løpet</string>
+    <string name="move_to_start">Flytt deg til startpunktet for å starte løpet</string>
     <string name="my_events">Mine løp</string>
-    <string name="position_count_marker_warning_formatted">Dette er %d.gang posisjonen vises, markor fjernes om %d sekunder</string>
+    <string name="position_count_marker_warning_formatted">Dette er %d.gang posisjonen vises, markør fjernes om %d sekunder</string>
     <string name="event_name_promt_toast">Du må gi løpet et navn!</string>
     <string name="access_denied">Ingen tilgang</string>
     <string name="access_granted_to_TRing">Tilgang gitt for TRing</string>
