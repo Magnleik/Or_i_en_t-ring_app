@@ -31,6 +31,7 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 
 
 /**
@@ -87,7 +88,7 @@ public class NearbyEvents extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
-        networkManager=NetworkManager.getInstance();
+        networkManager = NetworkManager.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -100,7 +101,6 @@ public class NearbyEvents extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nearby_events, container, false);
     }
-
 
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -165,11 +165,13 @@ public class NearbyEvents extends Fragment {
     public void initList() {
         theEventReceived = new HashMap<>();
         networkManager = NetworkManager.getInstance();
+        GeneralProgressDialog generalProgressDialog = new GeneralProgressDialog(getContext(), getActivity(), false);
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
             lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
+                    generalProgressDialog.show();
                     if (location != null) {
                         position = new LatLng(location.getLatitude(), location.getLongitude());
                         if (!(position.longitude == 0.0 || position.latitude == 0.0)) {
@@ -190,6 +192,7 @@ public class NearbyEvents extends Fragment {
                                         }
                                         updateList();
                                     }
+                                    generalProgressDialog.hide();
                                 }
 
                                 @Override
@@ -197,7 +200,7 @@ public class NearbyEvents extends Fragment {
                                     Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
                                 }
                             };
-                            networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                            networkManager.getNearbyEvents(position.latitude, position.longitude, 200, adapter);
                         }
                     }
                 }

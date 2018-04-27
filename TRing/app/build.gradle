@@ -5,12 +5,12 @@ def MAPS_API_KEY = MapsApiKey ?: '"Could not find maps api key"'
 def STRING = 'String'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "no.teacherspet.tring"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
