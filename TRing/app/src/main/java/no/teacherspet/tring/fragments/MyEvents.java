@@ -25,6 +25,7 @@ import java.util.List;
 import connection.Event;
 import connection.NetworkManager;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
@@ -178,9 +179,9 @@ public class MyEvents extends Fragment {
     private void loadPoints(List<RoomOEvent> oEvents){
         if(oEvents.size()>0) {
             for (RoomOEvent event : oEvents) {
-                joinViewModel.getStartPoint(event.getId()).subscribe(startPoints -> {
-                    if(startPoints.size() > 0){
-                        joinViewModel.getPointsNotStart(event.getId()).subscribe(points -> createEvent(event, startPoints.get(0), points));
+                joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
+                    if(roomPoints.size() > 0){
+                        joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> createEvent(event, roomPoints, joins));
                     }
                 });
             }
@@ -190,25 +191,33 @@ public class MyEvents extends Fragment {
             Toast.makeText(this.getContext(), "Found no locally saved events", Toast.LENGTH_SHORT).show();
         }
     }
-    private void createEvent(RoomOEvent oEvent, RoomPoint startPoint, List<RoomPoint> roomPoints){
+    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         Event event = new Event();
         event._setId(oEvent.getId());
-
-        event.setStartPoint(setupPoint(startPoint));
-        for(RoomPoint roomPoint : roomPoints){
-            event.addPost(setupPoint(roomPoint));
-        }
-
         for(String key : oEvent.getProperties().keySet()){
             event.addProperty(key, oEvent.getProperties().get(key));
         }
-
+        for (RoomPoint roomPoint : roomPoints){
+            for (PointOEventJoin join : joins){
+                if(roomPoint.getId() == join.getPointID()){
+                    //Point point = setupPoint(roomPoint, join.isVisited());
+                    Point point = setupPoint(roomPoint, false);
+                    if(join.isStart()){
+                        event.setStartPoint(point);
+                    }
+                    else{
+                        event.addPost(point);
+                    }
+                }
+            }
+        }
         listItems.add(event);
         updateList();
     }
-    private Point setupPoint(RoomPoint roomPoint){
+    private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
         point._setId(roomPoint.getId());
+        point.setVisited(visited);
         for(String key : roomPoint.getProperties().keySet()){
             point.addProperty(key, roomPoint.getProperties().get(key));
         }

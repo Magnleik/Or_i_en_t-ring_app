@@ -36,13 +36,15 @@
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".activities.StartupMenu">
+        </activity>
+        <activity android:name=".activities.OrientationSelector">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.OrientationSelector" />
-        <activity android:name=".activities.CreateOEvent" />
+        <activity android:name=".activities.CreateOEvent">
+        </activity>
         <activity android:name=".activities.PerformOEvent"
         android:configChanges="keyboardHidden|screenSize" />
 

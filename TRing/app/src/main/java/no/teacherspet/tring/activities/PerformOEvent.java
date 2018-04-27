@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import connection.Event;
 import connection.Point;
@@ -154,6 +155,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
             }
+
+            resetActiveEvents();
+
             updateEvent(true);
             LatLngBounds bounds = builder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
@@ -365,6 +369,26 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         joinViewModel.addJoins(join);
     }
 
+    /**
+     * Set all events in room to not active, set all points to not visited
+     */
+    private void resetActiveEvents(){
+        oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            for (RoomOEvent event : roomOEvents){
+                if(event.getId() != startedEvent.getId()){
+                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> resetEvent(event, joins));
+                }
+            }
+        });
+    }
+    private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
+        event.setActive(false);
+        oEventViewModel.addOEvents(event);
+        for (PointOEventJoin join : joins){
+            PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
+            joinViewModel.addJoins(newJoin);
+        }
+    }
 
     /**
      * @return The points of the event to be performed
@@ -399,8 +423,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         double avrageTimeBasedOnDistance = distance / 8000/60; //minutes
 
-
         double eventTime = getEventTime();
+
         double eventScore = avrageTimeBasedOnDistance *100 / eventTime;
         if ( eventScore > 100) {
             eventScore = 100;
