@@ -110,10 +110,13 @@ public class LogInActivity extends AppCompatActivity {
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
         userViewModel.getAllUsers().subscribe(roomUsers -> {
             if (roomUsers.size() > 0) {
-                userViewModel.deleteUsers(roomUsers.get(0))
-                        .subscribe(longs->{
-                                userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
-                                });
+                RoomUser[] users = new RoomUser[roomUsers.size()];
+                for (int i = 0; i < roomUsers.size(); i++) {
+                    users[i] = roomUsers.get(i);
+                }
+                userViewModel.deleteUsers(users).subscribe(longs->{
+                    userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
+                });
             }
             else{
                 userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));

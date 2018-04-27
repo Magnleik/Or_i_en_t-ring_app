@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,14 +13,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
-import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
@@ -43,7 +40,6 @@ public class OrientationSelector extends AppCompatActivity {
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
-    private Disposable user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +57,7 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton.setOnClickListener(v -> continueEvent());
 
         if(!NetworkManager.getInstance().isAuthenticated()){
-            user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+            userViewModel.getAllUsers().subscribe(users -> checkUser(users));
         }
 
         //TODO Start PerformOEvent with this event
@@ -89,44 +85,6 @@ public class OrientationSelector extends AppCompatActivity {
         }
         Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
     }
-
-    //Changes to createUserActivity if a roomUser has not been created
-    private void checkUser(List<RoomUser> roomUser){
-        progressDialog.show();
-        if (roomUser.size() > 0) {
-            NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
-                @Override
-                public void onResponse(Boolean object) {
-                    progressDialog.hide();
-                    if (object != null) {
-                        if (object) {
-                            Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(OrientationSelector.this, OrientationSelector.class));
-                        } else {
-                            userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
-                        }
-                    } else {
-                        userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                                startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-
-                    progressDialog.hide();
-
-                    userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
-                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
-                }
-            });
-        } else {
-            progressDialog.hide();
-            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void addPointsToEvent(Event event, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         for (RoomPoint roomPoint : roomPoints){
             for (PointOEventJoin join : joins){
@@ -152,6 +110,43 @@ public class OrientationSelector extends AppCompatActivity {
             point.addProperty(key, roomPoint.getProperties().get(key));
         }
         return point;
+    }
+    //Changes to createUserActivity if a roomUser has not been created
+    private void checkUser(List<RoomUser> roomUsers){
+        progressDialog.show();
+        if (roomUsers.size() > 0) {
+            RoomUser[] users = new RoomUser[roomUsers.size()];
+            for (int i = 0; i < roomUsers.size(); i++) {
+                users[i] = roomUsers.get(i);
+            }
+            NetworkManager.getInstance().logInWithToken(roomUsers.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+                @Override
+                public void onResponse(Boolean object) {
+                    progressDialog.hide();
+                    if (object != null) {
+                        if (object) {
+                            Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
+                        } else {
+                            userViewModel.deleteUsers(users).subscribe(integers ->
+                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                        }
+                    } else {
+                        userViewModel.deleteUsers(users).subscribe(integers ->
+                                startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    progressDialog.hide();
+                    userViewModel.deleteUsers(users).subscribe(integers ->
+                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                }
+            });
+        } else {
+            progressDialog.hide();
+            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -183,16 +178,20 @@ public class OrientationSelector extends AppCompatActivity {
         if(!NetworkManager.getInstance().isAuthenticated()){
             Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
             userViewModel.getAllUsers().subscribe(roomUsers -> {
-                for(RoomUser user : roomUsers){
-                    userViewModel.deleteUsers(user);
+                RoomUser[] users = new RoomUser[roomUsers.size()];
+                for (int i = 0; i < roomUsers.size(); i++) {
+                    users[i] = roomUsers.get(i);
                 }
+                userViewModel.deleteUsers(users).subscribe(integer ->{
+                    Toast.makeText(this, "Local user deleted", Toast.LENGTH_SHORT).show();
+                });
             });
         }
     }
 
     @Override
     protected void onResume() {
-        if(!NetworkManager.getInstance().isAuthenticated()){
+        if(getIntent().getBooleanExtra("Logout", false)){
             logout();
         }
         super.onResume();

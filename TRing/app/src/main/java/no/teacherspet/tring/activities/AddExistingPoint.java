@@ -165,8 +165,8 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                 finish();
                 break;
             case (R.id.log_out_menu):
-                NetworkManager.getInstance().logOut();
                 Intent intent = new Intent(this, OrientationSelector.class);
+                intent.putExtra("Logout", true);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
