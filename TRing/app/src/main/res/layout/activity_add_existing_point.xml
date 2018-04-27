@@ -26,7 +26,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:onClick="addButtonClick"
-        android:text="Add"
+        android:text="@string/add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -38,7 +38,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="60dp"
         android:onClick="doneAddingClick"
-        android:text="Done"
+        android:text="@string/done"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/add_existing_point_btn" />

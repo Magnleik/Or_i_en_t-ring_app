@@ -38,6 +38,7 @@ public class CreateUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_user);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(R.string.create_user_title);
         createUsername = (EditText) findViewById(R.id.create_username);
         createPassword = (EditText) findViewById(R.id.create_password);
         passwordCheck = (EditText) findViewById(R.id.password_check_edittext);
@@ -69,26 +70,26 @@ public class CreateUserActivity extends AppCompatActivity {
 
                 if(object!=null && object){
                     //Successfully created user. Should probably redirect to the main view.
-                    Toast.makeText(CreateUserActivity.this,"New user created",Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.new_user_created,Toast.LENGTH_LONG).show();
 
                     if (NetworkManager.getInstance().isAuthenticated()){
-                        Toast.makeText(CreateUserActivity.this, "Logged in", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CreateUserActivity.this, R.string.logged_in, Toast.LENGTH_LONG).show();
 
                         saveCredentialsToLocal();
                         backToMain();
 
                     }else{
-                        Toast.makeText(CreateUserActivity.this, "Failed to log in", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CreateUserActivity.this, R.string.failed_log_in, Toast.LENGTH_LONG).show();
                         finish(); //Send to log in
                     }
 
 
                 }
                 else if(object==null){
-                    Toast.makeText(CreateUserActivity.this,"Something went wrong on the server, please try again",Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.something_wrong_on_server_try_again,Toast.LENGTH_LONG).show();
                     saveButton.setEnabled(true);
                 }else{
-                    Toast.makeText(CreateUserActivity.this,"Username might be taken, please try another name",Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.username_might_be_taken,Toast.LENGTH_LONG).show();
                     saveButton.setEnabled(true);
                 }
             }
@@ -97,7 +98,7 @@ public class CreateUserActivity extends AppCompatActivity {
             public void onFailure(Throwable t) {
 
                 progressDialog.hide();
-                Toast.makeText(CreateUserActivity.this,"Something went wrong on the server, please try again",Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateUserActivity.this,R.string.something_wrong_on_server_try_again,Toast.LENGTH_LONG).show();
 
             }
         });
@@ -106,11 +107,11 @@ public class CreateUserActivity extends AppCompatActivity {
     //FIXME: Change this to work for new implementation
     private void changeActivity(long[] longs){
         if(longs[0] >= 0){
-            Toast.makeText(this, "User successfully saved", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.user_successfully_saved, Toast.LENGTH_LONG).show();
             startActivity(new Intent(this, MapsActivity.class));
         }
         else{
-            Toast.makeText(this, "Something went wrong, please try again", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.something_wrong_try_again, Toast.LENGTH_LONG).show();
             saveButton.setEnabled(true);
         }
     }
@@ -126,12 +127,12 @@ public class CreateUserActivity extends AppCompatActivity {
     private void checkResult(long[] longs){
         if(longs[0] < 0){
             Log.d("Room",String.format("User not saved, error: %d", longs[0]));
-            Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
             //saveCredentialsToLocal();
         }
         else{
             Log.d("Room","User saved successfully");
-            Toast.makeText(this, "User saved locally", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -148,11 +149,11 @@ public class CreateUserActivity extends AppCompatActivity {
                 createUser();
             }
             else{
-                Toast.makeText(CreateUserActivity.this,"Passwords do not match",Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateUserActivity.this, R.string.password_do_not_match,Toast.LENGTH_LONG).show();
             }
         }
         else{
-            Toast.makeText(CreateUserActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CreateUserActivity.this, R.string.fill_in_all_fields_toast, Toast.LENGTH_SHORT).show();
         }
     }
 

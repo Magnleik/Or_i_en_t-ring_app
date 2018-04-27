@@ -111,7 +111,7 @@ public class MyEvents extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
         loadData();
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
@@ -144,7 +144,7 @@ public class MyEvents extends Fragment {
     private void openSettingsDialog(Event selectedEvent){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(selectedEvent.getProperty("Title"));
-        CharSequence[] elements = {"Slett", "Avbryt"};
+        CharSequence[] elements = {getString(R.string.delete),getString(R.string.cancel)};
         builder.setItems(elements, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -191,7 +191,7 @@ public class MyEvents extends Fragment {
         }
         else{
             listItems = null;
-            Toast.makeText(this.getContext(), "Found no locally saved events", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this.getContext(), R.string.found_no_locally_saved_events, Toast.LENGTH_SHORT).show();
         }
     }
     private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
@@ -244,12 +244,12 @@ public class MyEvents extends Fragment {
         oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
             if(integer != -1){
                 Log.d("Room",String.format("Event %d deleted", event.getId()));
-                Toast.makeText(this.getContext(), "Event deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), R.string.event_deleted, Toast.LENGTH_SHORT).show();
                 listItems.remove(event);
                 updateList();
             }
             else{
-                Toast.makeText(this.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
             }
         });
     }

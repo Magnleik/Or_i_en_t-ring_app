@@ -38,6 +38,7 @@ public class OrientationSelector extends AppCompatActivity {
     private OEventViewModel eventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private Button continueButton;
+    private Button logInButton;
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
@@ -56,6 +57,11 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton = (Button) findViewById(R.id.continue_button);
         continueButton.setEnabled(false);
         continueButton.setOnClickListener(v -> continueEvent());
+        logInButton = (Button) findViewById(R.id.selector_log_in_btn);
+
+        if(NetworkManager.getInstance().isAuthenticated()){
+            logInButton.setEnabled(false);
+        }
 
         if(!NetworkManager.getInstance().isAuthenticated()){
             userViewModel.getAllUsers().subscribe(users -> {
@@ -86,7 +92,7 @@ public class OrientationSelector extends AppCompatActivity {
                 }
             });
         }
-        Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
     private void addPointsToEvent(Event event, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         for (RoomPoint roomPoint : roomPoints){
@@ -131,7 +137,7 @@ public class OrientationSelector extends AppCompatActivity {
                     progressDialog.hide();
                     if (object != null) {
                         if (object) {
-                            Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(OrientationSelector.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
                         } else {
                             userViewModel.deleteUsers(users).subscribe(integers ->{
                                     Log.d("Room",String.format("%d users deleted", users.length));
@@ -157,7 +163,7 @@ public class OrientationSelector extends AppCompatActivity {
             });
         } else {
             progressDialog.hide();
-            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_user_found, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -188,7 +194,7 @@ public class OrientationSelector extends AppCompatActivity {
         NetworkManager.getInstance().logOut();
 
         if(!NetworkManager.getInstance().isAuthenticated()){
-            Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.logout_successful, Toast.LENGTH_SHORT).show();
             userViewModel.getAllUsers().subscribe(roomUsers -> {
                 RoomUser[] users = new RoomUser[roomUsers.size()];
                 for (int i = 0; i < roomUsers.size(); i++) {
@@ -200,10 +206,14 @@ public class OrientationSelector extends AppCompatActivity {
                 });
             });
         }
+
+        logInButton.setEnabled(true);
     }
 
     @Override
     protected void onResume() {
+        logInButton.setEnabled(!NetworkManager.getInstance().isAuthenticated());
+
         if(getIntent().getBooleanExtra("Logout", false)){
             logout();
         }
@@ -269,10 +279,10 @@ public class OrientationSelector extends AppCompatActivity {
         switch (requestCode){
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
                 if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Toast.makeText(getApplicationContext(), "Access granted to TRing", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.access_granted_to_TRing, Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Access denied",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.access_denied,Toast.LENGTH_SHORT).show();
                 }
         }
     }

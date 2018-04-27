@@ -192,16 +192,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         double eventTime = getEventTime();
         String eventTimeString = Double.toString(eventTime);
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText("Tid: " + eventTimeString + " minutter");
+        timeTextView.setText(String.format(getString(R.string.time_minutes_formatted), eventTimeString));
 
         //Viser score oppnådd under eventet
         double eventScore = getEventScore();
         String eventScoreString = Double.toString(eventScore);
         TextView scoreTextView = (TextView) inflator.findViewById(R.id.scoreTextView);
-        scoreTextView.setText("Total score: " + eventScoreString);
+        scoreTextView.setText(String.format(getString(R.string.total_score_formatted), eventScoreString));
 
 
-        builder.setPositiveButton("Lagre", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Lagre event (Tid, score og avstand?)
@@ -209,7 +209,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 dialog.dismiss();
             }
         });
-        builder.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -235,7 +235,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onTick(long l) {
                 sek--;
-                Toast.makeText(getApplicationContext(), "Dette er " + positionViewed + ".gang posisjonen vises, markor fjernes om " + sek + " sekunder", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
 
             }
 
@@ -284,14 +284,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
-                Toast.makeText(getApplicationContext(), "You arrived at a previously unvisited point!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
                 mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 break;
             }
         }
 
         if (prevsize == visitedPoints.size()) {
-            Toast.makeText(getApplicationContext(), "There is no new point here to be visited", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_LONG).show();
         }
         if (points.size() == visitedPoints.size()) {
             updateEvent(false);
@@ -430,7 +430,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         View addEventButton = findViewById(R.id.start_event_btn);
         if (currentLocation == null) {
-            Toast.makeText(getApplicationContext(), "Prøv igjen om 5 sekunder", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.try_again_in_5_sec, Toast.LENGTH_SHORT).show();
             return;
         }
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -440,7 +440,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             this.startTime = System.currentTimeMillis();
             this.eventTime = -1;
         } else {
-            Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
         }
     }
 
