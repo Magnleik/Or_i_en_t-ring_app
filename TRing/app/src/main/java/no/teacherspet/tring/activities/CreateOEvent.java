@@ -384,18 +384,19 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
-
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
             Point point = event.getPoints().get(i);
-            PointOEventJoin join;
-            if(i > 0){
-                join = new PointOEventJoin(point.getId(), event.getId(), false, false);
+            boolean start = i == 0;
+            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
+            /*
+            if(point.equals(event.getStartPoint())){
+                joins[i] = new PointOEventJoin(point.getId(), event.getId(), true, false);
             }
             else{
-                join = new PointOEventJoin(point.getId(), event.getId(), true, false);
+                joins[i] = new PointOEventJoin(point.getId(), event.getId(), false, false);
             }
-            joins[i] = join;
+            */
         }
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
