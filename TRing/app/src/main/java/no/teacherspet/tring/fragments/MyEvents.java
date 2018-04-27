@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,14 +173,16 @@ public class MyEvents extends Fragment {
         database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
-
+        Log.d("Room","Started loading events");
         oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
     }
 
     private void loadPoints(List<RoomOEvent> oEvents){
+        Log.d("Room",String.format("%d events found", oEvents.size()));
         if(oEvents.size()>0) {
             for (RoomOEvent event : oEvents) {
                 joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
+                    Log.d("Room",String.format("%d points found for event %d", roomPoints.size(), event.getId()));
                     if(roomPoints.size() > 0){
                         joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> createEvent(event, roomPoints, joins));
                     }
@@ -211,6 +214,7 @@ public class MyEvents extends Fragment {
                 }
             }
         }
+        Log.d("Room",String.format("Event %d created",event.getId()));
         listItems.add(event);
         updateList();
     }
@@ -239,6 +243,7 @@ public class MyEvents extends Fragment {
     private void deleteEvent(Event event){
         oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
             if(integer != -1){
+                Log.d("Room",String.format("Event %d deleted", event.getId()));
                 Toast.makeText(this.getContext(), R.string.event_deleted, Toast.LENGTH_SHORT).show();
                 listItems.remove(event);
                 updateList();

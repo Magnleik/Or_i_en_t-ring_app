@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -111,10 +112,14 @@ public class LogInActivity extends AppCompatActivity {
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
         userViewModel.getAllUsers().subscribe(roomUsers -> {
             if (roomUsers.size() > 0) {
-                userViewModel.deleteUsers(roomUsers.get(0))
-                        .subscribe(longs->{
-                                userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
-                                });
+                RoomUser[] users = new RoomUser[roomUsers.size()];
+                for (int i = 0; i < roomUsers.size(); i++) {
+                    users[i] = roomUsers.get(i);
+                }
+                userViewModel.deleteUsers(users).subscribe(longs->{
+                    Log.d("Room",String.format("%d users deleted",users.length));
+                    userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
+                });
             }
             else{
                 userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
@@ -128,6 +133,7 @@ public class LogInActivity extends AppCompatActivity {
             //saveCredentialsToLocal();
         }
         else{
+            Log.d("Room","User token saved");
             Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
         }
     }

@@ -9,6 +9,7 @@ import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -155,7 +156,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
             }
-            resetActiveEvents();
+            resetActiveEvents(startedEvent);
             updateEvent(true);
             LatLngBounds bounds = builder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
@@ -301,7 +302,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     /**
      * Method for updating the event to Room. To be called when starting and when finishing
-     *
      * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
      */
     private void updateEvent(boolean starting) {
@@ -309,15 +309,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if (longs[0] != -1) {
+                Log.d("Room",String.format("Event %d updated, starting: %b", event.getId(), starting));
                 updatePoints(startedEvent, starting);
             }
         });
     }
-
     /**
      * Method for saving which points have been visited to room
-     *
-     * @param event
+     * @param event Event which we are updating
+     * @param starting True: Event should be set to active. False: Event should be set to inactive
      */
     private void updatePoints(Event event, boolean starting) {
         PointOEventJoin[] joins = new PointOEventJoin[points.size()];
@@ -328,42 +328,60 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
         joinViewModel.addJoins(joins).subscribe(longs -> {
             if(longs[0] != -1){
-                //TODO For testing purposes
-                Toast.makeText(this, R.string.event_updated, Toast.LENGTH_SHORT).show();
+                Log.d("Room",String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
             }
         });
     }
 
     /**
      * Updates a single point to "visited" in the local database
-     *
-     * @param point
+     * @param point Point to be updated
      */
     private void updatePoint(Point point) {
         boolean start = startedEvent.getStartPoint().equals(point);
         PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
-        joinViewModel.addJoins(join);
+        joinViewModel.addJoins(join).subscribe(longs -> {
+            if(longs[0]>0){
+                Log.d("Room",String.format("Point %d saved, code: %d", point.getId(), longs[0]));
+            }
+            else{
+                Log.d("Room",String.format("Point %d not saved, code: %d", point.getId(), longs[0]));
+            }
+        });
     }
 
     /**
      * Set all events in room to not active, set all points to not visited
+     * @param activeEvent Event which should not be reset
      */
-    private void resetActiveEvents(){
+    private void resetActiveEvents(Event activeEvent){
+        Log.d("Room","Started resetting active events");
         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            Log.d("Room",String.format("Found %d active events", roomOEvents.size()));
             for (RoomOEvent event : roomOEvents){
-                if(event.getId() != startedEvent.getId()){
-                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> resetEvent(event, joins));
+                if(event.getId() != activeEvent.getId()){
+                    Log.d("Room",String.format("Resetting event %d", event.getId()));
+                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins ->
+                            resetEvent(new RoomOEvent(event.getId(), event.getProperties()), joins));
                 }
             }
         });
     }
+    /**
+     * Method for setting to inactive, and points to not visited
+     * @param event Event we are resetting
+     * @param joins All connections between event and its points
+     */
     private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
+        Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
-        oEventViewModel.addOEvents(event);
-        for (PointOEventJoin join : joins){
-            PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
-            joinViewModel.addJoins(newJoin);
-        }
+        oEventViewModel.addOEvents(event).subscribe(longs -> {
+            for (PointOEventJoin join : joins){
+                PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
+                joinViewModel.addJoins(newJoin);
+            }
+            Log.d("Room",String.format("Event %d set to not active", event.getId()));
+        });
     }
 
     /**
