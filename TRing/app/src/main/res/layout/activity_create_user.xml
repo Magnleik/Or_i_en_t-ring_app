@@ -28,7 +28,7 @@
         android:layout_below="@+id/create_username"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/password"
         android:inputType="textPassword" />
 
     <EditText
@@ -39,7 +39,7 @@
         android:layout_below="@+id/create_password"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:ems="10"
-        android:hint="Repeat password"
+        android:hint="@string/repeat_password"
         android:inputType="textPassword" />
 
     <Button
@@ -50,5 +50,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:onClick="saveButtonClick"
-        android:text="Save" />
+        android:text="@string/save" />
 </RelativeLayout>

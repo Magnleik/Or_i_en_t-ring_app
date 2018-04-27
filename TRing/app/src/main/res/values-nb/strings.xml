@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_maps">Kart</string>
+    <string name="title_activity_create_user">LagBrukerAktivitet</string>
+    <string name="create">Lag</string>
+    <string name="save">Lagre</string>
+    <string name="first_name">Fornavn</string>
+    <string name="last_name">Etternavn</string>
+    <string name="title_activity_list_of_saved_events">ListeOverLagredeLøp</string>
+    <string name="add">Legg til</string>
+    <string name="done">Ferdig</string>
+    <string name="track_name">Løypenavn</string>
+    <string name="create_point_on_my_pos">Lag punkt på min posisjon</string>
+    <string name="get_saved_points">Hent lagrede punkt</string>
+    <string name="password">Passord</string>
+    <string name="repeat_password">Repetér passord</string>
+    <string name="username">Brukernavn</string>
+    <string name="log_in">Logg inn</string>
+    <string name="create_new">Lag ny</string>
+    <string name="perform_event">Gjennomfør løp</string>
+    <string name="create_new_event">Lag nytt løp</string>
+    <string name="continue_last_event">Fortsett forrige løp</string>
+    <string name="show_my_position">Vis min posisjon</string>
+    <string name="i_think_ive_arrived">Jeg tror jeg er framme</string>
+    <string name="start_event">Start løp</string>
+    <string name="name">Navn</string>
+    <string name="orienteering">Orientering</string>
+    <string name="log_out">Logg ut</string>
+    <string name="here_is_your_score">Meget bra! Her er din score:</string>
+    <string name="avg_time">Gjennomsnittstid:</string>
+    <string name="distance">Avstand:</string>
+    <string name="click_map_add_points_toast">Klikk på kartet for å legge til punkter.</string>
+    <string name="add_new_point">Legg til nytt punkt</string>
+    <string name="change_name">Endre navn</string>
+    <string name="cancel">Avbryt</string>
+    <string name="set_as_startpoint">Sett som startpunkt</string>
+    <string name="edit">Rediger</string>
+    <string name="delete">Slett</string>
+    <string name="event_startpoint_prompt_toast">Du må velge et startpunkt!</string>
+</resources>

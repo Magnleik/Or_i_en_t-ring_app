@@ -64,7 +64,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), "App needs permission to access location services on phone to run", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.location_permission_toast, Toast.LENGTH_LONG).show();
             finish();
         } else {
             lm.getLastLocation().addOnSuccessListener(location -> {
@@ -79,7 +79,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                                         mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
                                         builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                                     }
-                                    Toast.makeText(getApplicationContext(), "Select points you wish to add", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), R.string.select_points_toast, Toast.LENGTH_SHORT).show();
                                     LatLngBounds bounds = builder.build();
 
                                     mMap.setOnMapLoadedCallback(() -> {
@@ -107,7 +107,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
 
                         @Override
                         public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     });
