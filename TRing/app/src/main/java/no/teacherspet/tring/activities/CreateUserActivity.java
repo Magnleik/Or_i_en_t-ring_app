@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -21,28 +22,26 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 
 public class CreateUserActivity extends AppCompatActivity {
 
     EditText createUsername;
     EditText createPassword;
     EditText passwordCheck;
-    ProgressBar progressBar;
     Button saveButton;
+    GeneralProgressDialog progressDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_user);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-
         createUsername = (EditText) findViewById(R.id.create_username);
         createPassword = (EditText) findViewById(R.id.create_password);
         passwordCheck = (EditText) findViewById(R.id.password_check_edittext);
-        progressBar = (ProgressBar) findViewById(R.id.create_user_progressbar);
         saveButton = (Button) findViewById(R.id.create_user_save_btn);
-        progressBar.setVisibility(View.GONE);
+        progressDialog = new GeneralProgressDialog(this, this, true);
 
     }
 
@@ -58,14 +57,14 @@ public class CreateUserActivity extends AppCompatActivity {
 
         //TODO: Check for already being logged in? (NetworkManager.getInstance.isAuthenticated())
 
-        progressBar.setVisibility(View.VISIBLE);
+        progressDialog.show();
         saveButton.setEnabled(false);
 
         NetworkManager.getInstance().createUser(createUsername.getText().toString(), createPassword.getText().toString(), new ICallbackAdapter<Boolean>() {
             @Override
             public void onResponse(Boolean object) {
 
-                progressBar.setVisibility(View.GONE);
+                progressDialog.hide();
 
                 if(object!=null && object){
                     //Successfully created user. Should probably redirect to the main view.
@@ -96,8 +95,7 @@ public class CreateUserActivity extends AppCompatActivity {
             @Override
             public void onFailure(Throwable t) {
 
-                progressBar.setVisibility(View.GONE);
-
+                progressDialog.hide();
                 Toast.makeText(CreateUserActivity.this,"Something went wrong on the server, please try again",Toast.LENGTH_LONG).show();
 
             }
