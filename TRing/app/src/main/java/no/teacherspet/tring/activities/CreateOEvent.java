@@ -353,7 +353,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
             });
             //StartupMenu.addEvent(event);
-            //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_SHORT).show();
             //LAGRE
             //Reset
         }

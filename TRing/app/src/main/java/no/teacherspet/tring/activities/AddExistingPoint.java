@@ -64,7 +64,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), R.string.location_permission_toast, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.location_permission_toast, Toast.LENGTH_SHORT).show();
             finish();
         } else {
             lm.getLastLocation().addOnSuccessListener(location -> {

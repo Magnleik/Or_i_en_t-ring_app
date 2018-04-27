@@ -80,7 +80,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
-//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
         if (startedEvent != null) {
             points = readPoints();
             if (points == null) {
@@ -124,7 +124,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (!startedEvent.getPoints().isEmpty()) {
             return startedEvent.getPoints();
         } else {
-            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -284,14 +284,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
-                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_SHORT).show();
                 mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 break;
             }
         }
 
         if (prevsize == visitedPoints.size()) {
-            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_SHORT).show();
         }
         if (points.size() == visitedPoints.size()) {
             updateEvent(false);
@@ -440,7 +440,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             this.startTime = System.currentTimeMillis();
             this.eventTime = -1;
         } else {
-            Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_SHORT).show();
         }
     }
 

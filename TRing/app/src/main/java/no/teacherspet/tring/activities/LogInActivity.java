@@ -70,24 +70,24 @@ public class LogInActivity extends AppCompatActivity {
                 if (object!=null && object){
 
                     if(NetworkManager.getInstance().isAuthenticated()) {
-                        Toast.makeText(LogInActivity.this, R.string.successfully_logged_in, Toast.LENGTH_LONG).show();
+                        Toast.makeText(LogInActivity.this, R.string.successfully_logged_in, Toast.LENGTH_SHORT).show();
 
                         saveCredentialsToLocal();
 
                         finish();
 
                     }else{
-                        Toast.makeText(LogInActivity.this, R.string.user_verified_login_failed, Toast.LENGTH_LONG).show();
+                        Toast.makeText(LogInActivity.this, R.string.user_verified_login_failed, Toast.LENGTH_SHORT).show();
 
                         logInBtn.setEnabled(true);
                     }
 
                 }else if(object==null){
-                    Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_SHORT).show();
 
                     logInBtn.setEnabled(true);
                 }else{
-                    Toast.makeText(LogInActivity.this, R.string.wrong_login_credentials, Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogInActivity.this, R.string.wrong_login_credentials, Toast.LENGTH_SHORT).show();
 
                     logInBtn.setEnabled(true);
                 }
@@ -100,7 +100,7 @@ public class LogInActivity extends AppCompatActivity {
                 progressDialog.hide();
                 logInBtn.setEnabled(true);
 
-                Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_LONG).show();
+                Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_SHORT).show();
 
             }
         });

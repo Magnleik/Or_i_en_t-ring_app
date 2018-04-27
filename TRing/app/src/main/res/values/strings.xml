@@ -89,5 +89,6 @@
     <string name="log_in_title">Log In</string>
     <string name="position_count_marker_warning_formatted">This is the %dth time the location is shown. Marker removed in %d seconds.</string>
     <string name="event_name_promt_toast">You must give the event a name!</string>
+    <string name="local_user_deleted">Local user deleted</string>
 </resources>
 

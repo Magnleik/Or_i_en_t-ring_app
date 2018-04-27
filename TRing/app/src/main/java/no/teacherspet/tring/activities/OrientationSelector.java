@@ -137,6 +137,7 @@ public class OrientationSelector extends AppCompatActivity {
                     progressDialog.hide();
                     if (object != null) {
                         if (object) {
+                            logInButton.setEnabled(false);
                             Toast.makeText(OrientationSelector.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
                         } else {
                             userViewModel.deleteUsers(users).subscribe(integers ->{
@@ -202,7 +203,7 @@ public class OrientationSelector extends AppCompatActivity {
                 }
                 userViewModel.deleteUsers(users).subscribe(integer ->{
                     Log.d("Room",String.format("%d users deleted", users.length));
-                    Toast.makeText(this, "Local user deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.local_user_deleted, Toast.LENGTH_SHORT).show();
                 });
             });
         }
