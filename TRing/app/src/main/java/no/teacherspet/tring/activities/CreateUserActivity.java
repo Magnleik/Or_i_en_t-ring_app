@@ -153,7 +153,7 @@ public class CreateUserActivity extends AppCompatActivity {
     }
 
     private void backToMain(){
-        Intent intent = new Intent(this, StartupMenu.class);
+        Intent intent = new Intent(this, OrientationSelector.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
