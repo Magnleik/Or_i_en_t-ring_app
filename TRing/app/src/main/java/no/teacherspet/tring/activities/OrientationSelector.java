@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public class OrientationSelector extends AppCompatActivity {
     private LocalDatabase localDatabase;
     private OEventViewModel eventViewModel;
     private PointOEventJoinViewModel joinViewModel;
+    private Button continueButton;
+    private Event activeEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,21 +40,31 @@ public class OrientationSelector extends AppCompatActivity {
         eventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
+        continueButton = (Button) findViewById(R.id.continue_button);
+        continueButton.setEnabled(false);
+        continueButton.setOnClickListener(v -> continueEvent());
+
+
         //TODO Start PerformOEvent with this event
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
+    }
+    private void continueEvent(){
+        Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
+        intent.putExtra("MyEvent", activeEvent);
+        startActivity(intent);
     }
 
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
         if(activeEvents.size() > 0){
             RoomOEvent roomEvent = activeEvents.get(0);
-            Event activeEvent = new Event();
-            activeEvent._setId(roomEvent.getId());
+            Event event = new Event();
+            event._setId(roomEvent.getId());
             for(String key : roomEvent.getProperties().keySet()){
-                activeEvent.addProperty(key, roomEvent.getProperties().get(key));
+                event.addProperty(key, roomEvent.getProperties().get(key));
             }
-            joinViewModel.getPointsForOEvent(activeEvent.getId()).subscribe(roomPoints -> {
+            joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
                 if(roomPoints.size() > 0){
-                    joinViewModel.getJoinsForOEvent(activeEvent.getId()).subscribe(joins -> addPointsToEvent(activeEvent, roomPoints, joins));
+                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> addPointsToEvent(event, roomPoints, joins));
                 }
             });
         }
@@ -71,9 +84,8 @@ public class OrientationSelector extends AppCompatActivity {
                 }
             }
         }
-        Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
-        intent.putExtra("MyEvent", event);
-        startActivity(intent);
+        activeEvent = event;
+        continueButton.setEnabled(true);
     }
     private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
