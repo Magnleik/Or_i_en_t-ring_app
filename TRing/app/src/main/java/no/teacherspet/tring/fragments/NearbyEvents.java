@@ -134,15 +134,12 @@ public class NearbyEvents extends Fragment {
                 if (position >= 0) {
 
                     Event selectedEvent = listItems.get(position);
-
-                    // 2
+                    saveEventToRoom(selectedEvent);
+                    /*
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
-
-                    // 3
                     detailIntent.putExtra("MyEvent", selectedEvent);
-
-                    // 4
                     startActivity(detailIntent);
+                    */
                 }
             }
 
@@ -211,7 +208,7 @@ public class NearbyEvents extends Fragment {
                                     Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
                                 }
                             };
-                            networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
+                            networkManager.getNearbyEvents(position.latitude, position.longitude, 30000, adapter);
                         }
                     }
                 }
@@ -279,6 +276,9 @@ public class NearbyEvents extends Fragment {
         } else {
             Toast.makeText(this.getContext(), "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
         }
+        Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
+        detailIntent.putExtra("MyEvent", selectedEvent);
+        startActivity(detailIntent);
     }
 
 

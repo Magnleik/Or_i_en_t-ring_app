@@ -63,12 +63,6 @@ public class OrientationSelector extends AppCompatActivity {
                 checkUser(users);
             });
         }
-
-        //TODO Start PerformOEvent with this event
-        eventViewModel.getActiveEvent().subscribe(roomOEvents -> {
-            Log.d("Room","Started checking active events");
-            checkActiveEvent(roomOEvents);
-        });
     }
     private void continueEvent(){
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
@@ -213,6 +207,10 @@ public class OrientationSelector extends AppCompatActivity {
         if(getIntent().getBooleanExtra("Logout", false)){
             logout();
         }
+        eventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+            Log.d("Room","Started checking active events");
+            checkActiveEvent(roomOEvents);
+        });
         super.onResume();
     }
 

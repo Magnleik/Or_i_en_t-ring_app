@@ -361,7 +361,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             for (RoomOEvent event : roomOEvents){
                 if(event.getId() != activeEvent.getId()){
                     Log.d("Room",String.format("Resetting event %d", event.getId()));
-                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> resetEvent(event, joins));
+                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins ->
+                            resetEvent(new RoomOEvent(event.getId(), event.getProperties()), joins));
                 }
             }
         });
@@ -374,12 +375,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
         Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
-        oEventViewModel.addOEvents(event);
-        for (PointOEventJoin join : joins){
-            PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
-            joinViewModel.addJoins(newJoin);
-        }
-        Log.d("Room",String.format("Event %d set to not active", event.getId()));
+        oEventViewModel.addOEvents(event).subscribe(longs -> {
+            for (PointOEventJoin join : joins){
+                PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
+                joinViewModel.addJoins(newJoin);
+            }
+            Log.d("Room",String.format("Event %d set to not active", event.getId()));
+        });
     }
 
     /**
