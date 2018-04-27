@@ -15,7 +15,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Løypenavn"
+        android:hint="@string/track_name"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/map_under_creation"
         app:layout_constraintRight_toRightOf="parent"
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:onClick="existingPointClicked"
             android:src="@drawable/place"
-            app:fab_label="Hent lagrede punkt"
+            app:fab_label="@string/get_saved_points"
             app:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:onClick="addMarkerMyPosition"
             android:src="@drawable/my_location"
-            app:fab_label="Lag punkt på min posisjon"
+            app:fab_label="@string/create_point_on_my_pos"
             app:fab_size="mini" />
 
 
@@ -82,7 +82,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:onClick="saveEvent"
-        android:text="Ferdig"
+        android:text="@string/done"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.06"
