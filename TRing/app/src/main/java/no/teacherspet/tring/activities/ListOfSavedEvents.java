@@ -1,25 +1,48 @@
 package no.teacherspet.tring.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import connection.Event;
+import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 import no.teacherspet.tring.util.EventFragmentPagerAdapter;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 import no.teacherspet.tring.util.PagerAdapter;
 
 public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
+
+    private HashMap<Integer, Event> theEventReceived;
+    private NetworkManager networkManager;
+    private FusedLocationProviderClient lm;
+    private LatLng position;
+    private Location currentLocation;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,10 +63,10 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_saved_events);
-
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
+        initList();
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -81,7 +104,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         }
 
         MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
-        if(!NetworkManager.getInstance().isAuthenticated()){
+        if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
 
@@ -111,6 +134,53 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         return super.onOptionsItemSelected(item);
     }
 
+    public void initList() {
+        theEventReceived = new HashMap<>();
+        GeneralProgressDialog progressDialog = new GeneralProgressDialog(getApplicationContext(), this, true);
+        networkManager = NetworkManager.getInstance();
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            lm = LocationServices.getFusedLocationProviderClient(this);
+            progressDialog.show();
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            LocationCallback mLocationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    super.onLocationResult(locationResult);
+                    System.out.println(locationResult.getLastLocation().getAccuracy());
+                    if (locationResult.getLastLocation().getAccuracy() <= 500 || currentLocation == null) {
+                        currentLocation = locationResult.getLastLocation();
+                    }
+                    ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
+                        @Override
+                        public void onResponse(ArrayList<Event> object) {
+                            if (object == null) {
+                                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            } else {
+                                for (int i = 0; i < object.size(); i++) {
+                                    theEventReceived.put(object.get(i).getId(), object.get(i));
+                                }
+                            }
+                            progressDialog.hide();
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                        }
+                    };
+                    networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), 200, adapter);
+                }
+            };
+            lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
+        }
+        //theEventReceived = new StartupMenu().getTestEvents();
+
+    }
+
+    public HashMap<Integer, Event> getEvents() {
+        return theEventReceived;
+    }
 
 
     @Override

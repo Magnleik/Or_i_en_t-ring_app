@@ -32,6 +32,7 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.EventComparator;
 
 
 /**
@@ -52,6 +53,9 @@ public class MostPopularEvents extends Fragment {
     private String mParam1;
     private String mParam2;
     private Event selectedEvent;
+
+    private EventComparator eventComparator;
+
     private ListView mListView;
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;

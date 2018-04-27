@@ -53,7 +53,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Event startedEvent;
     long startTime;
     long eventTime;
-    boolean savedResults = false;
 
     private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
