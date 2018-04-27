@@ -1,6 +1,10 @@
 package no.teacherspet.tring.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,35 +13,49 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
+import io.reactivex.disposables.Disposable;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomPoint;
+import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.GeneralProgressDialog;
 
 public class OrientationSelector extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
     private LocalDatabase localDatabase;
     private OEventViewModel eventViewModel;
     private PointOEventJoinViewModel joinViewModel;
+    private GeneralProgressDialog progressDialog;
+    private UserViewModel userViewModel;
+    private Disposable user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orientation_selector);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
+        requestAccess();
+        progressDialog = new GeneralProgressDialog(this,this);
         localDatabase = LocalDatabase.getInstance(this);
+        userViewModel = new UserViewModel(localDatabase.userDAO());
         eventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            user = userViewModel.getAllUsers().subscribe(users -> checkUser(users));
+        }
 
         //TODO Start PerformOEvent with this event
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> checkActiveEvent(roomOEvents));
@@ -61,6 +79,44 @@ public class OrientationSelector extends AppCompatActivity {
         }
         Toast.makeText(this, "Active events: " + activeEvents.size(), Toast.LENGTH_SHORT).show();
     }
+
+    //Changes to createUserActivity if a roomUser has not been created
+    private void checkUser(List<RoomUser> roomUser){
+        progressDialog.show();
+        if (roomUser.size() > 0) {
+            NetworkManager.getInstance().logInWithToken(roomUser.get(0).getToken(), new ICallbackAdapter<Boolean>() {
+                @Override
+                public void onResponse(Boolean object) {
+                    progressDialog.hide();
+                    if (object != null) {
+                        if (object) {
+                            Toast.makeText(OrientationSelector.this, "Logged in", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(OrientationSelector.this, OrientationSelector.class));
+                        } else {
+                            userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                        }
+                    } else {
+                        userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                                startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+
+                    progressDialog.hide();
+
+                    userViewModel.deleteUsers(roomUser.get(0)).subscribe(integers ->
+                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class)));
+                }
+            });
+        } else {
+            progressDialog.hide();
+            Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void addPointsToEvent(Event event, RoomPoint startPoint, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         event.setStartPoint(setupPoint(startPoint, getVisited(startPoint, joins)));
         for(RoomPoint roomPoint : roomPoints){
@@ -108,6 +164,32 @@ public class OrientationSelector extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void logInButton(View v){
+        Intent intent = new Intent(OrientationSelector.this,LogInActivity.class);
+        startActivity(intent);
+    }
+
+    private void logout(){
+        NetworkManager.getInstance().logOut();
+
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            Toast.makeText(getApplicationContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+            userViewModel.getAllUsers().subscribe(roomUsers -> {
+                for(RoomUser user : roomUsers){
+                    userViewModel.deleteUsers(user);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        if(!NetworkManager.getInstance().isAuthenticated()){
+            logout();
+        }
+        super.onResume();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -141,11 +223,33 @@ public class OrientationSelector extends AppCompatActivity {
                 finish();
                 break;
             case (R.id.log_out_menu):
-                NetworkManager.getInstance().logOut();
+                logout();
                 break;
         }
 
         supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean requestAccess(){
+        if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS_ACCESS_FINE_LOCATION);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[],int[] grantResults){
+        switch (requestCode){
+            case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
+                if((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Toast.makeText(getApplicationContext(), "Access granted to TRing", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(),"Access denied",Toast.LENGTH_SHORT).show();
+                }
+        }
     }
 }
