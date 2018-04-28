@@ -83,6 +83,9 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                             mMap.setLatLngBoundsForCameraTarget(bounds);
                             mMap.moveCamera(CameraUpdateFactory.zoomOut());
                         });
+                    }else{
+                        Toast.makeText(getApplicationContext(), R.string.no_known_points_in_area, Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                     mMap.setOnMarkerClickListener(marker -> {
                         if (selectedPoints.contains(marker.getPosition())) {
