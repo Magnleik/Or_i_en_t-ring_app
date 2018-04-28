@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
@@ -61,6 +63,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private double seconds;
     private double minutes;
     private double hours;
+    private String timeTextToServer;
 
 
     private LocalDatabase localDatabase;
@@ -116,7 +119,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
-                    System.out.println(locationResult.getLastLocation().getAccuracy());
                     if (locationResult.getLastLocation().getAccuracy() <= 700 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
                     }
@@ -307,6 +309,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         //Viser tiden brukt under eventet
         seconds = getEventTime();
+        int secondsInt = (int) seconds;
+        int minutesInt = (int) minutes;
+        int hoursInt = (int) hours;
 
         if (seconds > 60) {
             //Regn om til minutter
@@ -323,6 +328,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             seconds=calculateRest(minutes);
         }
 
+        timeTextToServer = "";
+
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
         if ((seconds) != 0) {
             timeTextView.setText("Tid: " +  (int) seconds + " sekunder");
@@ -332,9 +339,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             timeTextView.setText("Tid: " + (int) minutes + "minutter " + (int) seconds + " sekunder");
         }
 
+
         if ((hours) != 0) {
             timeTextView.setText("Tid: " + (int) hours + "time " + (int) minutes + "minutter " + (int) seconds + " sekund");
+            //Fiks for timer
         }
+
+        //Tid som skal sendes til server
+        timeTextToServer = String.format("%02d:%02d:%02d",hoursInt,minutesInt,secondsInt);
+
+
         //Viser score oppnådd under eventet
         double eventScore = Math.round(getEventScore());
         String eventScoreString = Integer.toString( (int) eventScore);
@@ -342,20 +356,33 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         scoreTextView.setText(String.format(getString(R.string.total_score_formatted), eventScoreString));
 
 
-        builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //Lagre event (Tid, score og avstand?)
 
-                dialog.dismiss();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+
+        builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        NetworkManager networkManager = NetworkManager.getInstance();
+                        networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
+                            @Override
+                            public void onResponse(Event object) {
+                                Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
+
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 

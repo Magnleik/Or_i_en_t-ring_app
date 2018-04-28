@@ -56,6 +56,7 @@ public class EventAdapter extends BaseAdapter {
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.list_item_event_title);
         TextView avrageDistanceValue = (TextView) rowView.findViewById(R.id.avg_dist);
+        TextView avrageTimeTextView = (TextView) rowView.findViewById(R.id.avg_time);
 
 
 
@@ -82,9 +83,12 @@ public class EventAdapter extends BaseAdapter {
 
         };
 
+        if ((event.getProperty("avg_time") != null)) {
+
+            avrageTimeTextView.setText(event.getProperty("avg_time"));
+        }
+
         titleTextView.setText(event.getProperty("event_name"));
-
-
 
 
         return rowView;

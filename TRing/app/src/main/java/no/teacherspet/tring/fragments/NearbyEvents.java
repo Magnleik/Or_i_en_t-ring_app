@@ -187,47 +187,6 @@ public class NearbyEvents extends Fragment {
     }
 
     public void initList() {
-<<<<<<< HEAD
-        theEventReceived = new HashMap<>();
-        networkManager = NetworkManager.getInstance();
-        if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            lm = LocationServices.getFusedLocationProviderClient(this.getActivity());
-            lm.getLastLocation().addOnSuccessListener(this.getActivity(), new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        position = new LatLng(location.getLatitude(), location.getLongitude());
-                        if (!(position.longitude == 0.0 || position.latitude == 0.0)) {
-                            ICallbackAdapter<ArrayList<Event>> adapter = new ICallbackAdapter<ArrayList<Event>>() {
-                                @Override
-                                public void onResponse(ArrayList<Event> object) {
-                                    if (object == null) {
-                                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        for (int i = 0; i < object.size(); i++) {
-                                            theEventReceived.put(object.get(i).getId(), object.get(i));
-                                        }
-                                    }
-                                    listItems = new ArrayList<>();
-                                    if (theEventReceived != null) {
-                                        for (Event ev : theEventReceived.values()) {
-                                            listItems.add(ev);
-                                        }
-                                        updateList();
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Throwable t) {
-                                    Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
-                                }
-                            };
-                            networkManager.getNearbyEvents(position.latitude, position.longitude, 200, adapter);
-                        }
-                    }
-                }
-            });
-=======
         ArrayList<Event> listItems = new ArrayList<>();
         theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
@@ -238,7 +197,6 @@ public class NearbyEvents extends Fragment {
         if(!listItems.equals(this.listItems)){
             this.listItems=listItems;
             updateList();
->>>>>>> dev
         }
         //theEventReceived = new StartupMenu().getTestEvents();
 
