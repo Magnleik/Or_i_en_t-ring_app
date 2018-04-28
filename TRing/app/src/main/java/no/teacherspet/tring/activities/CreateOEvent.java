@@ -203,6 +203,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      */
     public void existingPointClicked(View v) {
         Intent intent = new Intent(CreateOEvent.this, AddExistingPoint.class);
+        intent.putExtra("map_center", mMap.getCameraPosition());
         startActivityForResult(intent, 2);
     }
 

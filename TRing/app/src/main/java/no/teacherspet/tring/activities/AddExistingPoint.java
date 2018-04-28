@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -63,57 +64,49 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getApplicationContext(), R.string.location_permission_toast, Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            lm.getLastLocation().addOnSuccessListener(location -> {
-                if (location != null) {
-                    networkManager.getNearbyPoints(location.getLatitude(), location.getLongitude(), 1000, new ICallbackAdapter<ArrayList<Point>>() {
-                        @Override
-                        public void onResponse(ArrayList<Point> object) {
-                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                            if (object != null) {
-                                if (!object.isEmpty()) {
-                                    for (Point point : object) {
-                                        mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
-                                        builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
-                                    }
-                                    Toast.makeText(getApplicationContext(), R.string.select_points_toast, Toast.LENGTH_SHORT).show();
-                                    LatLngBounds bounds = builder.build();
-
-                                    mMap.setOnMapLoadedCallback(() -> {
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-                                        mMap.setLatLngBoundsForCameraTarget(bounds);
-                                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                                    });
-                                }
-                                mMap.setOnMarkerClickListener(marker -> {
-                                    if (selectedPoints.contains(marker.getPosition())) {
-                                        selectedPoints.remove(marker.getPosition());
-                                        marker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                                        return false;
-                                    } else {
-                                        if (selectedMarker != null) {
-                                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                                        }
-                                        selectedMarker = marker;
-                                        selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                                        return true;
-                                    }
-                                });
-                            }
+        CameraPosition camPos = getIntent().getParcelableExtra("map_center");
+            networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, 1000, new ICallbackAdapter<ArrayList<Point>>() {
+            @Override
+            public void onResponse(ArrayList<Point> object) {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                if (object != null) {
+                    if (!object.isEmpty()) {
+                        for (Point point : object) {
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
+                            builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                         }
+                        Toast.makeText(getApplicationContext(), R.string.select_points_toast, Toast.LENGTH_SHORT).show();
+                        LatLngBounds bounds = builder.build();
 
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
-                            finish();
+                        mMap.setOnMapLoadedCallback(() -> {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                            mMap.setLatLngBoundsForCameraTarget(bounds);
+                            mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                        });
+                    }
+                    mMap.setOnMarkerClickListener(marker -> {
+                        if (selectedPoints.contains(marker.getPosition())) {
+                            selectedPoints.remove(marker.getPosition());
+                            marker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                            return false;
+                        } else {
+                            if (selectedMarker != null) {
+                                selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                            }
+                            selectedMarker = marker;
+                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                            return true;
                         }
                     });
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Toast.makeText(getApplicationContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
     public void addButtonClick(View v) {
