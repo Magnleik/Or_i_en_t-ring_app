@@ -88,4 +88,6 @@
     <string name="log_in_title">Logg inn</string>
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgjenge til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
+    <string name="return_to_event">Gå tilbake til løpet</string>
+    <string name="return_to_start_menu">Gå tilbake til startmenyen</string>
 </resources>

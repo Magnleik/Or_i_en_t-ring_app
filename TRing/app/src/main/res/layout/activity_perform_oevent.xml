@@ -47,5 +47,18 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/show_position_btn" />
 
+    <Button
+        android:id="@+id/start_event_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="startEventBtnPressed"
+        android:text="Start Event"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_used_in_event" />
+
 
 </android.support.constraint.ConstraintLayout>

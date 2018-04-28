@@ -91,5 +91,7 @@
     <string name="event_name_promt_toast">You must give the event a name!</string>
     <string name="must_log_in_for_access">You must log in to have access to this activity</string>
     <string name="must_log_in">You must log in</string>
+    <string name="return_to_event">Return to event</string>
+    <string name="return_to_start_menu">Return to startmenu</string>
 </resources>
 
