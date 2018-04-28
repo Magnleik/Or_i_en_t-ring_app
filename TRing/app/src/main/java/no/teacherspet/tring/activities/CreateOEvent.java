@@ -224,7 +224,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             point = mMap.addMarker(new MarkerOptions().position(location).title(name).draggable(true));
             arrayListWithCoords.add(point);
         } else {
-            point = mMap.addMarker(new MarkerOptions().position(location).title(R.string.point + " " + (arrayListWithCoords.size() + 1)).draggable(true));
+            point = mMap.addMarker(new MarkerOptions().position(location).title(getString(R.string.point) + " " + (arrayListWithCoords.size() + 1)).draggable(true));
             arrayListWithCoords.add(point);
         }
     }

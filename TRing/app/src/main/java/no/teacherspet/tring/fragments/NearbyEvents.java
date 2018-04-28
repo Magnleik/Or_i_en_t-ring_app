@@ -133,7 +133,7 @@ public class NearbyEvents extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
 
-                    Event selectedEvent = listItems.get(position);
+                    selectedEvent = listItems.get(position);
                     saveEventToRoom(selectedEvent);
                     /*
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
@@ -208,7 +208,7 @@ public class NearbyEvents extends Fragment {
                                     Toast.makeText(getContext(), R.string.could_not_connect_server, Toast.LENGTH_SHORT).show();
                                 }
                             };
-                            networkManager.getNearbyEvents(position.latitude, position.longitude, 30000, adapter);
+                            networkManager.getNearbyEvents(position.latitude, position.longitude, 3000000, adapter);
                         }
                     }
                 }

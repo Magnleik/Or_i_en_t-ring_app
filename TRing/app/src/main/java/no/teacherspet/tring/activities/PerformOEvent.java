@@ -80,6 +80,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        double startTime = getIntent().getDoubleExtra("StartTime", -1);
+        if(startTime>-1){
+            //TODO Sett startTime som starttid
+        }
+
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
         if (startedEvent != null) {
             points = readPoints();
@@ -300,6 +305,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
+
+
     /**
      * Method for updating the event to Room. To be called when starting and when finishing
      * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
@@ -326,13 +333,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             boolean start = startPoint.equals(points.get(i));
             joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited() && starting);
         }
+        Log.d("Room",String.format("Started updating %d points for event %d", joins.length, event.getId()));
         joinViewModel.addJoins(joins).subscribe(longs -> {
             if(longs[0] != -1){
                 Log.d("Room",String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
             }
         });
     }
-
     /**
      * Updates a single point to "visited" in the local database
      * @param point Point to be updated
@@ -340,14 +347,26 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void updatePoint(Point point) {
         boolean start = startedEvent.getStartPoint().equals(point);
         PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
+        Log.d("Room",String.format("Setting point %d to visited", point.getId()));
         joinViewModel.addJoins(join).subscribe(longs -> {
             if(longs[0]>0){
-                Log.d("Room",String.format("Point %d saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d updated, code: %d", point.getId(), longs[0]));
             }
             else{
-                Log.d("Room",String.format("Point %d not saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d not updated, code: %d", point.getId(), longs[0]));
             }
         });
+    }
+
+    /**
+     * Saves the start time of an event to Room
+     * @param startTime start time in seconds
+     */
+    private void saveEventStartTime(long startTime){
+        RoomOEvent event = new RoomOEvent(startedEvent.getId(), startedEvent._getAllProperties());
+        event.setActive(true);
+        event.setStartTime(startTime);
+        oEventViewModel.addOEvents(event);
     }
 
     /**
@@ -437,7 +456,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
         if (distance < 20) {
             addEventButton.setVisibility(View.GONE);
+            //TODO Ikke sett hvis startTime allerede er satt
             this.startTime = System.currentTimeMillis();
+            saveEventStartTime(startTime);
             this.eventTime = -1;
         } else {
             Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_SHORT).show();
