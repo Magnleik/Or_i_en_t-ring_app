@@ -1,9 +1,13 @@
 package no.teacherspet.tring.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,6 +46,7 @@ public class OrientationSelector extends AppCompatActivity {
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
+    private AlertDFragment alertFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,7 @@ public class OrientationSelector extends AppCompatActivity {
         continueButton.setEnabled(false);
         continueButton.setOnClickListener(v -> continueEvent());
         logInButton = (Button) findViewById(R.id.selector_log_in_btn);
+        alertFragment = new AlertDFragment();
 
         if(NetworkManager.getInstance().isAuthenticated()){
             logInButton.setEnabled(false);
@@ -138,6 +144,7 @@ public class OrientationSelector extends AppCompatActivity {
                     if (object != null) {
                         if (object) {
                             Toast.makeText(OrientationSelector.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
+                            logInButton.setEnabled(false);
                         } else {
                             userViewModel.deleteUsers(users).subscribe(integers ->{
                                     Log.d("Room",String.format("%d users deleted", users.length));
@@ -181,8 +188,15 @@ public class OrientationSelector extends AppCompatActivity {
      * @param v
      */
     public void createEvent (View v){
-        Intent intent = new Intent(OrientationSelector.this, CreateOEvent.class);
-        startActivity(intent);
+        if(NetworkManager.getInstance().isAuthenticated()) {
+            Intent intent = new Intent(OrientationSelector.this, CreateOEvent.class);
+            startActivity(intent);
+        }else{
+            if(alertFragment.isAdded()){
+                alertFragment.dismiss();
+            }
+            alertFragment.show(getSupportFragmentManager(),"must_log_in");
+        }
     }
 
     public void logInButton(View v){
@@ -221,6 +235,7 @@ public class OrientationSelector extends AppCompatActivity {
             Log.d("Room","Started checking active events");
             checkActiveEvent(roomOEvents);
         });
+        supportInvalidateOptionsMenu();
         super.onResume();
     }
 
@@ -284,6 +299,31 @@ public class OrientationSelector extends AppCompatActivity {
                 else{
                     Toast.makeText(getApplicationContext(), R.string.access_denied,Toast.LENGTH_SHORT).show();
                 }
+        }
+    }
+
+    public static class AlertDFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity())
+                    // Set Dialog Title
+                    .setTitle(R.string.must_log_in)
+                    // Set Dialog Message
+                    .setMessage(R.string.must_log_in_for_access)
+
+                    // Positive button
+                    .setPositiveButton(R.string.log_in, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            ((OrientationSelector)getActivity()).logInButton(null);
+                        }
+                    })
+
+                    // Negative Button
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,	int which) {
+                            dismiss();
+                        }
+                    }).create();
         }
     }
 }
