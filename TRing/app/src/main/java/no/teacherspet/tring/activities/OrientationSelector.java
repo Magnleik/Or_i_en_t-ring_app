@@ -34,8 +34,10 @@ import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.GeneralProgressDialog;
+import no.teacherspet.tring.util.RoomInteract;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
 
-public class OrientationSelector extends AppCompatActivity {
+public class OrientationSelector extends AppCompatActivity implements RoomInteract {
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
     private LocalDatabase localDatabase;
@@ -46,8 +48,9 @@ public class OrientationSelector extends AppCompatActivity {
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
-    private double startTime;
+    private long startTime;
     private AlertDFragment alertFragment;
+    private RoomSaveAndLoad roomSaveAndLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +58,14 @@ public class OrientationSelector extends AppCompatActivity {
         setContentView(R.layout.activity_orientation_selector);
         requestAccess();
         progressDialog = new GeneralProgressDialog(this,this);
+
+
         localDatabase = LocalDatabase.getInstance(this);
         userViewModel = new UserViewModel(localDatabase.userDAO());
         eventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+
+        roomSaveAndLoad = new RoomSaveAndLoad(getApplicationContext(), this);
 
         continueButton = (Button) findViewById(R.id.continue_button);
         continueButton.setEnabled(false);
@@ -87,50 +94,12 @@ public class OrientationSelector extends AppCompatActivity {
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
         Log.d("Room",String.format("%d active events found", activeEvents.size()));
         if(activeEvents.size() > 0){
-            RoomOEvent roomEvent = activeEvents.get(0);
-            startTime = roomEvent.getStartTime();
-            Event event = new Event();
-            event._setId(roomEvent.getId());
-            for(String key : roomEvent.getProperties().keySet()){
-                event.addProperty(key, roomEvent.getProperties().get(key));
-            }
-            joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
-                Log.d("Room",String.format("%d points found", roomPoints.size()));
-                if(roomPoints.size() > 0){
-                    joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> addPointsToEvent(event, roomPoints, joins));
-                }
-            });
+            startTime = activeEvents.get(0).getStartTime();
+            roomSaveAndLoad.reconstructEvent(activeEvents.get(0));
         }
         Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
-    private void addPointsToEvent(Event event, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
-        for (RoomPoint roomPoint : roomPoints){
-            for (PointOEventJoin join : joins){
-                if(roomPoint.getId() == join.getPointID()){
-                    Point point = setupPoint(roomPoint, join.isVisited());
-                    if(join.isStart()){
-                        Log.d("Room",String.format("Start point is point %d", join.getPointID()));
-                        event.setStartPoint(point);
-                    }
-                    else{
-                        event.addPost(point);
-                    }
-                }
-            }
-        }
-        Log.d("Room",String.format("Event %d recreated from Room", event.getId()));
-        activeEvent = event;
-        continueButton.setEnabled(true);
-    }
-    private Point setupPoint(RoomPoint roomPoint, boolean visited){
-        Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
-        point._setId(roomPoint.getId());
-        point.setVisited(visited);
-        for(String key : roomPoint.getProperties().keySet()){
-            point.addProperty(key, roomPoint.getProperties().get(key));
-        }
-        return point;
-    }
+
     //Changes to createUserActivity if a roomUser has not been created
     private void checkUser(List<RoomUser> roomUsers){
         progressDialog.show();
@@ -303,6 +272,14 @@ public class OrientationSelector extends AppCompatActivity {
                 else{
                     Toast.makeText(getApplicationContext(), R.string.access_denied,Toast.LENGTH_SHORT).show();
                 }
+        }
+    }
+
+    @Override
+    public void whenRoomFinished(Object object) {
+        if(object instanceof Event){
+            activeEvent = (Event) object;
+            continueButton.setEnabled(true);
         }
     }
 

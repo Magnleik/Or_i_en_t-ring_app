@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,16 +26,12 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
-import no.teacherspet.tring.util.RoomSaving;
-import no.teacherspet.tring.util.SaveToRoom;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
+import no.teacherspet.tring.util.RoomInteract;
 
 
 /**
@@ -47,7 +42,7 @@ import no.teacherspet.tring.util.SaveToRoom;
  * Use the {@link NearbyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NearbyEvents extends Fragment implements SaveToRoom{
+public class NearbyEvents extends Fragment implements RoomInteract {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -69,7 +64,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
 
     private OnFragmentInteractionListener mListener;
 
-    private RoomSaving roomSaving;
+    private RoomSaveAndLoad roomSaveAndLoad;
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -97,7 +92,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
-        roomSaving = new RoomSaving(getContext(), this);
+        roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -139,7 +134,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
                     selectedEvent = listItems.get(position);
-                    roomSaving.saveRoomEvent(selectedEvent);
+                    roomSaveAndLoad.saveRoomEvent(selectedEvent);
                 }
             }
 
@@ -211,7 +206,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     }
 
     @Override
-    public void whenRoomFinished(boolean savedAll) {
+    public void whenRoomFinished(Object object) {
         NetworkManager.getInstance().subscribeToEvent(selectedEvent.getId(), new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {

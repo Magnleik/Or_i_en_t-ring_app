@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 import connection.Event;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
@@ -20,12 +22,12 @@ import no.teacherspet.tring.Database.ViewModels.PointViewModel;
  * Created by Hermann on 28.04.2018.
  */
 
-public class RoomSaving {
+public class RoomSaveAndLoad {
 
     private LocalDatabase localDatabase;
-    private SaveToRoom returnClass;
+    private RoomInteract returnClass;
 
-    public RoomSaving(Context context, SaveToRoom returnClass){
+    public RoomSaveAndLoad(Context context, RoomInteract returnClass){
         localDatabase = LocalDatabase.getInstance(context);
         this.returnClass = returnClass;
     }
@@ -84,5 +86,47 @@ public class RoomSaving {
         }
         returnClass.whenRoomFinished(savedAll);
     }
+
+    public void reconstructEvent(RoomOEvent event){
+        PointOEventJoinViewModel joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+        joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
+            Log.d("Room",String.format("%d points found for event %d", roomPoints.size(), event.getId()));
+            if(roomPoints.size() > 0){
+                joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> createEvent(event, roomPoints, joins));
+            }
+        });
+    }
+    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
+        Event event = new Event();
+        event._setId(oEvent.getId());
+        for(String key : oEvent.getProperties().keySet()){
+            event.addProperty(key, oEvent.getProperties().get(key));
+        }
+        for (RoomPoint roomPoint : roomPoints){
+            for (PointOEventJoin join : joins){
+                if(roomPoint.getId() == join.getPointID()){
+                    Point point = setupPoint(roomPoint, join.isVisited());
+                    if(join.isStart()){
+                        event.setStartPoint(point);
+                    }
+                    else{
+                        event.addPost(point);
+                    }
+                }
+            }
+        }
+        Log.d("Room",String.format("Event %d created",event.getId()));
+        returnClass.whenRoomFinished(event);
+    }
+    private Point setupPoint(RoomPoint roomPoint, boolean visited){
+        Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
+        point._setId(roomPoint.getId());
+        point.setVisited(visited);
+        for(String key : roomPoint.getProperties().keySet()){
+            point.addProperty(key, roomPoint.getProperties().get(key));
+        }
+        return point;
+    }
+
 }
 

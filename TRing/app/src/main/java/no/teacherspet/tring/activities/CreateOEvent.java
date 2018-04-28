@@ -39,10 +39,10 @@ import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.R;
-import no.teacherspet.tring.util.RoomSaving;
-import no.teacherspet.tring.util.SaveToRoom;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
+import no.teacherspet.tring.util.RoomInteract;
 
-public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback, SaveToRoom {
+public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback, RoomInteract {
 
     private GoogleMap mMap;
     private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
@@ -52,7 +52,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng clickedPosition;
     private Marker startPoint;
     private Location currentLocation;
-    private RoomSaving roomSaving;
+    private RoomSaveAndLoad roomSaveAndLoad;
     private int eventID;
 
     @Override
@@ -71,7 +71,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         if (savedInstanceState != null) {
             latLngArrayList = savedInstanceState.getParcelableArrayList("points");
         }
-        roomSaving = new RoomSaving(getApplicationContext(), this);
+        roomSaveAndLoad = new RoomSaveAndLoad(getApplicationContext(), this);
     }
 
 
@@ -349,7 +349,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     } else {
                         Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
                         eventID = object.getId();
-                        roomSaving.saveRoomEvent(object);
+                        roomSaveAndLoad.saveRoomEvent(object);
 
                     }
                 }
@@ -430,7 +430,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
 
     @Override
-    public void whenRoomFinished(boolean savedAll) {
+    public void whenRoomFinished(Object savedAll) {
         NetworkManager.getInstance().subscribeToEvent(eventID, new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {
