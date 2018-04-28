@@ -363,6 +363,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
+            event.addProperty("dist", "-");
             Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
             event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
@@ -374,6 +375,20 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             }
+
+            // Kalkuler distanse
+            double distance = 0;
+
+            for (Point point : event.getPoints()) {
+                int index = event.getPoints().indexOf(point);
+                if (index == event.getPoints().size() - 1) {
+                    break;
+                }
+                distance += point.getDistanceFromPoint(new LatLng(event.getPoints().get(index + 1).getLatitude(), event.getPoints().get(index + 1).getLongitude()));
+            }
+
+            event.addProperty("dist", distance + "");
+
             networkManager = NetworkManager.getInstance();
             networkManager.addEvent(event, new ICallbackAdapter<Event>() {
                 @Override

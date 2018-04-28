@@ -57,6 +57,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     long eventTime;
     boolean savedResults = false;
     private int eventDifficultyValue;
+    private double seconds;
+    private double minutes;
+    private double hours;
 
     private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
@@ -66,6 +69,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Button mediumButton;
     private Button hardButton;
     private TextView difficultyTextView;
+    private TextView eventTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +93,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         // 1
         //TODO: Fix saving of points when phone is flipped
-        this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        if (startedEvent == null) {
+            this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        }
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
         if (startedEvent != null) {
             points = readPoints();
@@ -205,6 +211,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         mediumButton = (Button) inflator.findViewById(R.id.medium_btn);
         hardButton = (Button) inflator.findViewById(R.id.hard_btn);
         difficultyTextView = (TextView) inflator.findViewById(R.id.difficulty_textview);
+        eventTitle = (TextView) inflator.findViewById(R.id.eventStartedTitle);
+        if (startedEvent == null) {
+            this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        }
+        eventTitle.setText(startedEvent.getProperty("event_name"));
 
         setEventDifficulty("easy");
 
@@ -254,19 +265,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             case "easy":
                 this.eventDifficultyValue = 8;
                 this.difficultyTextView.setText("Lett");
-                this.difficultyTextView.setBackgroundColor(Color.GREEN);
+                this.difficultyTextView.setBackgroundColor(Color.parseColor("#80228B22"));
                 break;
 
             case "medium":
                 this.eventDifficultyValue = 12;
                 this.difficultyTextView.setText("Medium");
-                this.difficultyTextView.setBackgroundColor(Color.YELLOW);
+                this.difficultyTextView.setBackgroundColor(Color.parseColor("#99e5e500"));
                 break;
 
             case "hard":
                 this.eventDifficultyValue = 16;
                 this.difficultyTextView.setText("Vanskelig");
-                this.difficultyTextView.setBackgroundColor(Color.RED);
+                this.difficultyTextView.setBackgroundColor(Color.parseColor("#B3b20000"));
                 break;
 
         }
@@ -281,14 +292,39 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         builder.setView(inflator);
 
         //Viser tiden brukt under eventet
-        double eventTime = getEventTime();
-        String eventTimeString = Double.toString(eventTime);
+        seconds = getEventTime();
+
+        if (seconds > 60) {
+            //Regn om til minutter
+            minutes = calculate(eventTime);
+            seconds = calculateRest(eventTime);
+
+        }
+
+        if (minutes > 60) {
+            //Regn om til timer
+
+            hours = calculate(minutes);
+            minutes=calculateRest(minutes);
+            seconds=calculateRest(minutes);
+        }
+
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText("Tid: " + eventTimeString + " sekunder");
+        if ((seconds) != 0) {
+            timeTextView.setText("Tid: " +  (int) seconds + " sekunder");
+        }
+
+        if ((minutes) != 0) {
+            timeTextView.setText("Tid: " + (int) minutes + "minutter " + (int) seconds + " sekunder");
+        }
+
+        if ((hours) != 0) {
+            timeTextView.setText("Tid: " + (int) hours + "time " + (int) minutes + "minutter " + (int) seconds + " sekund");
+        }
 
         //Viser score oppnådd under eventet
-        double eventScore = getEventScore();
-        String eventScoreString = Double.toString(eventScore);
+        double eventScore = Math.round(getEventScore());
+        String eventScoreString = Integer.toString( (int) eventScore);
         TextView scoreTextView = (TextView) inflator.findViewById(R.id.scoreTextView);
         scoreTextView.setText("Total score: " + eventScoreString);
 
@@ -472,7 +508,18 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             long difference = System.currentTimeMillis() - this.startTime;
             this.eventTime = (difference / 1000) ; //seconds
         }
+
         return eventTime;
+    }
+
+    public double calculate(double eventTime) {
+        eventTime = Math.round(eventTime/60);
+        return eventTime;
+    }
+
+    public double calculateRest(double eventTime) {
+        double eventTimeRest = Math.round(eventTime%60);
+        return eventTimeRest;
     }
 
     public double getEventScore() {

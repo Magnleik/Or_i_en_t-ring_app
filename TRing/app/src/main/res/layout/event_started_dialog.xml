@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/eventStartTitle"
+        android:id="@+id/eventStartedTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -36,24 +36,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimary"
-            android:text="Lett"
-            />
+            android:background="#80228B22"
+            android:text="Lett" />
 
         <Button
             android:id="@+id/medium_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_orange_light"
-            android:text="Medium"
-            />
+            android:background="#99e5e500"
+            android:text="Medium" />
 
         <Button
             android:id="@+id/hard_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:background="@color/colorAccent"
+            android:background="#B3b20000"
             android:text="Vanskelig" />
 
         <LinearLayout
