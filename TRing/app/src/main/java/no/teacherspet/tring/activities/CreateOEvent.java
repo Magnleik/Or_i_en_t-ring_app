@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,26 +109,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-                Boolean hasPosition = false;
-                while (!hasPosition) {
-                    if (currentLocation != null) {
-                        hasPosition = true;
-                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
-
-                    }
-                    break;
+                long startTime = System.currentTimeMillis();
+                if (currentLocation != null) {
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+                }
+                if (System.currentTimeMillis() - startTime >= 5000) {
+                    Toast.makeText(CreateOEvent.this, "Could not find position", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         if ((latLngArrayList.size() > 0) && (arrayListWithCoords.size() == 0)) {
             for (LatLng latlng : latLngArrayList) {
-                Marker Point = mMap.addMarker(new MarkerOptions().position(latlng).title("Punkt " + (arrayListWithCoords.size() + 1)));
+                Marker Point = mMap.addMarker(new MarkerOptions().position(latlng).title(R.string.point + " " + (arrayListWithCoords.size() + 1)));
                 arrayListWithCoords.add(Point);
             }
         }
-        Toast.makeText(getApplicationContext(), "Klikk på kartet for å legge til punkter.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.click_map_add_points_toast, Toast.LENGTH_SHORT).show();
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             public void onMapClick(LatLng latLng) {
@@ -146,15 +145,15 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
     public void openAddDialog(Marker marker, LatLng position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Legg til nytt punkt");
+        builder.setTitle(R.string.add_new_point);
         EditText input = new EditText(this);
-        input.setHint("Navn");
+        input.setHint(R.string.name);
         if (marker != null) {
-            builder.setTitle("Endre navn");
+            builder.setTitle(R.string.change_name);
             input.setText(marker.getTitle());
         }
         builder.setView(input);
-        builder.setPositiveButton("Legg til", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (marker != null) {
@@ -169,7 +168,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 dialog.dismiss();
             }
         });
-        builder.setNegativeButton("Avbryt", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -182,7 +181,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     public void openEditDialog(Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(marker.getTitle());
-        CharSequence[] elements = {"Sett som startpunkt", "Rediger", "Slett"};
+        CharSequence[] elements = {getString(R.string.set_as_startpoint), getString(R.string.edit), getString(R.string.delete)};
         builder.setItems(elements, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -237,7 +236,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             point = mMap.addMarker(new MarkerOptions().position(location).title(name).draggable(true));
             arrayListWithCoords.add(point);
         } else {
-            point = mMap.addMarker(new MarkerOptions().position(location).title("Punkt " + (arrayListWithCoords.size() + 1)).draggable(true));
+            point = mMap.addMarker(new MarkerOptions().position(location).title(getString(R.string.point) + " " + (arrayListWithCoords.size() + 1)).draggable(true));
             arrayListWithCoords.add(point);
         }
     }
@@ -255,7 +254,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             //TODO hent ut navn til ulike markers
             addNewMarker(null, position);
         }
-        Toast.makeText(getApplicationContext(), "Added " + positions.size() + " points.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.added)+ " " + positions.size() + " " + getString(R.string.points) +".", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -279,8 +278,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * creates a locationRequest to update the CurrentLocation variable as often as possible. If a reading is to inaccurate, it will discard it
      */
     private void createLocationRequest() {
-        FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
-        locationRequest = new LocationRequest();
+
+        final Boolean[] hasFocused = {true};
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
+            locationRequest = new LocationRequest();
+
             locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
             LocationCallback mLocationCallback = new LocationCallback() {
@@ -291,40 +294,19 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     if (locationResult.getLastLocation().getAccuracy() <= 500 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
                     }
-                }
-            };
-
-            LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-
-            SettingsClient client = LocationServices.getSettingsClient(this);
-            Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-            task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-                @Override
-                public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
-                } else {
-                    Toast.makeText(getApplicationContext(), "You need to give the app location permission.", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            };
-
-
-        });
-            task.addOnFailureListener(this, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    if (e instanceof ResolvableApiException) {
-                        try {
-                            ResolvableApiException resolvable = (ResolvableApiException) e;
-                            resolvable.startResolutionForResult(CreateOEvent.this,0x1);
-                        } catch (IntentSender.SendIntentException sendEx) {
-
-                        }
-
+                    if (mMap != null && hasFocused[0]) {
+                        hasFocused[0] = false;
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15.0f));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
                     }
                 }
-            });
+            };
+
+            lm.requestLocationUpdates(locationRequest, mLocationCallback, getMainLooper());
+        } else {
+            Toast.makeText(getApplicationContext(), R.string.location_permission_prompt_toast, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     /**
@@ -333,18 +315,23 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param v Button that fires the method
      */
     public void addMarkerMyPosition(View v) {
-        boolean shouldAdd = true;
-        Location markerLocation;
-        for (Marker marker : arrayListWithCoords) {
-            markerLocation = new Location("");
-            markerLocation.setLatitude(marker.getPosition().latitude);
-            markerLocation.setLongitude(marker.getPosition().longitude);
-            if (currentLocation.distanceTo(markerLocation) <= 5) {
-                shouldAdd = false;
+        if(currentLocation!=null) {
+            boolean shouldAdd = true;
+            Location markerLocation;
+            for (Marker marker : arrayListWithCoords) {
+                markerLocation = new Location("");
+                markerLocation.setLatitude(marker.getPosition().latitude);
+                markerLocation.setLongitude(marker.getPosition().longitude);
+                if (currentLocation.distanceTo(markerLocation) <= 5) {
+                    shouldAdd = false;
+                }
+            }
+            if (shouldAdd) {
+                addNewMarker(null, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
             }
         }
-        if (shouldAdd) {
-            arrayListWithCoords.add(mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Punkt " + arrayListWithCoords.size() + 1)));
+        else{
+            Toast.makeText(getApplicationContext(),"Position not yet found",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -356,14 +343,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     public void saveEvent(View v) {
         EditText eventTitleField = (EditText) findViewById(R.id.create_event_name);
         if (eventTitleField.getText().toString().isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Du må gi løpet et navn!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.event_name_promt_toast, Toast.LENGTH_SHORT).show();
         } else if (startPoint == null) {
-            Toast.makeText(getApplicationContext(), "Du må velge et startpunkt!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.event_startpoint_prompt_toast, Toast.LENGTH_SHORT).show();
         } else {
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
-            event.addProperty("dist", "-");
             Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
             event.setStartPoint(sp);
             for (Marker marker : arrayListWithCoords) {
@@ -394,9 +380,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onResponse(Event object) {
                     if (object == null) {
-                        Toast.makeText(getApplicationContext(), "Failed to create event.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.failed_create_event_toast, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Event: " + event.getProperty("event_name") + " added.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
                         saveEventToRoom(object);
                         finish();
                     }
@@ -404,7 +390,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
                 @Override
                 public void onFailure(Throwable t) {
-                    Toast.makeText(getApplicationContext(), "Couldn't connect to internet", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), R.string.couldnt_connect_to_net, Toast.LENGTH_SHORT).show();
                 }
             });
             //StartupMenu.addEvent(event);
@@ -424,10 +410,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         pointViewModel = new PointViewModel(localDatabase.pointDAO());
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
 
+        Log.d("Room", "Started saving event");
         RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> savePoints(event));
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
+            Log.d("Room", String.format("Event %d saved", event.getId()));
+            savePoints(event);
+        });
     }
-
     private void savePoints(Event event) {
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
@@ -435,9 +424,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
             roomPoints[i] = roomPoint;
         }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> joinPointsToEvent(event));
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
+            Log.d("Room", String.format("%d points saved", longs.length));
+            joinPointsToEvent(event);
+        });
     }
-
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
@@ -455,10 +446,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
             */
 
+
         }
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
-
     private void checkSave(long[] longs) {
         boolean savedAll = true;
         for (long aLong : longs) {
@@ -467,9 +458,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         if (savedAll) {
-            Toast.makeText(this, "Save to phone successfull", Toast.LENGTH_SHORT).show();
+            Log.d("Room", String.format("%d joins saved", longs.length));
+            Toast.makeText(this, R.string.phone_save_success, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.phone_save_unsuccess, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -505,7 +497,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
-        if(!NetworkManager.getInstance().isAuthenticated()){
+        if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
 

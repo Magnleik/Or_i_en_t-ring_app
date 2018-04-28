@@ -1,14 +1,15 @@
 package no.teacherspet.tring.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +18,21 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import connection.Event;
-import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
+import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -47,6 +53,7 @@ public class NearbyEvents extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private ListOfSavedEvents parent;
     private Event selectedEvent;
     private ListView mListView;
     private HashMap<Integer, Event> theEventReceived;
@@ -54,12 +61,18 @@ public class NearbyEvents extends Fragment {
     private FusedLocationProviderClient lm;
     private LatLng position;
     private ArrayList<Event> listItems;
+    BroadcastReceiver mReciever;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private LocalDatabase localDatabase;
+    private PointViewModel pointViewModel;
+    private OEventViewModel oEventViewModel;
+    private PointOEventJoinViewModel pointOEventJoinViewModel;
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -86,8 +99,7 @@ public class NearbyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HashMap<Integer, Event> theEventReceived = new HashMap<>();
-        networkManager=NetworkManager.getInstance();
+        networkManager = NetworkManager.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -102,11 +114,21 @@ public class NearbyEvents extends Fragment {
     }
 
 
-
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        initList();
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Løp i nærheten");
+        mReciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())){
+                    initList();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ListOfSavedEvents.ACTION_LIST_LOADED);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever,filter);
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
@@ -119,16 +141,13 @@ public class NearbyEvents extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
 
-                    Event selectedEvent = listItems.get(position);
-
-                    // 2
+                    selectedEvent = listItems.get(position);
+                    saveEventToRoom(selectedEvent);
+                    /*
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
-
-                    // 3
                     detailIntent.putExtra("MyEvent", selectedEvent);
-
-                    // 4
                     startActivity(detailIntent);
+                    */
                 }
             }
 
@@ -137,6 +156,10 @@ public class NearbyEvents extends Fragment {
 
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -148,6 +171,7 @@ public class NearbyEvents extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        parent = (ListOfSavedEvents) getActivity();
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -163,6 +187,7 @@ public class NearbyEvents extends Fragment {
     }
 
     public void initList() {
+<<<<<<< HEAD
         theEventReceived = new HashMap<>();
         networkManager = NetworkManager.getInstance();
         if (ContextCompat.checkSelfPermission(this.getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -202,6 +227,18 @@ public class NearbyEvents extends Fragment {
                     }
                 }
             });
+=======
+        ArrayList<Event> listItems = new ArrayList<>();
+        theEventReceived = parent.getEvents();
+        if (theEventReceived != null) {
+            for (Event ev : theEventReceived.values()) {
+                listItems.add(ev);
+            }
+        }
+        if(!listItems.equals(this.listItems)){
+            this.listItems=listItems;
+            updateList();
+>>>>>>> dev
         }
         //theEventReceived = new StartupMenu().getTestEvents();
 
@@ -210,6 +247,75 @@ public class NearbyEvents extends Fragment {
     private void updateList() {
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
+    }
+
+    /**
+     * Saves the Event and corresponding Points, and adds connections between them in the Room database
+     * Makes sure that events and points are saved before the connections are saved. The next step
+     * is only called after the previous is finished.
+     */
+    //TODO Call when user wants to save event from server to Room
+    private void saveEventToRoom(Event event) {
+        localDatabase = LocalDatabase.getInstance(this.getContext());
+        pointViewModel = new PointViewModel(localDatabase.pointDAO());
+        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
+
+        Log.d("Room", "Started saving event");
+        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
+        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
+            Log.d("Room", String.format("Event %d saved", event.getId()));
+            savePoints(event);
+        });
+    }
+    private void savePoints(Event event) {
+        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
+            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
+            roomPoints[i] = roomPoint;
+        }
+        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
+            Log.d("Room", String.format("%d points saved", longs.length));
+            joinPointsToEvent(event);
+        });
+    }
+    private void joinPointsToEvent(Event event) {
+        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
+        for (int i = 0; i < event.getPoints().size(); i++) {
+            Point point = event.getPoints().get(i);
+            boolean start = i == 0;
+            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
+        }
+        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
+    }
+    private void checkSave(long[] longs) {
+        boolean savedAll = true;
+        for (long aLong : longs) {
+            if (aLong < 0) {
+                savedAll = false;
+            }
+        }
+        if (savedAll) {
+            Toast.makeText(this.getContext(), "Save to phone successfull", Toast.LENGTH_SHORT).show();
+            Log.d("Room", String.format("%d joins saved", longs.length));
+        } else {
+            Toast.makeText(this.getContext(), "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
+        }
+        Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
+        detailIntent.putExtra("MyEvent", selectedEvent);
+        startActivity(detailIntent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(mReciever);
     }
 
     /**

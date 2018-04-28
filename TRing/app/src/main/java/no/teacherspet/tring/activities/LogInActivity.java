@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +40,7 @@ public class LogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(R.string.log_in_title);
         username = (EditText) findViewById(R.id.login_username);
         password = (EditText) findViewById(R.id.login_password);
         logInBtn = (Button) findViewById(R.id.login_btn);
@@ -68,24 +70,24 @@ public class LogInActivity extends AppCompatActivity {
                 if (object!=null && object){
 
                     if(NetworkManager.getInstance().isAuthenticated()) {
-                        Toast.makeText(LogInActivity.this, "Successfully logged in", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LogInActivity.this, R.string.successfully_logged_in, Toast.LENGTH_LONG).show();
 
                         saveCredentialsToLocal();
 
                         finish();
 
                     }else{
-                        Toast.makeText(LogInActivity.this, "User verified, but log in failed", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LogInActivity.this, R.string.user_verified_login_failed, Toast.LENGTH_LONG).show();
 
                         logInBtn.setEnabled(true);
                     }
 
                 }else if(object==null){
-                    Toast.makeText(LogInActivity.this, "Something went wrong on the server", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_LONG).show();
 
                     logInBtn.setEnabled(true);
                 }else{
-                    Toast.makeText(LogInActivity.this, "Wrong log in credentials", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LogInActivity.this, R.string.wrong_login_credentials, Toast.LENGTH_LONG).show();
 
                     logInBtn.setEnabled(true);
                 }
@@ -98,7 +100,7 @@ public class LogInActivity extends AppCompatActivity {
                 progressDialog.hide();
                 logInBtn.setEnabled(true);
 
-                Toast.makeText(LogInActivity.this, "FAILURE: Something went wrong on the server, please try again", Toast.LENGTH_LONG).show();
+                Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_LONG).show();
 
             }
         });
@@ -110,10 +112,14 @@ public class LogInActivity extends AppCompatActivity {
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
         userViewModel.getAllUsers().subscribe(roomUsers -> {
             if (roomUsers.size() > 0) {
-                userViewModel.deleteUsers(roomUsers.get(0))
-                        .subscribe(longs->{
-                                userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
-                                });
+                RoomUser[] users = new RoomUser[roomUsers.size()];
+                for (int i = 0; i < roomUsers.size(); i++) {
+                    users[i] = roomUsers.get(i);
+                }
+                userViewModel.deleteUsers(users).subscribe(longs->{
+                    Log.d("Room",String.format("%d users deleted",users.length));
+                    userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
+                });
             }
             else{
                 userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
@@ -123,11 +129,12 @@ public class LogInActivity extends AppCompatActivity {
     }
     private void checkResult(long[] longs){
         if(longs[0] < 0){
-            Toast.makeText(this, "Something went wrong when saving the user locally", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
             //saveCredentialsToLocal();
         }
         else{
-            Toast.makeText(this, "User saved locally", Toast.LENGTH_SHORT).show();
+            Log.d("Room","User token saved");
+            Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
         }
     }
 

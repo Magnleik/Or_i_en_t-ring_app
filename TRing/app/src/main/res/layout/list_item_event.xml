@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toStartOf="@+id/avg_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Navn" />
+        tools:text="@string/name" />
 
     <TextView
         android:id="@+id/avg_time_title"
@@ -28,7 +28,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_marginEnd="12dp"
-        android:text="Avg time:"
+        android:text="@string/avg_time"
         app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteY="231dp" />
 
@@ -52,7 +52,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginEnd="12dp"
         android:layout_toStartOf="@+id/avg_time_title"
-        android:text="Distance:"
+        android:text="@string/distance"
         app:layout_constraintEnd_toStartOf="@+id/avg_time_title"
         tools:layout_editor_absoluteY="231dp" />
 

@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:onClick="showLocationButtonPressed"
-        android:text="Vis min posisjon"
+        android:text="@string/show_my_position"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/test_position_btn"
         app:layout_constraintHorizontal_bias="0.5"
@@ -40,11 +40,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Eg trur eg e framme"
+        android:text="@string/i_think_ive_arrived"
         android:onClick="onArrivedBtnPressed"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/show_position_btn" />
+
 
 </android.support.constraint.ConstraintLayout>
