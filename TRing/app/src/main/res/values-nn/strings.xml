@@ -18,8 +18,8 @@
     <string name="log_in">Logg inn</string>
     <string name="create_new">Lag ny</string>
     <string name="perform_event">Gjennomfør laup</string>
-    <string name="create_new_event">Lag nytt løp</string>
-    <string name="continue_last_event">Fortset førre løp</string>
+    <string name="create_new_event">Lag nytt laup</string>
+    <string name="continue_last_event">Fortset førre laup</string>
     <string name="show_my_position">Vis posisjonen min</string>
     <string name="i_think_ive_arrived">Eg trur eg er framme</string>
     <string name="start_event">Start laup</string>
@@ -44,7 +44,7 @@
     <string name="event_name_promt_toast">Du må gje løpet eit namn!</string>
     <string name="access_denied">Ingen tilgjenge</string>
     <string name="access_granted_to_TRing">Tilgjenge gjeve for TRing</string>
-    <string name="active_events_formatted">Aktive løp: %d</string>
+    <string name="active_events_formatted">Aktive laup: %d</string>
     <string name="added">Lagt til</string>
     <string name="location_permission_toast">Appen krev tilgjenge til posisjonsdata for å køyra</string>
     <string name="couldnt_connect_to_net">Kunne ikkje kopla til nettet</string>
@@ -53,9 +53,9 @@
     <string name="event_added_formated">Laup: %s lagt til.</string>
     <string name="event_deleted">Laup sletta</string>
     <string name="event_updated">Laup oppdatert</string>
-    <string name="failed_create_event_toast">Kunne ikkje laga løp</string>
+    <string name="failed_create_event_toast">Kunne ikkje laga laup</string>
     <string name="failed_log_in">Logg inn feila</string>
-    <string name="found_no_locally_saved_events">Ingen lokalt lagra løp</string>
+    <string name="found_no_locally_saved_events">Ingen lokalt lagra laup</string>
     <string name="logged_in">Logga inn</string>
     <string name="logout_successful">Logga ut</string>
     <string name="nearby_events">Laup i nærleiken</string>
