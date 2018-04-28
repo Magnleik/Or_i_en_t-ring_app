@@ -25,10 +25,6 @@ import java.util.HashMap;
 
 import connection.Event;
 import connection.NetworkManager;
-import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
@@ -37,6 +33,8 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.RoomSaving;
+import no.teacherspet.tring.util.SaveToRoom;
 
 
 /**
@@ -47,7 +45,7 @@ import no.teacherspet.tring.util.EventAdapter;
  * Use the {@link NearbyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NearbyEvents extends Fragment {
+public class NearbyEvents extends Fragment implements SaveToRoom{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -69,10 +67,7 @@ public class NearbyEvents extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private LocalDatabase localDatabase;
-    private PointViewModel pointViewModel;
-    private OEventViewModel oEventViewModel;
-    private PointOEventJoinViewModel pointOEventJoinViewModel;
+    private RoomSaving roomSaving;
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -100,6 +95,7 @@ public class NearbyEvents extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
+        roomSaving = new RoomSaving(getContext(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -140,14 +136,8 @@ public class NearbyEvents extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
-
                     selectedEvent = listItems.get(position);
-                    saveEventToRoom(selectedEvent);
-                    /*
-                    Intent detailIntent = new Intent(context, PerformOEvent.class);
-                    detailIntent.putExtra("MyEvent", selectedEvent);
-                    startActivity(detailIntent);
-                    */
+                    roomSaving.saveRoomEvent(selectedEvent);
                 }
             }
 
@@ -207,64 +197,6 @@ public class NearbyEvents extends Fragment {
         mListView.setAdapter(eventAdapter);
     }
 
-    /**
-     * Saves the Event and corresponding Points, and adds connections between them in the Room database
-     * Makes sure that events and points are saved before the connections are saved. The next step
-     * is only called after the previous is finished.
-     */
-    //TODO Call when user wants to save event from server to Room
-    private void saveEventToRoom(Event event) {
-        localDatabase = LocalDatabase.getInstance(this.getContext());
-        pointViewModel = new PointViewModel(localDatabase.pointDAO());
-        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
-
-        Log.d("Room", "Started saving event");
-        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
-            Log.d("Room", String.format("Event %d saved", event.getId()));
-            savePoints(event);
-        });
-    }
-    private void savePoints(Event event) {
-        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
-            roomPoints[i] = roomPoint;
-        }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
-            Log.d("Room", String.format("%d points saved", longs.length));
-            joinPointsToEvent(event);
-        });
-    }
-    private void joinPointsToEvent(Event event) {
-        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
-        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            boolean start = i == 0;
-            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
-        }
-        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
-    }
-    private void checkSave(long[] longs) {
-        boolean savedAll = true;
-        for (long aLong : longs) {
-            if (aLong < 0) {
-                savedAll = false;
-            }
-        }
-        if (savedAll) {
-            Toast.makeText(this.getContext(), "Save to phone successfull", Toast.LENGTH_SHORT).show();
-            Log.d("Room", String.format("%d joins saved", longs.length));
-        } else {
-            Toast.makeText(this.getContext(), "Save to phone unsuccessfull", Toast.LENGTH_SHORT).show();
-        }
-        Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
-        detailIntent.putExtra("MyEvent", selectedEvent);
-        startActivity(detailIntent);
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -274,6 +206,14 @@ public class NearbyEvents extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(mReciever);
+    }
+
+    @Override
+    public void whenRoomFinished(boolean savedAll) {
+        Toast.makeText(parent, "Event saved", Toast.LENGTH_SHORT).show();
+        Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
+        detailIntent.putExtra("MyEvent", selectedEvent);
+        startActivity(detailIntent);
     }
 
     /**

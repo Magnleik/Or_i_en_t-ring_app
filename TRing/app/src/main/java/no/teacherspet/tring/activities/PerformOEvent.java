@@ -376,7 +376,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             Log.d("Room",String.format("Found %d active events", roomOEvents.size()));
             for (RoomOEvent event : roomOEvents){
                 if(event.getId() != activeEvent.getId()){
-                    Log.d("Room",String.format("Resetting event %d", event.getId()));
+                    Log.d("Room",String.format("Setting event %d to not active", event.getId()));
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins ->
                             resetEvent(new RoomOEvent(event.getId(), event.getProperties()), joins));
                 }
@@ -391,11 +391,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
         Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
+        Log.d("Room", String.format("Event: eID: %d, active: %b", event.getId(), event.isActive()));
         oEventViewModel.addOEvents(event).subscribe(longs -> {
-            for (PointOEventJoin join : joins){
-                PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
-                joinViewModel.addJoins(newJoin);
+            PointOEventJoin[] joinArray = new PointOEventJoin[joins.size()];
+            for (int i = 0; i < joins.size(); i++) {
+                joinArray[i] = new PointOEventJoin(joins.get(i).pointID, joins.get(i).oEventID, joins.get(i).isStart(), false);
+                Log.d("Room", String.format("Join: pID: %d, eID %d, Start %b, Visited %b",
+                        joinArray[i].getPointID(), joinArray[i].getoEventID(), joinArray[i].isStart(), joinArray[i].isVisited()));
             }
+            joinViewModel.addJoins(joinArray).subscribe(longs1 -> Log.d("Room", String.format("%d points updated", longs1.length)));
             Log.d("Room",String.format("Event %d set to not active", event.getId()));
         });
     }

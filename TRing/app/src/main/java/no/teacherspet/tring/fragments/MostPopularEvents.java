@@ -33,6 +33,8 @@ import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
 import no.teacherspet.tring.util.EventComparator;
+import no.teacherspet.tring.util.RoomSaving;
+import no.teacherspet.tring.util.SaveToRoom;
 
 
 /**
@@ -43,7 +45,7 @@ import no.teacherspet.tring.util.EventComparator;
  * Use the {@link MostPopularEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MostPopularEvents extends Fragment {
+public class MostPopularEvents extends Fragment implements SaveToRoom{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,6 +66,7 @@ public class MostPopularEvents extends Fragment {
     private ArrayList<Event> listItems;
 
     private OnFragmentInteractionListener mListener;
+    private RoomSaving roomSaving;
 
     public MostPopularEvents() {
         // Required empty public constructor
@@ -90,6 +93,7 @@ public class MostPopularEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        roomSaving = new RoomSaving(getContext(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -163,27 +167,17 @@ public class MostPopularEvents extends Fragment {
 
 
 
-
-        final Context context = this.getContext();
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
+                    //Save event to room, then start activity
+                    selectedEvent = listItems.get(position);
+                    roomSaving.saveRoomEvent(selectedEvent);
 
-                    Event selectedEvent = listItems.get(position);
-
-                    // 2
-                    Intent detailIntent = new Intent(context, PerformOEvent.class);
-
-                    // 3
-                    detailIntent.putExtra("MyEvent", selectedEvent);
-
-                    // 4
-                    startActivity(detailIntent);
                 }
             }
-
         });
 
 
@@ -212,6 +206,13 @@ public class MostPopularEvents extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void whenRoomFinished(boolean savedAll) {
+        Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
+        detailIntent.putExtra("MyEvent", selectedEvent);
+        startActivity(detailIntent);
     }
 
     /**
