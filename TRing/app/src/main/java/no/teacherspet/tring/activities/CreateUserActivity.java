@@ -70,26 +70,26 @@ public class CreateUserActivity extends AppCompatActivity {
 
                 if(object!=null && object){
                     //Successfully created user. Should probably redirect to the main view.
-                    Toast.makeText(CreateUserActivity.this, R.string.new_user_created,Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.new_user_created,Toast.LENGTH_SHORT).show();
 
                     if (NetworkManager.getInstance().isAuthenticated()){
-                        Toast.makeText(CreateUserActivity.this, R.string.logged_in, Toast.LENGTH_LONG).show();
+                        Toast.makeText(CreateUserActivity.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
 
                         saveCredentialsToLocal();
                         backToMain();
 
                     }else{
-                        Toast.makeText(CreateUserActivity.this, R.string.failed_log_in, Toast.LENGTH_LONG).show();
+                        Toast.makeText(CreateUserActivity.this, R.string.failed_log_in, Toast.LENGTH_SHORT).show();
                         finish(); //Send to log in
                     }
 
 
                 }
                 else if(object==null){
-                    Toast.makeText(CreateUserActivity.this, R.string.something_wrong_on_server_try_again,Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.something_wrong_on_server_try_again,Toast.LENGTH_SHORT).show();
                     saveButton.setEnabled(true);
                 }else{
-                    Toast.makeText(CreateUserActivity.this, R.string.username_might_be_taken,Toast.LENGTH_LONG).show();
+                    Toast.makeText(CreateUserActivity.this, R.string.username_might_be_taken,Toast.LENGTH_SHORT).show();
                     saveButton.setEnabled(true);
                 }
             }
@@ -98,7 +98,7 @@ public class CreateUserActivity extends AppCompatActivity {
             public void onFailure(Throwable t) {
 
                 progressDialog.hide();
-                Toast.makeText(CreateUserActivity.this,R.string.something_wrong_on_server_try_again,Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateUserActivity.this,R.string.something_wrong_on_server_try_again,Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -107,11 +107,11 @@ public class CreateUserActivity extends AppCompatActivity {
     //FIXME: Change this to work for new implementation
     private void changeActivity(long[] longs){
         if(longs[0] >= 0){
-            Toast.makeText(this, R.string.user_successfully_saved, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.user_successfully_saved, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, MapsActivity.class));
         }
         else{
-            Toast.makeText(this, R.string.something_wrong_try_again, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.something_wrong_try_again, Toast.LENGTH_SHORT).show();
             saveButton.setEnabled(true);
         }
     }
@@ -149,7 +149,7 @@ public class CreateUserActivity extends AppCompatActivity {
                 createUser();
             }
             else{
-                Toast.makeText(CreateUserActivity.this, R.string.password_do_not_match,Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateUserActivity.this, R.string.password_do_not_match,Toast.LENGTH_SHORT).show();
             }
         }
         else{
