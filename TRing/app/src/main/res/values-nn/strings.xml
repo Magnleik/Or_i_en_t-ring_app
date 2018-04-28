@@ -89,4 +89,5 @@
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgjenge til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
     <string name="no_known_points_in_area">Det er ingen kjende punkt i dette området</string>
+    <string name="pos_not_yet_found">Posisjon er endå ikkje funnen</string>
 </resources>
