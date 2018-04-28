@@ -120,7 +120,7 @@ public class MostPopularEvents extends Fragment {
                                 @Override
                                 public void onResponse(ArrayList<Event> object) {
                                     if (object == null) {
-                                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
                                     } else {
                                         for (int i = 0; i < object.size(); i++) {
                                             theEventReceived.put(object.get(i).getId(), object.get(i));
@@ -137,7 +137,7 @@ public class MostPopularEvents extends Fragment {
 
                                 @Override
                                 public void onFailure(Throwable t) {
-                                    Toast.makeText(getContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), R.string.could_not_connect_server, Toast.LENGTH_SHORT).show();
                                 }
                             };
                             networkManager.getNearbyEvents(position.latitude, position.longitude, 3, adapter);
@@ -158,7 +158,7 @@ public class MostPopularEvents extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.popular_events_list);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
         initList();
 
 
