@@ -98,6 +98,7 @@ public class MyEvents extends Fragment implements SaveToRoom{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        listItems = new ArrayList<>();
         roomSaving = new RoomSaving(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
@@ -202,7 +203,6 @@ public class MyEvents extends Fragment implements SaveToRoom{
      * room database and create a new event from it
      */
     private void loadData() {
-        listItems = new ArrayList<>();
         database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());

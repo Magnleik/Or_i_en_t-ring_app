@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
@@ -52,6 +53,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private Marker startPoint;
     private Location currentLocation;
     private RoomSaving roomSaving;
+    private int eventID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -346,10 +348,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                         Toast.makeText(getApplicationContext(), R.string.failed_create_event_toast, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
-
+                        eventID = object.getId();
                         roomSaving.saveRoomEvent(object);
-                        //TODO Call and subscribe to event
-                        finish();
+
                     }
                 }
 
@@ -430,6 +431,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void whenRoomFinished(boolean savedAll) {
+        NetworkManager.getInstance().subscribeToEvent(eventID, new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
+                }
+                else {
+                    Log.d("Subscribe", "List<Event> is null");
+                }
+                finish();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", t.getMessage());
+                finish();
+            }
+        });
 
     }
 }

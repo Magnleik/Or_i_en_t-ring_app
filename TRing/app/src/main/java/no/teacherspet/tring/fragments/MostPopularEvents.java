@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
@@ -210,6 +212,27 @@ public class MostPopularEvents extends Fragment implements SaveToRoom{
 
     @Override
     public void whenRoomFinished(boolean savedAll) {
+        NetworkManager.getInstance().subscribeToEvent(selectedEvent.getId(), new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
+                }
+                else {
+                    Log.d("Subscribe", "List<Event> is null");
+                }
+                startEvent();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", t.getMessage());
+                startEvent();
+            }
+        });
+    }
+    private void startEvent(){
+        Log.d("Room", String.format("Event %d saved", selectedEvent.getId()));
         Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
         detailIntent.putExtra("MyEvent", selectedEvent);
         startActivity(detailIntent);

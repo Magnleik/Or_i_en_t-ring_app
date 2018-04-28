@@ -22,8 +22,10 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
@@ -210,7 +212,27 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
 
     @Override
     public void whenRoomFinished(boolean savedAll) {
-        Toast.makeText(parent, "Event saved", Toast.LENGTH_SHORT).show();
+        NetworkManager.getInstance().subscribeToEvent(selectedEvent.getId(), new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
+                }
+                else {
+                    Log.d("Subscribe", "List<Event> is null");
+                }
+                startEvent();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", t.getMessage());
+                startEvent();
+            }
+        });
+    }
+    private void startEvent(){
+        Log.d("Room", String.format("Event %d saved", selectedEvent.getId()));
         Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
         detailIntent.putExtra("MyEvent", selectedEvent);
         startActivity(detailIntent);
