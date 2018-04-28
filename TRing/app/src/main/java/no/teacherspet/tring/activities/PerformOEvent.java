@@ -433,13 +433,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             return;
         }
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
-        if (distance < 20) {
-            addEventButton.setVisibility(View.GONE);
-            this.startTime = System.currentTimeMillis();
-            this.eventTime = -1;
-        } else {
-            Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
+        if(startedEvent.getStartPoint()!=null) {
+            float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
+            if (distance < 20) {
+                addEventButton.setVisibility(View.GONE);
+                this.startTime = System.currentTimeMillis();
+                this.eventTime = -1;
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
+            }
         }
     }
 

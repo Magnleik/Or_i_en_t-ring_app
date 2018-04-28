@@ -85,6 +85,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
     }
 
+
     @Override
     protected void onResume() {
         supportInvalidateOptionsMenu();
@@ -153,6 +154,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
+                    stopLocationRequest();
                     System.out.println(locationResult.getLastLocation().getAccuracy());
                     if (locationResult.getLastLocation().getAccuracy() <= 500 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
@@ -185,8 +187,8 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
     }
 
-    public void stopLocationRequest(){
-        if(mLocationCallback!=null) {
+    public void stopLocationRequest() {
+        if (mLocationCallback != null) {
             lm.removeLocationUpdates(mLocationCallback);
         }
     }

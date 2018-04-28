@@ -53,6 +53,7 @@ public class NearbyEvents extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private ListOfSavedEvents parent;
     private Event selectedEvent;
     private ListView mListView;
     private HashMap<Integer, Event> theEventReceived;
@@ -60,6 +61,7 @@ public class NearbyEvents extends Fragment {
     private FusedLocationProviderClient lm;
     private LatLng position;
     private ArrayList<Event> listItems;
+    BroadcastReceiver mReciever;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -115,7 +117,7 @@ public class NearbyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle("Løp i nærheten");
-        BroadcastReceiver mReciever = new BroadcastReceiver() {
+        mReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if(ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())){
@@ -139,7 +141,7 @@ public class NearbyEvents extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
 
-                    Event selectedEvent = listItems.get(position);
+                    selectedEvent = listItems.get(position);
                     saveEventToRoom(selectedEvent);
                     /*
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
@@ -169,6 +171,7 @@ public class NearbyEvents extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        parent = (ListOfSavedEvents) getActivity();
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -184,16 +187,17 @@ public class NearbyEvents extends Fragment {
     }
 
     public void initList() {
-        ListOfSavedEvents parent = (ListOfSavedEvents) getActivity();
-        listItems = new ArrayList<>();
+        ArrayList<Event> listItems = new ArrayList<>();
         theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);
             }
         }
-        parent.stopLocationRequest();
-        updateList();
+        if(!listItems.equals(this.listItems)){
+            this.listItems=listItems;
+            updateList();
+        }
         //theEventReceived = new StartupMenu().getTestEvents();
 
     }
@@ -261,6 +265,16 @@ public class NearbyEvents extends Fragment {
         startActivity(detailIntent);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(mReciever);
+    }
 
     /**
      * This interface must be implemented by activities that contain this
