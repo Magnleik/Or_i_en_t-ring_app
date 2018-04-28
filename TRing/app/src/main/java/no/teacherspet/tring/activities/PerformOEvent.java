@@ -79,10 +79,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
-        long startTime = getIntent().getLongExtra("StartTime", -1);
-        if(startTime>-1){
-            this.startTime = startTime;
-        }
+        startTime = getIntent().getLongExtra("StartTime", -1);
 
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
         if (startedEvent != null) {
@@ -459,7 +456,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             if (distance < 20) {
                 addEventButton.setVisibility(View.GONE);
                 //TODO Ikke sett hvis startTime allerede er satt
-                if(startTime > -1){
+                if(startTime == -1){
                     startTime = System.currentTimeMillis();
                 }
                 saveEventStartTime(startTime);
