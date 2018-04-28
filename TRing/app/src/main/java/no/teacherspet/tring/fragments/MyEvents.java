@@ -285,6 +285,22 @@ public class MyEvents extends Fragment implements SaveToRoom{
                 Toast.makeText(this.getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
             }
         });
+        NetworkManager.getInstance().unsubscribeFromEvent(event.getId(), new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("Unsubscribed from event %d", event.getId()));
+                }
+                else{
+                    Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
+                }
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
+            }
+        });
+
     }
 
     @Override
