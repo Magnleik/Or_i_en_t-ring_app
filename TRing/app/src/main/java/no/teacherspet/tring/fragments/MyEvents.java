@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
@@ -36,6 +37,8 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.RoomSaving;
+import no.teacherspet.tring.util.SaveToRoom;
 
 
 /**
@@ -46,7 +49,7 @@ import no.teacherspet.tring.util.EventAdapter;
  * Use the {@link MyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyEvents extends Fragment {
+public class MyEvents extends Fragment implements SaveToRoom{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -65,6 +68,7 @@ public class MyEvents extends Fragment {
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private ArrayList<Event> listItems;
+    private RoomSaving roomSaving;
 
     private OnFragmentInteractionListener mListener;
 
@@ -94,6 +98,8 @@ public class MyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        listItems = new ArrayList<>();
+        roomSaving = new RoomSaving(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
@@ -112,7 +118,35 @@ public class MyEvents extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
-        loadData();
+
+        //Get subscribed events from server
+        NetworkManager.getInstance().getSubscribedEvents(new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    if(object.size()>0){
+                        listItems.clear();
+                        listItems.addAll(object);
+                        updateList();
+
+                        for(Event event : object){
+                            roomSaving.saveRoomEvent(event);
+                        }
+                    }
+                    else{
+                        loadData();
+                    }
+                }
+                else{
+                    loadData();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                loadData();
+            }
+        });
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
@@ -169,7 +203,6 @@ public class MyEvents extends Fragment {
      * room database and create a new event from it
      */
     private void loadData() {
-        listItems = new ArrayList<>();
         database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
@@ -269,6 +302,11 @@ public class MyEvents extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void whenRoomFinished(boolean savedAll) {
+
     }
 
     /**

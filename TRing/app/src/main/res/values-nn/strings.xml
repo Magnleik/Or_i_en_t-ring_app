@@ -86,6 +86,7 @@
     <string name="location_permission_prompt_toast">Du må gje appen lokasjonstilgang</string>
     <string name="create_user_title">Lag brukar</string>
     <string name="log_in_title">Logg inn</string>
+    <string name="local_user_deleted">Lokal brukar sletta</string>
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgjenge til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
 </resources>
