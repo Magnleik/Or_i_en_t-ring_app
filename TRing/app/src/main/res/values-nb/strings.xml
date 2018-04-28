@@ -87,4 +87,6 @@
     <string name="create_user_title">Lag bruker</string>
     <string name="log_in_title">Logg inn</string>
     <string name="local_user_deleted">Lokal bruker slettet</string>
+    <string name="must_log_in_for_access">Du må logge inn for å ha tilgang til denne aktiviteten</string>
+    <string name="must_log_in">Du må logge inn</string>
 </resources>

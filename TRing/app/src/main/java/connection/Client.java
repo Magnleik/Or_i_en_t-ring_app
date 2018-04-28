@@ -55,16 +55,11 @@ public interface Client {
             @Body User user
     );
 
-    @POST("/api/events/{eventID}/time/{time}")
-    Call<Event> postTime(
+    @POST("/api/events/{eventID}/finish")
+    Call<Event> postResults(
             @Path("eventID") int eventID,
-            @Path("time") String time
-    );
-
-    @POST("/api/events/{eventID}/score/{score}")
-    Call<Event> postScore(
-            @Path("eventID") int eventID,
-            @Path("score") int score
+            @Query("time") String time,
+            @Query("score") int score
     );
 
     @POST("/api/login")
