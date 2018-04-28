@@ -17,6 +17,9 @@ branches:
     - master
     - dev
 
+before_install:
+- y | sdkmanager "platforms;android-27"
+
 before_script:
   - cd TRing
   - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
