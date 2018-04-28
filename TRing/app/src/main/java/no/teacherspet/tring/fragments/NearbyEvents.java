@@ -1,11 +1,14 @@
 package no.teacherspet.tring.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +82,6 @@ public class NearbyEvents extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HashMap<Integer, Event> theEventReceived = new HashMap<>();
         networkManager = NetworkManager.getInstance();
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -97,8 +99,18 @@ public class NearbyEvents extends Fragment {
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Mine løp");
-        initList();
+        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Løp i nærheten");
+        BroadcastReceiver mReciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())){
+                    initList();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ListOfSavedEvents.ACTION_LIST_LOADED);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever,filter);
 
 
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
@@ -129,6 +141,10 @@ public class NearbyEvents extends Fragment {
 
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -156,14 +172,15 @@ public class NearbyEvents extends Fragment {
 
     public void initList() {
         ListOfSavedEvents parent = (ListOfSavedEvents) getActivity();
-        theEventReceived = parent.getEvents();
         listItems = new ArrayList<>();
+        theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);
             }
-            updateList();
         }
+        parent.stopLocationRequest();
+        updateList();
         //theEventReceived = new StartupMenu().getTestEvents();
 
     }

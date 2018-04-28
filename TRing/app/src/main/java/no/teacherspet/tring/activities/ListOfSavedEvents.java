@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -42,7 +43,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
+    private LocationCallback mLocationCallback;
     private Location currentLocation;
+    public static final String ACTION_LIST_LOADED = "action_list_loaded";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -65,8 +68,8 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         setContentView(R.layout.activity_list_of_saved_events);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
         initList();
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -143,7 +146,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
             progressDialog.show();
             LocationRequest locationRequest = new LocationRequest();
             locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            LocationCallback mLocationCallback = new LocationCallback() {
+            mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
@@ -162,6 +165,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                                 }
                             }
                             progressDialog.hide();
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_LIST_LOADED));
                         }
 
                         @Override
@@ -176,6 +180,12 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         }
         //theEventReceived = new StartupMenu().getTestEvents();
 
+    }
+
+    public void stopLocationRequest(){
+        if(mLocationCallback!=null) {
+            lm.removeLocationUpdates(mLocationCallback);
+        }
     }
 
     public HashMap<Integer, Event> getEvents() {
