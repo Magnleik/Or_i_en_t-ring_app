@@ -21,6 +21,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import connection.Event;
@@ -37,6 +38,7 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.EventComparator;
 
 
 /**
@@ -52,6 +54,11 @@ public class NearbyEvents extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private boolean reverseAlpha;
+    private boolean reversePop;
+    private boolean reverseScore;
+    private boolean reverseTime;
 
     private ListOfSavedEvents parent;
     private Event selectedEvent;
@@ -73,6 +80,7 @@ public class NearbyEvents extends Fragment {
     private PointViewModel pointViewModel;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel pointOEventJoinViewModel;
+    private EventAdapter eventAdapter;
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -100,6 +108,10 @@ public class NearbyEvents extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
+        reverseAlpha = false;
+        reversePop = false;
+        reverseScore = false;
+        reverseTime = false;
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -120,14 +132,30 @@ public class NearbyEvents extends Fragment {
         mReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())){
+                if (ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())) {
                     initList();
+                } else if (ListOfSavedEvents.ACTION_SORT_ALPHA.equals(intent.getAction())) {
+                    sortList("event_name", reverseAlpha);
+                    reverseAlpha = !reverseAlpha;
+                } else if (ListOfSavedEvents.ACTION_SORT_POPULARITY.equals(intent.getAction())) {
+                    sortList("popularity", reversePop);
+                    reversePop = !reversePop;
+                } else if (ListOfSavedEvents.ACTION_SORT_SCORE.equals(intent.getAction())) {
+                    sortList("avg_score", reverseScore);
+                    reverseScore = !reverseScore;
+                } else if (ListOfSavedEvents.ACTION_SORT_TIME.equals(intent.getAction())) {
+                    sortList("avg_time", reverseTime);
+                    reverseTime = !reverseTime;
                 }
             }
         };
         IntentFilter filter = new IntentFilter();
         filter.addAction(ListOfSavedEvents.ACTION_LIST_LOADED);
-        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever,filter);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_ALPHA);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_POPULARITY);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_SCORE);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
@@ -194,8 +222,8 @@ public class NearbyEvents extends Fragment {
                 listItems.add(ev);
             }
         }
-        if(!listItems.equals(this.listItems)){
-            this.listItems=listItems;
+        if (!listItems.equals(this.listItems)) {
+            this.listItems = listItems;
             updateList();
         }
         //theEventReceived = new StartupMenu().getTestEvents();
@@ -203,8 +231,14 @@ public class NearbyEvents extends Fragment {
     }
 
     private void updateList() {
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
+    }
+
+    private void sortList(String property, boolean reversed) {
+        Collections.sort(listItems, new EventComparator(property, reversed));
+        eventAdapter.notifyDataSetChanged();
+
     }
 
     /**
@@ -225,6 +259,7 @@ public class NearbyEvents extends Fragment {
             savePoints(event);
         });
     }
+
     private void savePoints(Event event) {
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
@@ -237,6 +272,7 @@ public class NearbyEvents extends Fragment {
             joinPointsToEvent(event);
         });
     }
+
     private void joinPointsToEvent(Event event) {
         pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
@@ -247,6 +283,7 @@ public class NearbyEvents extends Fragment {
         }
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
+
     private void checkSave(long[] longs) {
         boolean savedAll = true;
         for (long aLong : longs) {
