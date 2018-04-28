@@ -54,7 +54,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Event startedEvent;
     long startTime;
     long eventTime;
-    boolean savedResults = false;
 
     private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
@@ -305,8 +304,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-
-
     /**
      * Method for updating the event to Room. To be called when starting and when finishing
      * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
@@ -453,15 +450,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             return;
         }
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
-        if (distance < 20) {
-            addEventButton.setVisibility(View.GONE);
-            //TODO Ikke sett hvis startTime allerede er satt
-            this.startTime = System.currentTimeMillis();
-            saveEventStartTime(startTime);
-            this.eventTime = -1;
-        } else {
-            Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_SHORT).show();
+        if(startedEvent.getStartPoint()!=null) {
+            float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
+            if (distance < 20) {
+                addEventButton.setVisibility(View.GONE);
+                //TODO Ikke sett hvis startTime allerede er satt
+                this.startTime = System.currentTimeMillis();
+                this.eventTime = -1;
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
