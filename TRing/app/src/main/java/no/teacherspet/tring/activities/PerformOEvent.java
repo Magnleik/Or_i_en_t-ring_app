@@ -241,18 +241,32 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         });
 
 
-        builder.setPositiveButton("Start løp", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Start løp", null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //Lagre event (Tid, score og avstand?)
-                startEventBtnPressed();
-                if (eventTime == -1) {
-                    dialog.dismiss();
-                }
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button button = ((AlertDialog) alertDialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        // TODO Do something
+
+                        //Dismiss once everything is OK.
+
+                        //Lagre event (Tid, score og avstand?)
+                        startEventBtnPressed();
+                        if (eventTime == -1) {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
             }
         });
 
-        AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
 
