@@ -23,6 +23,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.util.ArrayList;
 
@@ -40,8 +43,9 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     GoogleMap mMap;
     FusedLocationProviderClient lm;
     NetworkManager networkManager;
-    ArrayList<LatLng> selectedPoints;
-    Marker selectedMarker;
+    ArrayList<Point> selectedPoints;
+    Point selectedPoint;
+    ClusterManager<Point> manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,33 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        manager = new ClusterManager<Point>(this,mMap);
+        manager.setAnimation(false);
+        manager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Point>() {
+            @Override
+            public boolean onClusterItemClick(Point point) {
+                Toast.makeText(AddExistingPoint.this,"ClusterItem clicked", Toast.LENGTH_SHORT).show();
+
+                if (selectedPoints.contains(point)) {
+                    selectedPoints.remove(point);
+                    ((DefaultClusterRenderer)manager.getRenderer()).getMarker(point).setIcon(BitmapDescriptorFactory.defaultMarker());
+                    return false;
+                } else {
+                    if (selectedPoint != null) {
+                        ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
+                    }
+                    selectedPoint = point;
+                    ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    return true;
+                }
+            }
+
+        });
+        mMap.setOnCameraIdleListener(manager);
+        mMap.setOnMarkerClickListener(manager);
+        mMap.setOnInfoWindowClickListener(manager);
+        mMap.setMaxZoomPreference(20);
+
         CameraPosition camPos = getIntent().getParcelableExtra("map_center");
             networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, 1000, new ICallbackAdapter<ArrayList<Point>>() {
             @Override
@@ -72,7 +103,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                 if (object != null) {
                     if (!object.isEmpty()) {
                         for (Point point : object) {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())));
+                            manager.addItem(point);
                             builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                         }
                         Toast.makeText(getApplicationContext(), R.string.select_points_toast, Toast.LENGTH_SHORT).show();
@@ -87,20 +118,6 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                         Toast.makeText(getApplicationContext(), R.string.no_known_points_in_area, Toast.LENGTH_SHORT).show();
                         finish();
                     }
-                    mMap.setOnMarkerClickListener(marker -> {
-                        if (selectedPoints.contains(marker.getPosition())) {
-                            selectedPoints.remove(marker.getPosition());
-                            marker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                            return false;
-                        } else {
-                            if (selectedMarker != null) {
-                                selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                            }
-                            selectedMarker = marker;
-                            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                            return true;
-                        }
-                    });
                 }
             }
 
@@ -113,16 +130,16 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     }
 
     public void addButtonClick(View v) {
-        if (selectedMarker != null) {
-            selectedPoints.add(selectedMarker.getPosition());
-            selectedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-            selectedMarker = null;
+        if (selectedPoint != null) {
+            selectedPoints.add(selectedPoint);
+            ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            selectedPoint = null;
         }
     }
 
     public void doneAddingClick(View v) {
         Intent intent = new Intent();
-        intent.putExtra("selectedPositions", selectedPoints);
+        intent.putExtra("selectedPoints", selectedPoints);
         setResult(RESULT_OK, intent);
         finish();
     }

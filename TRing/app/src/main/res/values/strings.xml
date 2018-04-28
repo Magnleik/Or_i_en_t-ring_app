@@ -92,5 +92,6 @@
     <string name="must_log_in_for_access">You must log in to have access to this activity</string>
     <string name="must_log_in">You must log in</string>
     <string name="no_known_points_in_area">There are no known points in this area</string>
+    <string name="pos_not_yet_found">Position not yet found</string>
 </resources>
 
