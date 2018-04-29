@@ -28,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -148,7 +149,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if(mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(),R.raw.mapstyle))){
+            System.out.println("parsing successful");
+        }
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(true);
         LatLng avgPosition = getAvgLatLng();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         if (points != null) {
@@ -156,9 +161,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 if (point != null) {
                     if (point.isVisited()) {
                         visitedPoints.add(point);
-                        mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))));
                     } else {
-                        mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())));
+                        markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude()))));
                     }
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
