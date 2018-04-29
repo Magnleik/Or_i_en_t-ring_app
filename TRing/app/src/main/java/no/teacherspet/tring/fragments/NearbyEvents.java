@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
@@ -28,10 +27,6 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -178,7 +173,11 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
 
     }
 
-    @Override
+    private void sortList(String property, boolean reversed) {
+        Collections.sort(listItems, new EventComparator(property, reversed));
+        eventAdapter.notifyDataSetChanged();
+    }
+        @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
