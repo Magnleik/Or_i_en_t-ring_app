@@ -43,7 +43,6 @@ import no.teacherspet.tring.util.RoomInteract;
  * {@link } interface
  * to handle interaction events.
  * Use the {@link MyEvents#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class MyEvents extends Fragment implements RoomInteract {
 
