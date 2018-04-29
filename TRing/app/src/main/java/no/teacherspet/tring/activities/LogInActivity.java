@@ -130,7 +130,6 @@ public class LogInActivity extends AppCompatActivity {
     private void checkResult(long[] longs){
         if(longs[0] < 0){
             Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
-            //saveCredentialsToLocal();
         }
         else{
             Log.d("Room","User token saved");

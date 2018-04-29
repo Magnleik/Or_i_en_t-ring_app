@@ -154,7 +154,6 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         } else {
             Toast.makeText(this, R.string.no_user_found, Toast.LENGTH_SHORT).show();
             progressDialog.hide();
-            startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
         }
     }
 

@@ -643,6 +643,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void saveEventStartTime(long startTime, List<EventResult> results){
         EventResult result = new EventResult(startedEvent.getId());
         result.setStartTime(startTime);
+        result.setDifficulty(eventDifficultyValue);
         if(results.size() > 0){
             result.setEventTime(results.get(0).getEventTime());
         }
