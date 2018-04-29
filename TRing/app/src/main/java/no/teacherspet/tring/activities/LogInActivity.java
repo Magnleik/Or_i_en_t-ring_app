@@ -131,7 +131,6 @@ public class LogInActivity extends AppCompatActivity {
         if(longs[0] < 0){
             Log.d("Room", "Something went wrong when saving the user locally");
             //Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
-            //saveCredentialsToLocal();
         }
         else{
             Log.d("Room","User token saved");
