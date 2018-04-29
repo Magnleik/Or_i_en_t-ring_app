@@ -469,22 +469,22 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         positionViewed++;
         Marker positionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title(getString(R.string.my_position)));
         //Marker removed after 5 seconds
-        CountDownTimer visible = new CountDownTimer(5000, 1000) {
+        CountDownTimer visible = new CountDownTimer(5000, 990) {
             int sek = 5;
 
+            Toast myToast = Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT);
 
             @Override
             public void onTick(long l) {
+                myToast.setText(String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek));
+                myToast.show();
                 sek--;
-                Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
-
             }
 
             @Override
             public void onFinish() {
                 positionMarker.remove();
-
-
+                myToast.cancel();
             }
 
         }.start();
