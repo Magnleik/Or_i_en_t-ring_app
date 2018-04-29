@@ -92,5 +92,10 @@
     <string name="local_user_deleted">Local user deleted</string>
     <string name="must_log_in_for_access">You must log in to have access to this activity</string>
     <string name="must_log_in">You must log in</string>
+    <string name="sort">Sort</string>
+    <string name="sort_time">Sort by average time</string>
+    <string name="sort_score">Sort by average Score</string>
+    <string name="sort_popularity">Sort by popularity</string>
+    <string name="sort_alpha">Sort by name</string>
 </resources>
 
