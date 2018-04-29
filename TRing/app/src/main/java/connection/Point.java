@@ -134,6 +134,11 @@ public class Point implements Serializable, ClusterItem {
 
     @Override
     public String getTitle() {
+
+        if (properties.get("name")==null) {
+            return " ";
+        }
+
         return properties.get("name");
     }
 

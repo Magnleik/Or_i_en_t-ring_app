@@ -73,7 +73,9 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         manager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Point>() {
             @Override
             public boolean onClusterItemClick(Point point) {
-                Toast.makeText(AddExistingPoint.this,"ClusterItem clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(AddExistingPoint.this,"ClusterItem clicked", Toast.LENGTH_SHORT).show();
+
+                ((DefaultClusterRenderer)manager.getRenderer()).getMarker(point).showInfoWindow();
 
                 if (selectedPoints.contains(point)) {
                     selectedPoints.remove(point);
