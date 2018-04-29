@@ -100,5 +100,10 @@
     <string name="no_known_points_in_area">Det er ingen kjende punkt i dette området</string>
     <string name="pos_not_yet_found">Posisjon er endå ikkje funnen</string>
     <string name="my_position">Min posisjon</string>
+    <string name="sort">Sorter</string>
+    <string name="sort_time">Sorter på tid</string>
+    <string name="sort_score">Sorter på score</string>
+    <string name="sort_alpha">"Sorter på navn "</string>
+    <string name="sort_popularity">Sorter på popularitet</string>
 
 </resources>
