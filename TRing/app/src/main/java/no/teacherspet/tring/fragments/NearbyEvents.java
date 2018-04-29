@@ -15,26 +15,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.EventComparator;
 import no.teacherspet.tring.util.RoomSaving;
 import no.teacherspet.tring.util.SaveToRoom;
 
@@ -53,6 +50,11 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private boolean reverseAlpha;
+    private boolean reversePop;
+    private boolean reverseScore;
+    private boolean reverseTime;
+
     private ListOfSavedEvents parent;
     private Event selectedEvent;
     private ListView mListView;
@@ -69,6 +71,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
 
     private OnFragmentInteractionListener mListener;
 
+    private EventAdapter eventAdapter;
     private RoomSaving roomSaving;
 
     public NearbyEvents() {
@@ -97,6 +100,12 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
+
+        reverseAlpha = false;
+        reversePop = false;
+        reverseScore = false;
+        reverseTime = false;
+
         roomSaving = new RoomSaving(getContext(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -118,14 +127,30 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
         mReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())){
+                if (ListOfSavedEvents.ACTION_LIST_LOADED.equals(intent.getAction())) {
                     initList();
+                } else if (ListOfSavedEvents.ACTION_SORT_ALPHA.equals(intent.getAction())) {
+                    sortList("event_name", reverseAlpha);
+                    reverseAlpha = !reverseAlpha;
+                } else if (ListOfSavedEvents.ACTION_SORT_POPULARITY.equals(intent.getAction())) {
+                    sortList("popularity", reversePop);
+                    reversePop = !reversePop;
+                } else if (ListOfSavedEvents.ACTION_SORT_SCORE.equals(intent.getAction())) {
+                    sortList("avg_score", reverseScore);
+                    reverseScore = !reverseScore;
+                } else if (ListOfSavedEvents.ACTION_SORT_TIME.equals(intent.getAction())) {
+                    sortList("avg_time", reverseTime);
+                    reverseTime = !reverseTime;
                 }
             }
         };
         IntentFilter filter = new IntentFilter();
         filter.addAction(ListOfSavedEvents.ACTION_LIST_LOADED);
-        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever,filter);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_ALPHA);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_POPULARITY);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_SCORE);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
@@ -148,7 +173,11 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
 
     }
 
-    @Override
+    private void sortList(String property, boolean reversed) {
+        Collections.sort(listItems, new EventComparator(property, reversed));
+        eventAdapter.notifyDataSetChanged();
+    }
+        @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
@@ -186,8 +215,8 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
                 listItems.add(ev);
             }
         }
-        if(!listItems.equals(this.listItems)){
-            this.listItems=listItems;
+        if (!listItems.equals(this.listItems)) {
+            this.listItems = listItems;
             updateList();
         }
         //theEventReceived = new StartupMenu().getTestEvents();
@@ -195,7 +224,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     }
 
     private void updateList() {
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
     }
 

@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.fragments.MyEvents;
-import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 
 /**
@@ -15,8 +14,8 @@ import no.teacherspet.tring.fragments.NearbyEvents;
  */
 
 public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
-    private static final int PAGE_COUNT = 3;
-    private static final String[] titles = new String[]{"0","1","2"}; //Initialize with dummy values for localization.
+    private static final int PAGE_COUNT = 2;
+    private static final String[] titles = new String[]{"0","1",}; //Initialize with dummy values for localization.
     private Context context;
 
     public EventFragmentPagerAdapter(FragmentManager fm, Context context) {
@@ -25,7 +24,6 @@ public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
 
         titles[0] = context.getString(R.string.my_events);
         titles[1] = context.getString(R.string.nearby_events);
-        titles[2] = context.getString(R.string.popular_events);
     }
 
     @Override
@@ -35,9 +33,6 @@ public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
         }
         if(position == 1){
             return NearbyEvents.newInstance("","");
-        }
-        if(position == 2){
-            return MostPopularEvents.newInstance("","");
         }
         return null;
     }
