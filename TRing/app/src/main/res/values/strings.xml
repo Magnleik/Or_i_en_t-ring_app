@@ -14,7 +14,7 @@
     <string name="done">Done</string>
     <string name="track_name">Track Name</string>
     <string name="create_point_on_my_pos">Create point on my position</string>
-    <string name="get_saved_points">Get saved points</string>
+    <string name="get_saved_points">Get existing points</string>
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>
     <string name="username">Username</string>
@@ -92,5 +92,13 @@
     <string name="local_user_deleted">Local user deleted</string>
     <string name="must_log_in_for_access">You must log in to have access to this activity</string>
     <string name="must_log_in">You must log in</string>
+    <string name="no_known_points_in_area">There are no known points in this area</string>
+    <string name="pos_not_yet_found">Position not yet found</string>
+    <string name="my_position">My position</string>
+    <string name="sort">Sort</string>
+    <string name="sort_time">Sort by average time</string>
+    <string name="sort_score">Sort by average Score</string>
+    <string name="sort_popularity">Sort by popularity</string>
+    <string name="sort_alpha">Sort by name</string>
 </resources>
 

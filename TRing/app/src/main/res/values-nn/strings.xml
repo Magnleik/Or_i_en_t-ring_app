@@ -11,7 +11,7 @@
     <string name="done">Ferdig</string>
     <string name="track_name">Løypenamn</string>
     <string name="create_point_on_my_pos">Lag punkt på posisjonen min</string>
-    <string name="get_saved_points">Hent lagra punkt</string>
+    <string name="get_saved_points">Hent eksisterande punkt</string>
     <string name="password">Passord</string>
     <string name="repeat_password">Repetér passord</string>
     <string name="username">Brukarnamn</string>
@@ -89,4 +89,7 @@
     <string name="local_user_deleted">Lokal brukar sletta</string>
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgjenge til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
+    <string name="no_known_points_in_area">Det er ingen kjende punkt i dette området</string>
+    <string name="pos_not_yet_found">Posisjon er endå ikkje funnen</string>
+    <string name="my_position">Min posisjon</string>
 </resources>
