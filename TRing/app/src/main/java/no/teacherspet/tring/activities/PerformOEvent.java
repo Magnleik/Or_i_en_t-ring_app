@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
@@ -49,6 +50,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private LocationRequest locationRequest;
     private Location currentLocation;
     private int positionViewed = 0;
+    private HashMap<Point, Marker> markers;
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
@@ -62,6 +64,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        markers = new HashMap<>();
         setContentView(R.layout.activity_perform_oevent);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_used_in_event);
@@ -79,7 +82,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         // 1
         //TODO: Fix saving of points when phone is flipped
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
-//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
+        startTime = getIntent().getLongExtra("StartTime", -1);
+
+//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
         if (startedEvent != null) {
             points = readPoints();
             if (points == null) {
@@ -123,7 +128,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (!startedEvent.getPoints().isEmpty()) {
             return startedEvent.getPoints();
         } else {
-            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -283,14 +288,14 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
-                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
-                mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                markers.get(point).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_SHORT).show();
                 break;
             }
         }
 
         if (prevsize == visitedPoints.size()) {
-            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_SHORT).show();
         }
         if (points.size() == visitedPoints.size()) {
             updateEvent(false);
@@ -301,6 +306,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     /**
      * Method for updating the event to Room. To be called when starting and when finishing
+     *
      * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
      */
     private void updateEvent(boolean starting) {
@@ -308,14 +314,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if (longs[0] != -1) {
-                Log.d("Room",String.format("Event %d updated, starting: %b", event.getId(), starting));
+                Log.d("Room", String.format("Event %d updated, starting: %b", event.getId(), starting));
                 updatePoints(startedEvent, starting);
             }
         });
     }
+
     /**
      * Method for saving which points have been visited to room
-     * @param event Event which we are updating
+     *
+     * @param event    Event which we are updating
      * @param starting True: Event should be set to active. False: Event should be set to inactive
      */
     private void updatePoints(Event event, boolean starting) {
@@ -325,60 +333,80 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             boolean start = startPoint.equals(points.get(i));
             joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited() && starting);
         }
+        Log.d("Room",String.format("Started updating %d points for event %d", joins.length, event.getId()));
         joinViewModel.addJoins(joins).subscribe(longs -> {
-            if(longs[0] != -1){
-                Log.d("Room",String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
+            if (longs[0] != -1) {
+                Log.d("Room", String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
             }
         });
     }
-
     /**
      * Updates a single point to "visited" in the local database
+     *
      * @param point Point to be updated
      */
     private void updatePoint(Point point) {
         boolean start = startedEvent.getStartPoint().equals(point);
         PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
+        Log.d("Room",String.format("Setting point %d to visited", point.getId()));
         joinViewModel.addJoins(join).subscribe(longs -> {
             if(longs[0]>0){
-                Log.d("Room",String.format("Point %d saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d updated, code: %d", point.getId(), longs[0]));
             }
             else{
-                Log.d("Room",String.format("Point %d not saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d not updated, code: %d", point.getId(), longs[0]));
             }
         });
     }
 
     /**
+     * Saves the start time of an event to Room
+     * @param startTime start time in seconds
+     */
+    private void saveEventStartTime(long startTime){
+        RoomOEvent event = new RoomOEvent(startedEvent.getId(), startedEvent._getAllProperties());
+        event.setActive(true);
+        event.setStartTime(startTime);
+        oEventViewModel.addOEvents(event);
+    }
+
+    /**
      * Set all events in room to not active, set all points to not visited
+     *
      * @param activeEvent Event which should not be reset
      */
-    private void resetActiveEvents(Event activeEvent){
-        Log.d("Room","Started resetting active events");
+    private void resetActiveEvents(Event activeEvent) {
+        Log.d("Room", "Started resetting active events");
         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
             Log.d("Room",String.format("Found %d active events", roomOEvents.size()));
             for (RoomOEvent event : roomOEvents){
                 if(event.getId() != activeEvent.getId()){
-                    Log.d("Room",String.format("Resetting event %d", event.getId()));
+                    Log.d("Room",String.format("Setting event %d to not active", event.getId()));
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins ->
                             resetEvent(new RoomOEvent(event.getId(), event.getProperties()), joins));
                 }
             }
         });
     }
+
     /**
      * Method for setting to inactive, and points to not visited
+     *
      * @param event Event we are resetting
      * @param joins All connections between event and its points
      */
-    private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
-        Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
+    private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins) {
+        Log.d("Room", String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
+        Log.d("Room", String.format("Event: eID: %d, active: %b", event.getId(), event.isActive()));
         oEventViewModel.addOEvents(event).subscribe(longs -> {
-            for (PointOEventJoin join : joins){
-                PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
-                joinViewModel.addJoins(newJoin);
+            PointOEventJoin[] joinArray = new PointOEventJoin[joins.size()];
+            for (int i = 0; i < joins.size(); i++) {
+                joinArray[i] = new PointOEventJoin(joins.get(i).pointID, joins.get(i).oEventID, joins.get(i).isStart(), false);
+                Log.d("Room", String.format("Join: pID: %d, eID %d, Start %b, Visited %b",
+                        joinArray[i].getPointID(), joinArray[i].getoEventID(), joinArray[i].isStart(), joinArray[i].isVisited()));
             }
+            joinViewModel.addJoins(joinArray).subscribe(longs1 -> Log.d("Room", String.format("%d points updated", longs1.length)));
             Log.d("Room",String.format("Event %d set to not active", event.getId()));
         });
     }
@@ -433,11 +461,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             return;
         }
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        if(startedEvent.getStartPoint()!=null) {
+        if (startedEvent.getStartPoint() != null) {
             float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
             if (distance < 20) {
                 addEventButton.setVisibility(View.GONE);
-                this.startTime = System.currentTimeMillis();
+                //TODO Ikke sett hvis startTime allerede er satt
+                if(startTime == -1){
+                    startTime = System.currentTimeMillis();
+                }
+                saveEventStartTime(startTime);
                 this.eventTime = -1;
             } else {
                 Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();

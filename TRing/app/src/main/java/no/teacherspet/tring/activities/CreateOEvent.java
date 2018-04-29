@@ -35,21 +35,17 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.RoomSaving;
+import no.teacherspet.tring.util.SaveToRoom;
 
-public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
+public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback, SaveToRoom {
 
     private GoogleMap mMap;
     private ArrayList<Point> arrayListWithCoords = new ArrayList<>();
@@ -63,6 +59,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel pointOEventJoinViewModel;
     private ClusterManager manager;
+    private RoomSaving roomSaving;
+    private int eventID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +78,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         if (savedInstanceState != null) {
             latLngArrayList = (ArrayList<Point>) savedInstanceState.getSerializable("points");
         }
+        roomSaving = new RoomSaving(getApplicationContext(), this);
     }
 
 
@@ -372,8 +371,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                         Toast.makeText(getApplicationContext(), R.string.failed_create_event_toast, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
-                        saveEventToRoom(object);
-                        finish();
+                        eventID = object.getId();
+                        roomSaving.saveRoomEvent(object);
+
                     }
                 }
 
@@ -382,60 +382,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(getApplicationContext(), R.string.couldnt_connect_to_net, Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-    }
-
-    /**
-     * Saves the Event and corresponding Points, and adds connections between them in the Room database
-     * Makes sure that events and points are saved before the connections are saved. The next step
-     * is only called after the previous is finished.
-     */
-    private void saveEventToRoom(Event event) {
-        localDatabase = LocalDatabase.getInstance(this);
-        pointViewModel = new PointViewModel(localDatabase.pointDAO());
-        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
-
-        Log.d("Room", "Started saving event");
-        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
-            Log.d("Room", String.format("Event %d saved", event.getId()));
-            savePoints(event);
-        });
-    }
-    private void savePoints(Event event) {
-        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
-            roomPoints[i] = roomPoint;
-        }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
-            Log.d("Room", String.format("%d points saved", longs.length));
-            joinPointsToEvent(event);
-        });
-    }
-    private void joinPointsToEvent(Event event) {
-        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
-        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            boolean start = i == 0;
-            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
-        }
-        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
-    }
-    private void checkSave(long[] longs) {
-        boolean savedAll = true;
-        for (long aLong : longs) {
-            if (aLong < 0) {
-                savedAll = false;
-            }
-        }
-        if (savedAll) {
-            Log.d("Room", String.format("%d joins saved", longs.length));
-            Toast.makeText(this, R.string.phone_save_success, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, R.string.phone_save_unsuccess, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -502,4 +448,26 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    @Override
+    public void whenRoomFinished(boolean savedAll) {
+        NetworkManager.getInstance().subscribeToEvent(eventID, new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
+                }
+                else {
+                    Log.d("Subscribe", "List<Event> is null");
+                }
+                finish();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", t.getMessage());
+                finish();
+            }
+        });
+
+    }
 }

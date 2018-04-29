@@ -89,10 +89,16 @@
     <string name="log_in_title">Log In</string>
     <string name="position_count_marker_warning_formatted">This is the %dth time the location is shown. Marker removed in %d seconds.</string>
     <string name="event_name_promt_toast">You must give the event a name!</string>
+    <string name="local_user_deleted">Local user deleted</string>
     <string name="must_log_in_for_access">You must log in to have access to this activity</string>
     <string name="must_log_in">You must log in</string>
     <string name="no_known_points_in_area">There are no known points in this area</string>
     <string name="pos_not_yet_found">Position not yet found</string>
     <string name="my_position">My position</string>
+    <string name="sort">Sort</string>
+    <string name="sort_time">Sort by average time</string>
+    <string name="sort_score">Sort by average Score</string>
+    <string name="sort_popularity">Sort by popularity</string>
+    <string name="sort_alpha">Sort by name</string>
 </resources>
 

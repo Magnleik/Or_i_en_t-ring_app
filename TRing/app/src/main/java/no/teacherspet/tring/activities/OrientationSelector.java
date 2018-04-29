@@ -46,6 +46,7 @@ public class OrientationSelector extends AppCompatActivity {
     private Event activeEvent;
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
+    private double startTime;
     private AlertDFragment alertFragment;
 
     @Override
@@ -79,6 +80,7 @@ public class OrientationSelector extends AppCompatActivity {
     private void continueEvent(){
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
         intent.putExtra("MyEvent", activeEvent);
+        intent.putExtra("StartTime", startTime);
         startActivity(intent);
     }
 
@@ -86,6 +88,7 @@ public class OrientationSelector extends AppCompatActivity {
         Log.d("Room",String.format("%d active events found", activeEvents.size()));
         if(activeEvents.size() > 0){
             RoomOEvent roomEvent = activeEvents.get(0);
+            startTime = roomEvent.getStartTime();
             Event event = new Event();
             event._setId(roomEvent.getId());
             for(String key : roomEvent.getProperties().keySet()){
@@ -143,6 +146,7 @@ public class OrientationSelector extends AppCompatActivity {
                     progressDialog.hide();
                     if (object != null) {
                         if (object) {
+                            logInButton.setEnabled(false);
                             Toast.makeText(OrientationSelector.this, R.string.logged_in, Toast.LENGTH_SHORT).show();
                             logInButton.setEnabled(false);
                         } else {
@@ -216,7 +220,7 @@ public class OrientationSelector extends AppCompatActivity {
                 }
                 userViewModel.deleteUsers(users).subscribe(integer ->{
                     Log.d("Room",String.format("%d users deleted", users.length));
-                    Toast.makeText(this, "Local user deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.local_user_deleted, Toast.LENGTH_SHORT).show();
                 });
             });
         }
