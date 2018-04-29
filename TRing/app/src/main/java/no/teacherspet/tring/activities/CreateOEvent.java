@@ -54,10 +54,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private LocationRequest locationRequest;
     private Point startPoint;
     private Location currentLocation;
-    private LocalDatabase localDatabase;
-    private PointViewModel pointViewModel;
-    private OEventViewModel oEventViewModel;
-    private PointOEventJoinViewModel pointOEventJoinViewModel;
     private ClusterManager manager;
     private RoomSaving roomSaving;
     private int eventID;
