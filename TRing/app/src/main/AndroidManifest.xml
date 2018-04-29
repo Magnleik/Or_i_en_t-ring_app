@@ -67,7 +67,8 @@
 
         <activity
             android:name=".activities.ListOfSavedEvents"
-            android:label="@string/my_events"
+            android:label="@string/title_activity_list_of_saved_events"
+            android:theme="@style/AppTheme.NoActionBar">
             android:screenOrientation="portrait">
         </activity>
 
