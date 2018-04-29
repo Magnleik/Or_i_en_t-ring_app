@@ -3,9 +3,13 @@ package no.teacherspet.tring.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.print.PrintAttributes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +20,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,6 +41,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -280,11 +290,14 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * creates a locationRequest to update the CurrentLocation variable as often as possible. If a reading is to inaccurate, it will discard it
      */
     private void createLocationRequest() {
+
         final Boolean[] hasFocused = {true};
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
             locationRequest = new LocationRequest();
+
             locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
             LocationCallback mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -300,6 +313,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             };
+
             lm.requestLocationUpdates(locationRequest, mLocationCallback, getMainLooper());
         } else {
             Toast.makeText(getApplicationContext(), R.string.location_permission_prompt_toast, Toast.LENGTH_SHORT).show();
@@ -359,6 +373,20 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             }
+
+            // Kalkuler distanse
+            double distance = 0;
+
+            for (Point point : event.getPoints()) {
+                int index = event.getPoints().indexOf(point);
+                if (index == event.getPoints().size() - 1) {
+                    break;
+                }
+                distance += point.getDistanceFromPoint(new LatLng(event.getPoints().get(index + 1).getLatitude(), event.getPoints().get(index + 1).getLongitude()));
+            }
+
+            event.addProperty("dist", distance + "");
+
             networkManager = NetworkManager.getInstance();
             networkManager.addEvent(event, new ICallbackAdapter<Event>() {
                 @Override
@@ -378,8 +406,15 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(getApplicationContext(), R.string.couldnt_connect_to_net, Toast.LENGTH_SHORT).show();
                 }
             });
+
+            //StartupMenu.addEvent(event);
+            //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
+            //LAGRE
+            //Reset
         }
     }
+
+
 
     /**
      * Saves the currently created points to an arraylist to be provided later when the state is restored. Used when phone is flipped and state is destroyed
