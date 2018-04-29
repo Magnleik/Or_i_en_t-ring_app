@@ -205,9 +205,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))));
                     } else {
                         if (point.equals(startedEvent.getStartPoint())) {
-                            markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.startpoint_flag_five))));
+                            markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.startpoint_flag_five))));
                         } else {
-                            markers.put(point,mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((point.getDescription()))));                   
+                            markers.put(point,mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title(point.getTitle()).snippet(point.getSnippet())));
                         }
                     }
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
@@ -220,7 +220,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    //TODO: display information when marker is clicked
+                    marker.showInfoWindow();
                     return false;
                 }
             });
