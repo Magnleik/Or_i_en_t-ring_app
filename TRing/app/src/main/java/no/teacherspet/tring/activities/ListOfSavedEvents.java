@@ -39,13 +39,23 @@ import no.teacherspet.tring.util.PagerAdapter;
 
 public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
 
+    public static final String ACTION_LIST_LOADED = "action_list_loaded";
+    public static final String ACTION_SORT_ALPHA = "action_sort_alpha";
+    public static final String ACTION_SORT_POPULARITY = "action_sort_popularity";
+    public static final String ACTION_SORT_SCORE = "action_sort_score";
+    public static final String ACTION_SORT_TIME = "action_sort_time";
+
+    private boolean reverseAlpha;
+    private boolean reversePop;
+    private boolean reverseScore;
+    private boolean reverseTime;
+
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
     private LocationCallback mLocationCallback;
     private Location currentLocation;
-    public static final String ACTION_LIST_LOADED = "action_list_loaded";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -65,11 +75,15 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        reverseAlpha = false;
+        reversePop = false;
+        reverseScore = false;
+        reverseTime = false;
         setContentView(R.layout.activity_list_of_saved_events);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         initList();
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 3);
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 2);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -100,6 +114,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.general_menu, menu);
+        getMenuInflater().inflate(R.menu.sorting_menu, menu);
 
         MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
         logInMenu.setIntent(new Intent(this, LogInActivity.class));
@@ -111,8 +126,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
-
-
         return true;
     }
 
@@ -135,8 +148,19 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                 startActivity(intent);
                 finish();
                 break;
+            case (R.id.sort_alpha):
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_ALPHA));
+                break;
+            case (R.id.sort_popularity):
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_POPULARITY));
+                break;
+            case (R.id.sort_score):
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_SCORE));
+                break;
+            case (R.id.sort_time):
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_TIME));
+                break;
         }
-
         supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
     }
@@ -176,6 +200,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                         @Override
                         public void onFailure(Throwable t) {
                             Toast.makeText(getApplicationContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            progressDialog.hide();
                         }
                     };
                     networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), 200, adapter);
