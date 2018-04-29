@@ -92,6 +92,13 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
             }
 
         });
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
+                selectedPoint = null;
+            }
+        });
         mMap.setOnCameraIdleListener(manager);
         mMap.setOnMarkerClickListener(manager);
         mMap.setOnInfoWindowClickListener(manager);
