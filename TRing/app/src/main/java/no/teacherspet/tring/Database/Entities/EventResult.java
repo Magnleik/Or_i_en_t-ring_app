@@ -14,7 +14,7 @@ public class EventResult {
     public EventResult(int id){
         this.id = id;
         startTime = -1;
-        resultTime = -1;
+        eventTime = -1;
     }
 
     @PrimaryKey
@@ -22,7 +22,7 @@ public class EventResult {
 
     private long startTime;
 
-    private long resultTime;
+    private long eventTime;
 
     public int getId() {
         return id;
@@ -38,11 +38,10 @@ public class EventResult {
         this.startTime = startTime;
     }
 
-    public long getResultTime() {
-        return resultTime;
+    public long getEventTime() {
+        return eventTime;
     }
-    public void setResultTime(long resultTime) {
-        this.resultTime = resultTime;
+    public void setEventTime(long eventTime) {
+        this.eventTime = eventTime;
     }
-
 }

@@ -106,6 +106,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         else{
             startTime = -1;
         }
+        Log.d("Room", String.format("StartTime set to: %d", startTime));
     }
 
     //Changes to createUserActivity if a roomUser has not been created
@@ -150,8 +151,9 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                 }
             });
         } else {
-            progressDialog.hide();
             Toast.makeText(this, R.string.no_user_found, Toast.LENGTH_SHORT).show();
+            progressDialog.hide();
+            startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
         }
     }
 

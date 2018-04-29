@@ -364,9 +364,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         EventResult result = new EventResult(startedEvent.getId());
         result.setStartTime(startTime);
         if(results.size() > 0){
-            result.setResultTime(results.get(0).getResultTime());
+            result.setEventTime(results.get(0).getEventTime());
         }
-        resultViewModel.addResults(result);
+        Log.d("Room", String.format("StartTime set to %d", startTime));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("StartTime saved for event %d", result.getId())));
     }
 
     /**
@@ -375,20 +376,21 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private void saveEventResult(long eventTime, List<EventResult> results){
         EventResult result = new EventResult(startedEvent.getId());
         if(results.size() > 0){
-            if(results.get(0).getResultTime() == -1){
-                result.setResultTime(eventTime);
+            if(results.get(0).getEventTime() == -1){
+                result.setEventTime(eventTime);
             }
-            else if(eventTime < results.get(0).getResultTime()){
-                result.setResultTime(eventTime);
+            else if(eventTime < results.get(0).getEventTime()){
+                result.setEventTime(eventTime);
             }
             else{
-                result.setResultTime(results.get(0).getResultTime());
+                result.setEventTime(results.get(0).getEventTime());
             }
         }
         else{
-            result.setResultTime(eventTime);
+            result.setEventTime(eventTime);
         }
-        resultViewModel.addResults(result);
+        Log.d("Room", String.format("StartTime : %d, ResultTime: %d", result.getStartTime(), result.getEventTime()));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("ResultTime saved for event %d", result.getId())));
     }
 
     /**
