@@ -37,11 +37,13 @@ import java.util.List;
 
 import connection.Event;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.EventResult;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.ResultViewModel;
 import no.teacherspet.tring.R;
 
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
@@ -57,9 +59,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     long startTime;
     long eventTime;
 
-    private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
+    private ResultViewModel resultViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +77,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         visitedPoints = new ArrayList<>();
 
-        localDatabase = LocalDatabase.getInstance(this);
+        LocalDatabase localDatabase = LocalDatabase.getInstance(this);
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+        resultViewModel = new ResultViewModel(localDatabase.resultDAO());
 
         // 1
         //TODO: Fix saving of points when phone is flipped
@@ -300,6 +303,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (points.size() == visitedPoints.size()) {
             updateEvent(false);
             //Event finnished!
+            resultViewModel.getResult(startedEvent.getId()).subscribe(results -> saveEventResult(getEventTime(), results));
             endEvent();
         }
     }
@@ -363,11 +367,37 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Saves the start time of an event to Room
      * @param startTime start time in seconds
      */
-    private void saveEventStartTime(long startTime){
-        RoomOEvent event = new RoomOEvent(startedEvent.getId(), startedEvent._getAllProperties());
-        event.setActive(true);
-        event.setStartTime(startTime);
-        oEventViewModel.addOEvents(event);
+    private void saveEventStartTime(long startTime, List<EventResult> results){
+        EventResult result = new EventResult(startedEvent.getId());
+        result.setStartTime(startTime);
+        if(results.size() > 0){
+            result.setEventTime(results.get(0).getEventTime());
+        }
+        Log.d("Room", String.format("StartTime set to %d", startTime));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("StartTime saved for event %d", result.getId())));
+    }
+
+    /**
+     * Saves the result to room, if the new result is better than the previous result
+     */
+    private void saveEventResult(long eventTime, List<EventResult> results){
+        EventResult result = new EventResult(startedEvent.getId());
+        if(results.size() > 0){
+            if(results.get(0).getEventTime() == -1){
+                result.setEventTime(eventTime);
+            }
+            else if(eventTime < results.get(0).getEventTime()){
+                result.setEventTime(eventTime);
+            }
+            else{
+                result.setEventTime(results.get(0).getEventTime());
+            }
+        }
+        else{
+            result.setEventTime(eventTime);
+        }
+        Log.d("Room", String.format("StartTime : %d, ResultTime: %d", result.getStartTime(), result.getEventTime()));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("ResultTime saved for event %d", result.getId())));
     }
 
     /**
@@ -418,7 +448,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return points;
     }
 
-    public double getEventTime() {
+    public long getEventTime() {
         if (this.eventTime == -1) {
             long difference = System.currentTimeMillis() - this.startTime;
             this.eventTime = (difference / 1000) / 60; //minutes
@@ -469,7 +499,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 if(startTime == -1){
                     startTime = System.currentTimeMillis();
                 }
-                saveEventStartTime(startTime);
+                resultViewModel.getResult(startedEvent.getId()).subscribe(results -> {
+                    Log.d("Room",String.format("Found %d results for event %d", results.size(), startedEvent.getId()));
+                    saveEventStartTime(startTime, results);
+                });
                 this.eventTime = -1;
             } else {
                 Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();

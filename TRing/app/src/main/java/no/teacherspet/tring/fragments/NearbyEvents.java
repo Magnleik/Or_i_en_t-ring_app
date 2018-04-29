@@ -31,9 +31,10 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
+import no.teacherspet.tring.util.RoomInteract;
 import no.teacherspet.tring.util.EventComparator;
-import no.teacherspet.tring.util.RoomSaving;
-import no.teacherspet.tring.util.SaveToRoom;
+
 
 
 /**
@@ -44,7 +45,7 @@ import no.teacherspet.tring.util.SaveToRoom;
  * Use the {@link NearbyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NearbyEvents extends Fragment implements SaveToRoom{
+public class NearbyEvents extends Fragment implements RoomInteract {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -70,9 +71,9 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
+    private RoomSaveAndLoad roomSaveAndLoad;
     private EventAdapter eventAdapter;
-    private RoomSaving roomSaving;
+
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -101,12 +102,12 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
 
+        roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         reverseAlpha = false;
         reversePop = false;
         reverseScore = false;
         reverseTime = false;
 
-        roomSaving = new RoomSaving(getContext(), this);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -164,7 +165,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position >= 0) {
                     selectedEvent = listItems.get(position);
-                    roomSaving.saveRoomEvent(selectedEvent);
+                    roomSaveAndLoad.saveRoomEvent(selectedEvent);
                 }
             }
 
@@ -240,7 +241,7 @@ public class NearbyEvents extends Fragment implements SaveToRoom{
     }
 
     @Override
-    public void whenRoomFinished(boolean savedAll) {
+    public void whenRoomFinished(Object object) {
         NetworkManager.getInstance().subscribeToEvent(selectedEvent.getId(), new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {
