@@ -84,6 +84,9 @@ public class MyEvents extends Fragment implements RoomInteract {
         roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
+        LocalDatabase database = LocalDatabase.getInstance(this.getContext());
+        oEventViewModel = new OEventViewModel(database.oEventDAO());
+
     }
 
     @Override
@@ -181,8 +184,6 @@ public class MyEvents extends Fragment implements RoomInteract {
      * room database and create a new event from it
      */
     private void loadData() {
-        LocalDatabase database = LocalDatabase.getInstance(this.getContext());
-        oEventViewModel = new OEventViewModel(database.oEventDAO());
         Log.d("Room","Started loading events");
         oEventViewModel.getAllOEvents().subscribe(oEvents -> createEvents(oEvents));
     }

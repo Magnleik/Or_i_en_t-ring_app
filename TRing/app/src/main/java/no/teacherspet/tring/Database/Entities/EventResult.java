@@ -15,6 +15,7 @@ public class EventResult {
         this.id = id;
         startTime = -1;
         eventTime = -1;
+        difficulty = -1;
     }
 
     @PrimaryKey
@@ -23,6 +24,8 @@ public class EventResult {
     private long startTime;
 
     private long eventTime;
+
+    private int difficulty;
 
     public int getId() {
         return id;
@@ -43,5 +46,12 @@ public class EventResult {
     }
     public void setEventTime(long eventTime) {
         this.eventTime = eventTime;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 }
