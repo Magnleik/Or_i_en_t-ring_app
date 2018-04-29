@@ -813,6 +813,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     saveEventStartTime(startTime, results);
                 });
                 this.eventTime = -1;
+                posisjonsmarkor.remove();
                 arrivedButton.setVisibility(View.VISIBLE);
                 showMyPosition.setVisibility(View.VISIBLE);
                 startButton.setVisibility(View.INVISIBLE);
