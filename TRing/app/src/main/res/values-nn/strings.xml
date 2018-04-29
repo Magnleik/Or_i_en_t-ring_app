@@ -89,7 +89,16 @@
     <string name="local_user_deleted">Lokal brukar sletta</string>
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgjenge til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
+    <string name="return_to_event">Gå tilbake til løpet</string>
+    <string name="return_to_start_menu">Gå tilbake til startmenyen</string>
+    <string name="difficulty">Vanskelighetsgrad:</string>
+    <string name="easy_button_text" >Lett</string>
+    <string name="medium_button_text" >Medium</string>
+    <string name="hard_button_text" >Vanskelig</string>
+    <string name="start_dialog_positive_button_next">Neste</string>
+    <string name="explain_event_when_started" >1. Gå til startpunktet (den grønne markøren) \n\n 2. Trykk på "Start Event"-knappen \n\n 3. Spring. Lykke til!</string>
     <string name="no_known_points_in_area">Det er ingen kjende punkt i dette området</string>
     <string name="pos_not_yet_found">Posisjon er endå ikkje funnen</string>
     <string name="my_position">Min posisjon</string>
+
 </resources>

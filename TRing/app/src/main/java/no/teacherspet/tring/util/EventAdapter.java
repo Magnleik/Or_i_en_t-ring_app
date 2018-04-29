@@ -55,12 +55,40 @@ public class EventAdapter extends BaseAdapter {
         View rowView = mInflater.inflate(R.layout.list_item_event, parent, false);
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.list_item_event_title);
+        TextView avrageDistanceValue = (TextView) rowView.findViewById(R.id.avg_dist);
+        TextView avrageTimeTextView = (TextView) rowView.findViewById(R.id.avg_time);
 
 
 
         Event event = getItem(position);
 
-        titleTextView.setText(event.getProperty("event_name")+"");
+        if ((event.getProperty("dist") != null)) {
+            int distance = (int) Math.round(event.getMinDistance());
+
+            int m = 0;
+            double km = 0;
+
+            //Kalkuler km osv
+            if (distance > 1000) {
+                km = (double) distance /1000;
+                m = (distance%1000)/1000;
+
+                String numberAsString = String.format("%.1f", km);
+                avrageDistanceValue.setText(numberAsString + "km");
+
+            } else {
+                m=distance;
+                avrageDistanceValue.setText((m + "m"));
+            }
+
+        };
+
+        if ((event.getProperty("avg_time") != null)) {
+
+            avrageTimeTextView.setText(event.getProperty("avg_time"));
+        }
+
+        titleTextView.setText(event.getProperty("event_name"));
 
 
         return rowView;
