@@ -54,8 +54,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private LocationRequest locationRequest;
     private Point startPoint;
     private Location currentLocation;
-    private ClusterManager manager;
     private RoomSaveAndLoad roomSaveAndLoad;
+    private ClusterManager manager;
     private int eventID;
 
     @Override

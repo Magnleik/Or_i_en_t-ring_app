@@ -31,9 +31,10 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
-import no.teacherspet.tring.util.EventComparator;
 import no.teacherspet.tring.util.RoomSaveAndLoad;
 import no.teacherspet.tring.util.RoomInteract;
+import no.teacherspet.tring.util.EventComparator;
+
 
 
 /**
@@ -70,9 +71,9 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    private EventAdapter eventAdapter;
     private RoomSaveAndLoad roomSaveAndLoad;
+    private EventAdapter eventAdapter;
+
 
     public NearbyEvents() {
         // Required empty public constructor
@@ -100,8 +101,8 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         networkManager = NetworkManager.getInstance();
-        roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
 
+        roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         reverseAlpha = false;
         reversePop = false;
         reverseScore = false;
