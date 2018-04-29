@@ -11,7 +11,7 @@
     <string name="done">Ferdig</string>
     <string name="track_name">Løypenavn</string>
     <string name="create_point_on_my_pos">Lag punkt på min posisjon</string>
-    <string name="get_saved_points">Hent lagrede punkt</string>
+    <string name="get_saved_points">Hent eksisterende punkt</string>
     <string name="password">Passord</string>
     <string name="repeat_password">Repetér passord</string>
     <string name="username">Brukernavn</string>
@@ -89,4 +89,16 @@
     <string name="local_user_deleted">Lokal bruker slettet</string>
     <string name="must_log_in_for_access">Du må logge inn for å ha tilgang til denne aktiviteten</string>
     <string name="must_log_in">Du må logge inn</string>
+    <string name="return_to_event">Gå tilbake til løpet</string>
+    <string name="return_to_start_menu">Gå tilbake til startmenyen</string>
+    <string name="difficulty">Vanskelighetsgrad:</string>
+    <string name="easy_button_text" >Lett</string>
+    <string name="medium_button_text" >Medium</string>
+    <string name="hard_button_text" >Vanskelig</string>
+    <string name="start_dialog_positive_button_next">Neste</string>
+    <string name="explain_event_when_started" >1. Gå til startpunktet (den grønne markøren) \n\n 2. Trykk på "Start Event"-knappen \n\n 3. Spring. Lykke til!</string>
+    <string name="no_known_points_in_area">Det er ingen kjente punkt i dette området</string>
+    <string name="pos_not_yet_found">Posisjon er enda ikke funnet</string>
+    <string name="my_position">Min posisjon</string>
+
 </resources>

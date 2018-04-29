@@ -202,6 +202,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                         @Override
                         public void onFailure(Throwable t) {
                             Toast.makeText(getApplicationContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            progressDialog.hide();
                         }
                     };
                     networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), 200, adapter);

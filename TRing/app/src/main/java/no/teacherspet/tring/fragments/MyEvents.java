@@ -26,19 +26,15 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
-import no.teacherspet.tring.util.RoomSaving;
-import no.teacherspet.tring.util.SaveToRoom;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
+import no.teacherspet.tring.util.RoomInteract;
 
 
 /**
@@ -49,7 +45,7 @@ import no.teacherspet.tring.util.SaveToRoom;
  * Use the {@link MyEvents#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyEvents extends Fragment implements SaveToRoom{
+public class MyEvents extends Fragment implements RoomInteract {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,11 +60,9 @@ public class MyEvents extends Fragment implements SaveToRoom{
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
-    private LocalDatabase database;
     private OEventViewModel oEventViewModel;
-    private PointOEventJoinViewModel joinViewModel;
     private ArrayList<Event> listItems;
-    private RoomSaving roomSaving;
+    private RoomSaveAndLoad roomSaveAndLoad;
 
     private OnFragmentInteractionListener mListener;
 
@@ -99,7 +93,7 @@ public class MyEvents extends Fragment implements SaveToRoom{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         listItems = new ArrayList<>();
-        roomSaving = new RoomSaving(getContext(), this);
+        roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
         if (getArguments() != null) {
@@ -130,7 +124,7 @@ public class MyEvents extends Fragment implements SaveToRoom{
                         updateList();
 
                         for(Event event : object){
-                            roomSaving.saveRoomEvent(event);
+                            roomSaveAndLoad.saveRoomEvent(event);
                         }
                     }
                     else{
@@ -203,23 +197,17 @@ public class MyEvents extends Fragment implements SaveToRoom{
      * room database and create a new event from it
      */
     private void loadData() {
-        database = LocalDatabase.getInstance(this.getContext());
+        LocalDatabase database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
-        joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
         Log.d("Room","Started loading events");
-        oEventViewModel.getAllOEvents().subscribe(oEvents -> loadPoints(oEvents));
+        oEventViewModel.getAllOEvents().subscribe(oEvents -> createEvents(oEvents));
     }
 
-    private void loadPoints(List<RoomOEvent> oEvents){
+    private void createEvents(List<RoomOEvent> oEvents){
         Log.d("Room",String.format("%d events found", oEvents.size()));
         if(oEvents.size()>0) {
             for (RoomOEvent event : oEvents) {
-                joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
-                    Log.d("Room",String.format("%d points found for event %d", roomPoints.size(), event.getId()));
-                    if(roomPoints.size() > 0){
-                        joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins -> createEvent(event, roomPoints, joins));
-                    }
-                });
+                roomSaveAndLoad.reconstructEvent(event);
             }
         }
         else{
@@ -227,40 +215,6 @@ public class MyEvents extends Fragment implements SaveToRoom{
             Toast.makeText(this.getContext(), R.string.found_no_locally_saved_events, Toast.LENGTH_SHORT).show();
         }
     }
-    private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
-        Event event = new Event();
-        event._setId(oEvent.getId());
-        for(String key : oEvent.getProperties().keySet()){
-            event.addProperty(key, oEvent.getProperties().get(key));
-        }
-        for (RoomPoint roomPoint : roomPoints){
-            for (PointOEventJoin join : joins){
-                if(roomPoint.getId() == join.getPointID()){
-                    //Point point = setupPoint(roomPoint, join.isVisited());
-                    Point point = setupPoint(roomPoint, false);
-                    if(join.isStart()){
-                        event.setStartPoint(point);
-                    }
-                    else{
-                        event.addPost(point);
-                    }
-                }
-            }
-        }
-        Log.d("Room",String.format("Event %d created",event.getId()));
-        listItems.add(event);
-        updateList();
-    }
-    private Point setupPoint(RoomPoint roomPoint, boolean visited){
-        Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
-        point._setId(roomPoint.getId());
-        point.setVisited(visited);
-        for(String key : roomPoint.getProperties().keySet()){
-            point.addProperty(key, roomPoint.getProperties().get(key));
-        }
-        return point;
-    }
-
     private void updateList() {
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
@@ -285,6 +239,22 @@ public class MyEvents extends Fragment implements SaveToRoom{
                 Toast.makeText(this.getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
             }
         });
+        NetworkManager.getInstance().unsubscribeFromEvent(event.getId(), new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("Unsubscribed from event %d", event.getId()));
+                }
+                else{
+                    Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
+                }
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
+            }
+        });
+
     }
 
     @Override
@@ -305,8 +275,11 @@ public class MyEvents extends Fragment implements SaveToRoom{
     }
 
     @Override
-    public void whenRoomFinished(boolean savedAll) {
-
+    public void whenRoomFinished(Object object) {
+        if(object instanceof Event){
+            listItems.add((Event) object);
+            updateList();
+        }
     }
 
     /**

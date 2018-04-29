@@ -34,35 +34,42 @@
 
         <activity
             android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps" />
-        <activity android:name=".activities.StartupMenu">
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.StartupMenu"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".activities.OrientationSelector">
+        <activity android:name=".activities.OrientationSelector"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.CreateOEvent">
+        <activity android:name=".activities.CreateOEvent"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".activities.PerformOEvent"
-        android:configChanges="keyboardHidden|screenSize" />
+        android:configChanges="keyboardHidden|screenSize"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".activities.AddExistingPoint">
+        <activity android:name=".activities.AddExistingPoint"
+            android:screenOrientation="portrait">
 
         </activity>
         <activity
             android:name=".activities.CreateUserActivity"
-            android:label="Create User" />
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activities.LogInActivity"
-            android:label="Log In" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.ListOfSavedEvents"
             android:label="@string/title_activity_list_of_saved_events"
             android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="portrait">
         </activity>
 
 
