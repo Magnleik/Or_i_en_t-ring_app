@@ -688,9 +688,13 @@ public class NetworkManager {
             for (int i = httpClient.interceptors().size()-1; i >=0; i--) {
                 if( httpClient.interceptors().get(i) instanceof AuthenticationInterceptor){
                     httpClient.interceptors().remove(i);
+                    builder.client(httpClient.build());
+                    retrofit = builder.build();
                 }
             }
         }
+
+        client = retrofit.create(Client.class);
 
     }
     /**
