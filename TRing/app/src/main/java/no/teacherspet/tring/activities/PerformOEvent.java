@@ -3,9 +3,11 @@ package no.teacherspet.tring.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
+import connection.ICallbackAdapter;
+import connection.NetworkManager;
 import connection.Point;
 import no.teacherspet.tring.Database.Entities.EventResult;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
@@ -59,10 +64,28 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Event startedEvent;
     long startTime;
     long eventTime;
+    boolean savedResults = false;
+    private int eventDifficultyValue;
+    private double seconds;
+    private double minutes;
+    private double hours;
+    private String timeTextToServer;
+
 
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
     private ResultViewModel resultViewModel;
+
+    private Button easyButton;
+    private Button mediumButton;
+    private Button hardButton;
+    private TextView difficultyTextViewValue;
+    private TextView eventTitle;
+    private TextView difficultyTextViewText;
+    private TextView explanationTextView;
+    private Button startButton;
+    private Button showMyPosition;
+    private Button arrivedButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +98,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         createLocationRequest();
+        openStartDialog();
+        showLocationUntilEventIsStarted();
+
+        startButton = (Button) findViewById(R.id.start_event_btn);
+        showMyPosition = (Button) findViewById(R.id.show_position_btn);
+        arrivedButton = (Button) findViewById(R.id.test_position_btn);
+        showMyPosition.setVisibility(View.INVISIBLE);
+        arrivedButton.setVisibility(View.INVISIBLE);
+
 
         visitedPoints = new ArrayList<>();
 
@@ -85,10 +117,17 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
         // 1
         //TODO: Fix saving of points when phone is flipped
+
+        if (startedEvent == null) {
+            this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        }
+//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
+
         this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
         startTime = getIntent().getLongExtra("StartTime", -1);
 
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
+
         if (startedEvent != null) {
             points = readPoints();
             if (points == null) {
@@ -106,9 +145,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
-                    System.out.println(locationResult.getLastLocation().getAccuracy());
                     if (locationResult.getLastLocation().getAccuracy() <= 700 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
+                        if (eventTime != -1) {
+                            showLocationUntilEventIsStarted();
+                        }
                     }
                 }
             };
@@ -163,7 +204,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         visitedPoints.add(point);
                         markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))));
                     } else {
-                        markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude()))));
+                        if (point.equals(startedEvent.getStartPoint())) {
+                            markers.put(point,mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.startpoint_flag_five))));
+                        } else {
+                            markers.put(point,mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((point.getDescription()))));                   
+                        }
                     }
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
@@ -192,6 +237,114 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
+    //Dialog opens when event starts
+
+    public void openStartDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View inflator = inflater.inflate(R.layout.event_started_dialog, null);
+        builder.setView(inflator);
+
+        easyButton = (Button) inflator.findViewById(R.id.easy_btn);
+        mediumButton = (Button) inflator.findViewById(R.id.medium_btn);
+        hardButton = (Button) inflator.findViewById(R.id.hard_btn);
+        difficultyTextViewValue = (TextView) inflator.findViewById(R.id.difficulty_textview);
+        eventTitle = (TextView) inflator.findViewById(R.id.eventStartedTitle);
+        difficultyTextViewText = inflator.findViewById(R.id.difficulty_textView_Text);
+        explanationTextView = inflator.findViewById(R.id.explanation_textview);
+
+        if (startedEvent == null) {
+            this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        }
+        eventTitle.setText(startedEvent.getProperty("event_name"));
+        explanationTextView.setVisibility(View.INVISIBLE);
+
+        setEventDifficulty("easy");
+
+        easyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("easy");
+            }
+        });
+
+        mediumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("medium");
+            }
+        });
+
+        hardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setEventDifficulty("hard");
+            }
+        });
+
+
+        builder.setPositiveButton(R.string.start_dialog_positive_button_next, null);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button button = ((AlertDialog) alertDialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        // TODO Do something
+                        if (easyButton.getVisibility() == View.VISIBLE) {
+                            easyButton.setVisibility(View.INVISIBLE);
+                            mediumButton.setVisibility(View.INVISIBLE);
+                            hardButton.setVisibility(View.INVISIBLE);
+                            difficultyTextViewText.setVisibility(View.INVISIBLE);
+                            difficultyTextViewValue.setVisibility(View.INVISIBLE);
+                            explanationTextView.setVisibility(View.VISIBLE);
+                            button.setText("Got it!");
+                        } else {
+                            //Dismiss once everything is OK.
+                            //Lagre event (Tid, score og avstand?)
+
+                            alertDialog.dismiss();
+
+
+                        }
+                    }
+                });
+            }
+        });
+
+        alertDialog.show();
+
+    }
+
+    public void setEventDifficulty(String difficulty) {
+        switch (difficulty) {
+            case "easy":
+                this.eventDifficultyValue = 8;
+                this.difficultyTextViewValue.setText(R.string.easy_button_text);
+                this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#80228B22"));
+                break;
+
+            case "medium":
+                this.eventDifficultyValue = 12;
+                this.difficultyTextViewValue.setText(R.string.medium_button_text);
+                this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#99e5e500"));
+                break;
+
+            case "hard":
+                this.eventDifficultyValue = 16;
+                this.difficultyTextViewValue.setText(R.string.hard_button_text);
+                this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#B3b20000"));
+                break;
+
+        }
+    }
+
     //Dialog opens when event is finished
     public void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -201,14 +354,52 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         builder.setView(inflator);
 
         //Viser tiden brukt under eventet
-        double eventTime = getEventTime();
-        String eventTimeString = Double.toString(eventTime);
+        seconds = 0;
+        seconds = getEventTime();
+        int secondsInt = (int) seconds;
+        int minutesInt = (int) minutes;
+        int hoursInt = (int) hours;
+
+        if (seconds > 60) {
+            //Regn om til minutter
+            minutes = calculate(eventTime);
+            seconds = calculateRest(eventTime);
+
+        }
+
+        if (minutes > 60) {
+            //Regn om til timer
+
+            hours = calculate(minutes);
+            minutes = calculateRest(minutes);
+            seconds = calculateRest(minutes);
+        }
+
+        timeTextToServer = "";
+
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText(String.format(getString(R.string.time_minutes_formatted), eventTimeString));
+        if ((seconds) != 0) {
+            timeTextView.setText("Tid: " + (int) seconds + " sec");
+        }
+
+        if ((minutes) != 0) {
+            timeTextView.setText("Tid: " + (int) minutes + "min " + (int) seconds + " sec");
+        }
+
+
+        if ((hours) != 0) {
+            timeTextView.setText("Tid: " + (int) hours + "hour " + (int) minutes + "min " + (int) seconds + " sec");
+            //Fiks for timer
+        }
+
+        //Tid som skal sendes til server
+        timeTextToServer = String.format("%02d:%02d:%02d", hoursInt, minutesInt, secondsInt);
+
 
         //Viser score oppnådd under eventet
-        double eventScore = getEventScore();
-        String eventScoreString = Double.toString(eventScore);
+        double eventScore = Math.round(getEventScore());
+        String eventScoreString = Integer.toString((int) eventScore);
+        eventScoreString += "/100";
         TextView scoreTextView = (TextView) inflator.findViewById(R.id.scoreTextView);
         scoreTextView.setText(String.format(getString(R.string.total_score_formatted), eventScoreString));
 
@@ -216,12 +407,48 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //Lagre event (Tid, score og avstand?)
+                NetworkManager networkManager = NetworkManager.getInstance();
+                networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
+                    @Override
+                    public void onResponse(Event object) {
+                        Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
+                        openScoreDialog();
+                    }
 
-                dialog.dismiss();
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+
+                    }
+                });
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
+    //Shows the users score, compared to the avrage time
+    public void openScoreDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View inflator = inflater.inflate(R.layout.event_score_dialog, null);
+        builder.setView(inflator);
+
+        builder.setPositiveButton(R.string.return_to_start_menu, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setNegativeButton(R.string.return_to_event, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -239,10 +466,12 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param v
      */
     public void showLocationButtonPressed(View v) {
+        positionViewed++;
         Marker positionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title(getString(R.string.my_position)));
         //Marker removed after 5 seconds
         CountDownTimer visible = new CountDownTimer(5000, 1000) {
             int sek = 5;
+
 
             @Override
             public void onTick(long l) {
@@ -255,9 +484,44 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             public void onFinish() {
                 positionMarker.remove();
 
+
             }
+
         }.start();
     }
+
+
+
+
+
+
+    public void showLocationUntilEventIsStarted() {
+
+        if (currentLocation != null) {
+            Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
+            //Markor fjernes etter 5 sekund
+
+
+
+                CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+                    int sek = 5;
+
+                    @Override
+                    public void onTick(long l) {
+                        sek--;
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        posisjonsmarkor.remove();
+
+                    }
+                }.start();
+
+        }
+
+    }
+
 
     /**
      * gives the average LatLng for the points in the event. Used for centering the camera correctly for the user.
@@ -296,8 +560,12 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
-                markers.get(point).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_SHORT).show();
+
+                if(!point.equals(startedEvent.getStartPoint())) {
+                    markers.get(point).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             }
         }
@@ -456,9 +724,20 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public long getEventTime() {
         if (this.eventTime == -1) {
             long difference = System.currentTimeMillis() - this.startTime;
-            this.eventTime = (difference / 1000) / 60; //minutes
+            this.eventTime = (difference / 1000) ; //seconds
         }
+
         return eventTime;
+    }
+
+    public double calculate(double eventTime) {
+        eventTime = Math.round(eventTime/60);
+        return eventTime;
+    }
+
+    public double calculateRest(double eventTime) {
+        double eventTimeRest = Math.round(eventTime%60);
+        return eventTimeRest;
     }
 
     public double getEventScore() {
@@ -473,16 +752,23 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             }
             distance += point.getDistanceFromPoint(new LatLng(points.get(index + 1).getLatitude(), points.get(index + 1).getLongitude()));
         }
-
+        distance = distance*1.2; // Multiplying because of the terrain (The route will most likely be longer than the air distance
         //This must be changed based on the users level
         //Now using avrg jogging spead (Mid-levelsish?) 8kmph
 
-        double avrageTimeBasedOnDistance = distance / 8000; //minutes
-
+        double avrageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000)/3600); //
 
         double eventTime = getEventTime();
-        double eventScore = avrageTimeBasedOnDistance / eventTime;
 
+        double eventScore = avrageTimeBasedOnDistance *100 / eventTime;
+        if ( eventScore > 100) {
+            eventScore = 100;
+        }
+        eventScore -= positionViewed*5; // Fjerner poeng for å ha sjekket posisjonen.
+
+        if(eventScore<1) {
+            eventScore =1;
+        }
 
         return eventScore;
     }
@@ -490,16 +776,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public void startEventBtnPressed(View v) {
         // Check if user is on startpoint
 
-        View addEventButton = findViewById(R.id.start_event_btn);
+
+
         if (currentLocation == null) {
             Toast.makeText(getApplicationContext(), R.string.try_again_in_5_sec, Toast.LENGTH_SHORT).show();
             return;
         }
+
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
         if (startedEvent.getStartPoint() != null) {
             float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
             if (distance < 20) {
-                addEventButton.setVisibility(View.GONE);
+                //addEventButton.setVisibility(View.GONE);
                 //TODO Ikke sett hvis startTime allerede er satt
                 if(startTime == -1){
                     startTime = System.currentTimeMillis();
@@ -509,6 +798,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     saveEventStartTime(startTime, results);
                 });
                 this.eventTime = -1;
+                arrivedButton.setVisibility(View.VISIBLE);
+                showMyPosition.setVisibility(View.VISIBLE);
+                startButton.setVisibility(View.INVISIBLE);
+                onArrivedBtnPressed(new View(getApplicationContext()));
             } else {
                 Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
             }
