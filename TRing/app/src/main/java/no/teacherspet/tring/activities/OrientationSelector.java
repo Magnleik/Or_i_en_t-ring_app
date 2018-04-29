@@ -23,14 +23,10 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.GeneralProgressDialog;
@@ -40,9 +36,7 @@ import no.teacherspet.tring.util.RoomSaveAndLoad;
 public class OrientationSelector extends AppCompatActivity implements RoomInteract {
 
     private static final int MY_PERMISSIONS_ACCESS_FINE_LOCATION=1;
-    private LocalDatabase localDatabase;
     private OEventViewModel eventViewModel;
-    private PointOEventJoinViewModel joinViewModel;
     private Button continueButton;
     private Button logInButton;
     private Event activeEvent;
@@ -60,10 +54,9 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         progressDialog = new GeneralProgressDialog(this,this);
 
 
-        localDatabase = LocalDatabase.getInstance(this);
+        LocalDatabase localDatabase = LocalDatabase.getInstance(this);
         userViewModel = new UserViewModel(localDatabase.userDAO());
         eventViewModel = new OEventViewModel(localDatabase.oEventDAO());
-        joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
 
         roomSaveAndLoad = new RoomSaveAndLoad(getApplicationContext(), this);
 

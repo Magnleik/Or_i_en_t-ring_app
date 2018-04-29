@@ -26,13 +26,9 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -64,9 +60,7 @@ public class MyEvents extends Fragment implements RoomInteract {
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
     private LatLng position;
-    private LocalDatabase database;
     private OEventViewModel oEventViewModel;
-    private PointOEventJoinViewModel joinViewModel;
     private ArrayList<Event> listItems;
     private RoomSaveAndLoad roomSaveAndLoad;
 
@@ -203,9 +197,8 @@ public class MyEvents extends Fragment implements RoomInteract {
      * room database and create a new event from it
      */
     private void loadData() {
-        database = LocalDatabase.getInstance(this.getContext());
+        LocalDatabase database = LocalDatabase.getInstance(this.getContext());
         oEventViewModel = new OEventViewModel(database.oEventDAO());
-        joinViewModel = new PointOEventJoinViewModel(database.pointOEventJoinDAO());
         Log.d("Room","Started loading events");
         oEventViewModel.getAllOEvents().subscribe(oEvents -> createEvents(oEvents));
     }

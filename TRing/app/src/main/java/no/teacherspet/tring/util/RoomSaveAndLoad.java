@@ -18,7 +18,7 @@ import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 
 /**
- * Util class for saving events to room
+ * Util class for saving and loading events to room
  * Created by Hermann on 28.04.2018.
  */
 
@@ -27,6 +27,9 @@ public class RoomSaveAndLoad {
     private LocalDatabase localDatabase;
     private RoomInteract returnClass;
 
+    /**
+     * Needs context to create database, returnClass to return callback
+     */
     public RoomSaveAndLoad(Context context, RoomInteract returnClass){
         localDatabase = LocalDatabase.getInstance(context);
         this.returnClass = returnClass;
@@ -46,6 +49,9 @@ public class RoomSaveAndLoad {
         });
     }
 
+    /**
+     * Saves all points connected to event with all attributes
+     */
     private void savePoints(Event event) {
         RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
         for (int i = 0; i < event.getPoints().size(); i++) {
@@ -60,6 +66,9 @@ public class RoomSaveAndLoad {
         });
     }
 
+    /**
+     * Saves all connections between the event and its points. Runs after both points and event is saved
+     */
     private void joinPointsToEvent(Event event) {
         PointOEventJoinViewModel pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
         PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
@@ -71,6 +80,11 @@ public class RoomSaveAndLoad {
         pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
     }
 
+    /**
+     * Checks if the save was successful
+     * @param longs Which columns were effected by saving, or -1 if an error occurred
+     * Returns if everything was saved or not
+     */
     private void checkSave(long[] longs) {
         boolean savedAll = true;
         for (long aLong : longs) {
@@ -87,6 +101,10 @@ public class RoomSaveAndLoad {
         returnClass.whenRoomFinished(savedAll);
     }
 
+    /**
+     * Loads all Points connected to Event from room
+     * @param event RoomOEvent which we are creating an Event out of
+     */
     public void reconstructEvent(RoomOEvent event){
         PointOEventJoinViewModel joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
         joinViewModel.getPointsForOEvent(event.getId()).subscribe(roomPoints -> {
@@ -96,6 +114,14 @@ public class RoomSaveAndLoad {
             }
         });
     }
+
+    /**
+     * Creates an Event from an RoomOEvent and its Points
+     * @param oEvent the RoomOEvent we are turning into an Event
+     * @param roomPoints Points belonging to the Event
+     * @param joins Connections between Points and the Event
+     * Returns the reconstructed Event
+     */
     private void createEvent(RoomOEvent oEvent, List<RoomPoint> roomPoints, List<PointOEventJoin> joins){
         Event event = new Event();
         event._setId(oEvent.getId());
@@ -118,6 +144,13 @@ public class RoomSaveAndLoad {
         Log.d("Room",String.format("Event %d created",event.getId()));
         returnClass.whenRoomFinished(event);
     }
+
+    /**
+     * Reconstructs an Point from an RoomPoint
+     * @param roomPoint The RoomPoint containing the information of the Point
+     * @param visited If the point has been visited or not
+     * @return The reconstructed Point
+     */
     private Point setupPoint(RoomPoint roomPoint, boolean visited){
         Point point = new Point(roomPoint.getLatLng().latitude, roomPoint.getLatLng().longitude, "placeholder");
         point._setId(roomPoint.getId());
