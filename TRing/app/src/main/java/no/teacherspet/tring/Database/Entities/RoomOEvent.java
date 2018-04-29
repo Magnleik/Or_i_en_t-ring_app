@@ -15,7 +15,6 @@ public class RoomOEvent {
         this.id = id;
         this.properties = properties;
         active = false;
-        startTime = -1;
     }
 
     @PrimaryKey //(autoGenerate = true)
@@ -24,8 +23,6 @@ public class RoomOEvent {
     private boolean active;
 
     private Map<String, String> properties;
-
-    private long startTime;
 
     public int getId() {
         return id;
@@ -49,11 +46,4 @@ public class RoomOEvent {
         this.properties = properties;
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
 }

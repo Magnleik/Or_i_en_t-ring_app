@@ -23,10 +23,12 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.Database.Entities.EventResult;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.ResultViewModel;
 import no.teacherspet.tring.Database.ViewModels.UserViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.GeneralProgressDialog;
@@ -87,10 +89,23 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
         Log.d("Room",String.format("%d active events found", activeEvents.size()));
         if(activeEvents.size() > 0){
-            startTime = activeEvents.get(0).getStartTime();
+            LocalDatabase database = LocalDatabase.getInstance(this);
+            ResultViewModel resultViewModel = new ResultViewModel(database.resultDAO());
+            resultViewModel.getResult(activeEvents.get(0).getId()).subscribe(eventResults -> {
+                Log.d("Room",String.format("Found %d results for event %d", eventResults.size(), activeEvents.get(0).getId()));
+                setStartTime(eventResults);
+            });
             roomSaveAndLoad.reconstructEvent(activeEvents.get(0));
         }
         Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
+    }
+    private void setStartTime(List<EventResult> results){
+        if(results.size() > 0){
+            startTime = results.get(0).getStartTime();
+        }
+        else{
+            startTime = -1;
+        }
     }
 
     //Changes to createUserActivity if a roomUser has not been created
