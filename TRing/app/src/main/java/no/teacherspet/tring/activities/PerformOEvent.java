@@ -220,7 +220,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    //TODO: display information when marker is clicked
+                    marker.showInfoWindow();
                     return false;
                 }
             });

@@ -593,8 +593,6 @@ public class NetworkManager {
                     callback.onResponse(null);
                     logOut();
                 }
-
-                callback.onResponse(response.body());
             }
 
             @Override
@@ -635,8 +633,6 @@ public class NetworkManager {
                     callback.onResponse(null);
                     logOut();
                 }
-
-                callback.onResponse(response.body());
             }
 
             @Override
