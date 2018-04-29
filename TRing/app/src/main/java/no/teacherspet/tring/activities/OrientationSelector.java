@@ -45,6 +45,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
     private GeneralProgressDialog progressDialog;
     private UserViewModel userViewModel;
     private long startTime;
+    private int difficulty;
     private AlertDFragment alertFragment;
     private RoomSaveAndLoad roomSaveAndLoad;
 
@@ -83,6 +84,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
         intent.putExtra("MyEvent", activeEvent);
         intent.putExtra("StartTime", startTime);
+        intent.putExtra("Difficulty", difficulty);
         startActivity(intent);
     }
 
@@ -94,17 +96,19 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
             resultViewModel.getResult(activeEvents.get(0).getId()).subscribe(eventResults -> {
                 Log.d("Room",String.format("Found %d results for event %d", eventResults.size(), activeEvents.get(0).getId()));
                 setStartTime(eventResults);
+                roomSaveAndLoad.reconstructEvent(activeEvents.get(0));
             });
-            roomSaveAndLoad.reconstructEvent(activeEvents.get(0));
         }
         Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
     private void setStartTime(List<EventResult> results){
         if(results.size() > 0){
             startTime = results.get(0).getStartTime();
+            difficulty = results.get(0).getDifficulty();
         }
         else{
             startTime = -1;
+            difficulty = -1;
         }
         Log.d("Room", String.format("StartTime set to: %d", startTime));
     }
@@ -129,14 +133,12 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                             logInButton.setEnabled(false);
                         } else {
                             userViewModel.deleteUsers(users).subscribe(integers ->{
-                                    Log.d("Room",String.format("%d users deleted", users.length));
-                                    startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
-                                    });
+                                Log.d("Room",String.format("%d users deleted", users.length));
+                            });
                         }
                     } else {
                         userViewModel.deleteUsers(users).subscribe(integers ->{
                             Log.d("Room",String.format("%d users deleted", users.length));
-                            startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
                         });
                     }
                 }
@@ -146,7 +148,6 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                     progressDialog.hide();
                     userViewModel.deleteUsers(users).subscribe(integers ->{
                         Log.d("Room",String.format("%d users deleted", users.length));
-                        startActivity(new Intent(OrientationSelector.this, LogInActivity.class));
                     });
                 }
             });
