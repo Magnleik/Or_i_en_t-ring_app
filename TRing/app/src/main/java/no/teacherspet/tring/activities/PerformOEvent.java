@@ -153,9 +153,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 if (point != null) {
                     if (point.isVisited()) {
                         visitedPoints.add(point);
-                        markers.put(point, mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))));
+                        mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     } else {
-                        markers.put(point, mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((point.getDescription()))));
+                        mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())));
                     }
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
@@ -231,9 +231,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param v
      */
     public void showLocationButtonPressed(View v) {
-        Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
-        //Markor fjernes etter 5 sekund
-        CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+        Marker positionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title(getString(R.string.my_position)));
+        //Marker removed after 5 seconds
+        CountDownTimer visible = new CountDownTimer(5000, 1000) {
             int sek = 5;
 
             @Override
@@ -245,7 +245,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
             @Override
             public void onFinish() {
-                posisjonsmarkor.remove();
+                positionMarker.remove();
 
             }
         }.start();

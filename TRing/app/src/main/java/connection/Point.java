@@ -3,6 +3,7 @@ package connection;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
  * Created by Eirik on 15-Feb-18.
  */
 
-public class Point implements Serializable {
+public class Point implements Serializable, ClusterItem {
 
     private int id = -1;
     private Map<String, String> properties;
@@ -40,6 +41,19 @@ public class Point implements Serializable {
         geometry = new Geometry();
         properties = new HashMap<>();
         isVisited = false;
+    }
+
+    public Point(double latitude,double longitude, String description, String name){
+        geometry = new Geometry();
+        geometry.coordinates = new double[]{latitude,longitude};
+        properties = new HashMap<>();
+        if(description!=null) {
+            properties.put("description", description);
+        }
+        if(properties!=null) {
+            properties.put("name", name);
+        }
+        isVisited=false;
     }
 
     public int getId() {
@@ -111,6 +125,26 @@ public class Point implements Serializable {
 
     public Map<String, String> _getAllProperties() {
         return properties;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(getLatitude(),getLongitude());
+    }
+
+    @Override
+    public String getTitle() {
+
+        if (properties.get("name")==null) {
+            return " ";
+        }
+
+        return properties.get("name");
+    }
+
+    @Override
+    public String getSnippet() {
+        return properties.get("description");
     }
 
     private class Geometry implements Serializable{
