@@ -488,6 +488,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
 
 
+
+
     public void showLocationUntilEventIsStarted() {
 
         if (currentLocation != null) {
