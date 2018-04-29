@@ -126,9 +126,19 @@ public class MyEvents extends Fragment implements RoomInteract {
                         listItems.addAll(object);
                         updateList();
 
-                        for(Event event : object){
-                            roomSaveAndLoad.saveRoomEvent(event);
-                        }
+                        oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+                            for(Event event : object){
+                                if(roomOEvents.isEmpty()){
+                                    roomSaveAndLoad.saveRoomEvent(event);
+                                }
+                                else{
+                                    if(event.getId() != roomOEvents.get(0).getId()){
+                                        roomSaveAndLoad.saveRoomEvent(event);
+                                    }
+                                }
+                            }
+                        });
+
                     }
                     else{
                         loadData();
