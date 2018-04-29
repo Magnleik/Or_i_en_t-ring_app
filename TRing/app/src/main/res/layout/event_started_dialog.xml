@@ -27,7 +27,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Move to the startpoint (the green marker) to start the event. Once there, click the startbutton when ready. Good luck!"
+        android:text="@string/explain_event_when_started"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +54,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginTop="16dp"
             android:background="#80228B22"
-            android:text="Lett" />
+            android:text="@string/easy_button_text" />
 
         <Button
             android:id="@+id/medium_btn"
@@ -63,7 +63,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:background="#99e5e500"
-            android:text="Medium" />
+            android:text="@string/medium_button_text" />
 
         <Button
             android:id="@+id/hard_btn"
@@ -73,7 +73,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:background="#B3b20000"
-            android:text="Vanskelig" />
+            android:text="@string/hard_button_text" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right"
-                android:text="Vanskelighetsgrad:"
+                android:text="@string/difficulty"
                 android:textColor="@android:color/background_dark"
                 android:textSize="18sp" />
 

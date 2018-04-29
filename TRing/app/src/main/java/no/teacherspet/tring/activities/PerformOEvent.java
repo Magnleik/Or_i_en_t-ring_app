@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -80,7 +81,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Button startButton;
     private Button showMyPosition;
     private Button arrivedButton;
-    private Marker getUserToStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,10 +93,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         actionBar.setDisplayHomeAsUpEnabled(true);
         createLocationRequest();
         openStartDialog();
+        showLocationUntilEventIsStarted();
 
         startButton = (Button) findViewById(R.id.start_event_btn);
         showMyPosition = (Button) findViewById(R.id.show_position_btn);
         arrivedButton = (Button) findViewById(R.id.test_position_btn);
+        showMyPosition.setVisibility(View.INVISIBLE);
+        arrivedButton.setVisibility(View.INVISIBLE);
+
+
 
 
 
@@ -131,6 +136,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     super.onLocationResult(locationResult);
                     if (locationResult.getLastLocation().getAccuracy() <= 700 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
+                        if (eventTime != -1) {
+                            showLocationUntilEventIsStarted();
+                        }
                     }
                 }
             };
@@ -181,7 +189,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         visitedPoints.add(point);
                         mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     } else {
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((point.getDescription())));
+                        if (point.equals(startedEvent.getStartPoint())) {
+                            mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.startpoint_flag_five)));
+                        } else {
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude())).title((point.getDescription())));
+                        }
                     }
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
@@ -257,7 +269,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         });
 
 
-        builder.setPositiveButton("Next", null);
+        builder.setPositiveButton(R.string.start_dialog_positive_button_next, null);
         AlertDialog alertDialog = builder.create();
         alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
@@ -270,7 +282,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     @Override
                     public void onClick(View view) {
                         // TODO Do something
-                        getUserToStart = null;
                         if (easyButton.getVisibility() == View.VISIBLE) {
                             easyButton.setVisibility(View.INVISIBLE);
                             mediumButton.setVisibility(View.INVISIBLE);
@@ -279,13 +290,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                             difficultyTextViewValue.setVisibility(View.INVISIBLE);
                             explanationTextView.setVisibility(View.VISIBLE);
                             button.setText("Got it!");
-                            getUserToStart = mMap.addMarker(new MarkerOptions().title(startedEvent.getStartPoint().getDescription()).position(new LatLng(startedEvent.getStartPoint().getLatitude(), startedEvent.getStartPoint().getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                         } else {
                             //Dismiss once everything is OK.
                             //Lagre event (Tid, score og avstand?)
-                            startedEvent.getStartPoint();
-                            showMyPosition.setVisibility(View.INVISIBLE);
-                            arrivedButton.setVisibility(View.INVISIBLE);
+
                             alertDialog.dismiss();
 
 
@@ -303,19 +311,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         switch (difficulty) {
             case "easy":
                 this.eventDifficultyValue = 8;
-                this.difficultyTextViewValue.setText("Lett");
+                this.difficultyTextViewValue.setText(R.string.easy_button_text);
                 this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#80228B22"));
                 break;
 
             case "medium":
                 this.eventDifficultyValue = 12;
-                this.difficultyTextViewValue.setText("Medium");
+                this.difficultyTextViewValue.setText(R.string.medium_button_text);
                 this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#99e5e500"));
                 break;
 
             case "hard":
                 this.eventDifficultyValue = 16;
-                this.difficultyTextViewValue.setText("Vanskelig");
+                this.difficultyTextViewValue.setText(R.string.hard_button_text);
                 this.difficultyTextViewValue.setBackgroundColor(Color.parseColor("#B3b20000"));
                 break;
 
@@ -331,6 +339,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         builder.setView(inflator);
 
         //Viser tiden brukt under eventet
+        seconds=0;
         seconds = getEventTime();
         int secondsInt = (int) seconds;
         int minutesInt = (int) minutes;
@@ -447,23 +456,54 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         positionViewed++;
         Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
         //Markor fjernes etter 5 sekund
-        CountDownTimer synlig = new CountDownTimer(5000, 1000) {
-            int sek = 5;
+        if (eventTime == -1) {
+            CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+                int sek = 5;
 
-            @Override
-            public void onTick(long l) {
-                sek--;
-                Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
+                @Override
+                public void onTick(long l) {
+                    sek--;
+                    Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
 
-            }
+                }
 
-            @Override
-            public void onFinish() {
-                posisjonsmarkor.remove();
+                @Override
+                public void onFinish() {
+                    posisjonsmarkor.remove();
 
-            }
-        }.start();
+                }
+
+            }.start();
+        }
     }
+
+    public void showLocationUntilEventIsStarted() {
+
+        if (currentLocation != null) {
+            Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
+            //Markor fjernes etter 5 sekund
+
+
+
+                CountDownTimer synlig = new CountDownTimer(5000, 1000) {
+                    int sek = 5;
+
+                    @Override
+                    public void onTick(long l) {
+                        sek--;
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        posisjonsmarkor.remove();
+
+                    }
+                }.start();
+
+        }
+
+    }
+
 
     /**
      * gives the average LatLng for the points in the event. Used for centering the camera correctly for the user.
@@ -502,8 +542,10 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
-                Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
-                mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                if(!point.equals(startedEvent.getStartPoint())) {
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
+                }
                 break;
             }
         }
@@ -664,6 +706,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     public void startEventBtnPressed(View v) {
         // Check if user is on startpoint
 
+
+
         if (currentLocation == null) {
             Toast.makeText(getApplicationContext(), R.string.try_again_in_5_sec, Toast.LENGTH_SHORT).show();
             return;
@@ -677,10 +721,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             arrivedButton.setVisibility(View.VISIBLE);
             showMyPosition.setVisibility(View.VISIBLE);
             startButton.setVisibility(View.INVISIBLE);
-            if (getUserToStart != null) {
-                getUserToStart.remove();
-
-            }
+            onArrivedBtnPressed(new View(getApplicationContext()));
             Toast.makeText(getApplicationContext(), "Event started", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_SHORT).show();
