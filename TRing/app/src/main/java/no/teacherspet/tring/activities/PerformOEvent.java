@@ -35,17 +35,20 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
+import no.teacherspet.tring.Database.Entities.EventResult;
 import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
+import no.teacherspet.tring.Database.ViewModels.ResultViewModel;
 import no.teacherspet.tring.R;
 
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
@@ -54,6 +57,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private LocationRequest locationRequest;
     private Location currentLocation;
     private int positionViewed = 0;
+    private HashMap<Point, Marker> markers;
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
@@ -67,9 +71,9 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private String timeTextToServer;
 
 
-    private LocalDatabase localDatabase;
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
+    private ResultViewModel resultViewModel;
 
     private Button easyButton;
     private Button mediumButton;
@@ -85,6 +89,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        markers = new HashMap<>();
         setContentView(R.layout.activity_perform_oevent);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_used_in_event);
@@ -102,21 +107,26 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         arrivedButton.setVisibility(View.INVISIBLE);
 
 
-
-
-
         visitedPoints = new ArrayList<>();
 
-        localDatabase = LocalDatabase.getInstance(this);
+        LocalDatabase localDatabase = LocalDatabase.getInstance(this);
         oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
         joinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
+        resultViewModel = new ResultViewModel(localDatabase.resultDAO());
 
         // 1
         //TODO: Fix saving of points when phone is flipped
+
         if (startedEvent == null) {
             this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
         }
 //        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_LONG).show();
+
+        this.startedEvent = (Event) getIntent().getSerializableExtra("MyEvent");
+        startTime = getIntent().getLongExtra("StartTime", -1);
+
+//        Toast.makeText(getApplicationContext(),Integer.toString(startedEvent.getId()),Toast.LENGTH_SHORT).show();
+
         if (startedEvent != null) {
             points = readPoints();
             if (points == null) {
@@ -162,7 +172,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (!startedEvent.getPoints().isEmpty()) {
             return startedEvent.getPoints();
         } else {
-            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -187,7 +197,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 if (point != null) {
                     if (point.isVisited()) {
                         visitedPoints.add(point);
-                        mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        mMap.addMarker(new MarkerOptions().title(point.getTitle()).snippet(point.getSnippet()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                     } else {
                         if (point.equals(startedEvent.getStartPoint())) {
                             mMap.addMarker(new MarkerOptions().title(point.getDescription()).position(new LatLng(point.getLatitude(), point.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.startpoint_flag_five)));
@@ -339,7 +349,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         builder.setView(inflator);
 
         //Viser tiden brukt under eventet
-        seconds=0;
+        seconds = 0;
         seconds = getEventTime();
         int secondsInt = (int) seconds;
         int minutesInt = (int) minutes;
@@ -356,15 +366,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             //Regn om til timer
 
             hours = calculate(minutes);
-            minutes=calculateRest(minutes);
-            seconds=calculateRest(minutes);
+            minutes = calculateRest(minutes);
+            seconds = calculateRest(minutes);
         }
 
         timeTextToServer = "";
 
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
         if ((seconds) != 0) {
-            timeTextView.setText("Tid: " +  (int) seconds + " sec");
+            timeTextView.setText("Tid: " + (int) seconds + " sec");
         }
 
         if ((minutes) != 0) {
@@ -378,7 +388,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
 
         //Tid som skal sendes til server
-        timeTextToServer = String.format("%02d:%02d:%02d",hoursInt,minutesInt,secondsInt);
+        timeTextToServer = String.format("%02d:%02d:%02d", hoursInt, minutesInt, secondsInt);
 
 
         //Viser score oppnådd under eventet
@@ -389,33 +399,31 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         scoreTextView.setText(String.format(getString(R.string.total_score_formatted), eventScoreString));
 
 
-
-
         builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                NetworkManager networkManager = NetworkManager.getInstance();
+                networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        NetworkManager networkManager = NetworkManager.getInstance();
-                        networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
-                            @Override
-                            public void onResponse(Event object) {
-                                Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
-                                openScoreDialog();
-                            }
+                    public void onResponse(Event object) {
+                        Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
+                        openScoreDialog();
+                    }
 
-                            @Override
-                            public void onFailure(Throwable t) {
-                                Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
 
-                            }
-                        });
                     }
                 });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
@@ -454,28 +462,31 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      */
     public void showLocationButtonPressed(View v) {
         positionViewed++;
-        Marker posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
-        //Markor fjernes etter 5 sekund
-        if (eventTime == -1) {
-            CountDownTimer synlig = new CountDownTimer(5000, 1000) {
-                int sek = 5;
+        Marker positionMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title(getString(R.string.my_position)));
+        //Marker removed after 5 seconds
+        CountDownTimer visible = new CountDownTimer(5000, 1000) {
+            int sek = 5;
 
-                @Override
-                public void onTick(long l) {
-                    sek--;
-                    Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
 
-                }
+            @Override
+            public void onTick(long l) {
+                sek--;
+                Toast.makeText(getApplicationContext(), String.format(getString(R.string.position_count_marker_warning_formatted), positionViewed, sek), Toast.LENGTH_SHORT).show();
 
-                @Override
-                public void onFinish() {
-                    posisjonsmarkor.remove();
+            }
 
-                }
+            @Override
+            public void onFinish() {
+                positionMarker.remove();
 
-            }.start();
-        }
+
+            }
+
+        }.start();
     }
+
+
+
 
     public void showLocationUntilEventIsStarted() {
 
@@ -542,26 +553,30 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 visitedPoints.add(point);
                 point.setVisited(true);
                 updatePoint(point);
+
                 if(!point.equals(startedEvent.getStartPoint())) {
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(point.getLatitude(), point.getLongitude()))).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                    Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_LONG).show();
+                    markers.get(point).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    Toast.makeText(getApplicationContext(), R.string.arrived_at_unvisited_point, Toast.LENGTH_SHORT).show();
                 }
+
                 break;
             }
         }
 
         if (prevsize == visitedPoints.size()) {
-            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), R.string.no_new_point_here, Toast.LENGTH_SHORT).show();
         }
         if (points.size() == visitedPoints.size()) {
             updateEvent(false);
             //Event finnished!
+            resultViewModel.getResult(startedEvent.getId()).subscribe(results -> saveEventResult(getEventTime(), results));
             endEvent();
         }
     }
 
     /**
      * Method for updating the event to Room. To be called when starting and when finishing
+     *
      * @param starting Whether the event should be saved as starting(TRUE), or finishing(FALSE)
      */
     private void updateEvent(boolean starting) {
@@ -569,14 +584,16 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         event.setActive(starting);
         oEventViewModel.addOEvents(event).subscribe(longs -> {
             if (longs[0] != -1) {
-                Log.d("Room",String.format("Event %d updated, starting: %b", event.getId(), starting));
+                Log.d("Room", String.format("Event %d updated, starting: %b", event.getId(), starting));
                 updatePoints(startedEvent, starting);
             }
         });
     }
+
     /**
      * Method for saving which points have been visited to room
-     * @param event Event which we are updating
+     *
+     * @param event    Event which we are updating
      * @param starting True: Event should be set to active. False: Event should be set to inactive
      */
     private void updatePoints(Event event, boolean starting) {
@@ -586,60 +603,106 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             boolean start = startPoint.equals(points.get(i));
             joins[i] = new PointOEventJoin(points.get(i).getId(), event.getId(), start, points.get(i).isVisited() && starting);
         }
+        Log.d("Room",String.format("Started updating %d points for event %d", joins.length, event.getId()));
         joinViewModel.addJoins(joins).subscribe(longs -> {
-            if(longs[0] != -1){
-                Log.d("Room",String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
+            if (longs[0] != -1) {
+                Log.d("Room", String.format("Points for event %d updated, code: %d", event.getId(), longs[0]));
             }
         });
     }
-
     /**
      * Updates a single point to "visited" in the local database
+     *
      * @param point Point to be updated
      */
     private void updatePoint(Point point) {
         boolean start = startedEvent.getStartPoint().equals(point);
         PointOEventJoin join = new PointOEventJoin(point.getId(), startedEvent.getId(), start, true);
+        Log.d("Room",String.format("Setting point %d to visited", point.getId()));
         joinViewModel.addJoins(join).subscribe(longs -> {
             if(longs[0]>0){
-                Log.d("Room",String.format("Point %d saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d updated, code: %d", point.getId(), longs[0]));
             }
             else{
-                Log.d("Room",String.format("Point %d not saved, code: %d", point.getId(), longs[0]));
+                Log.d("Room",String.format("Visit point %d not updated, code: %d", point.getId(), longs[0]));
             }
         });
     }
 
     /**
+     * Saves the start time of an event to Room
+     * @param startTime start time in seconds
+     */
+    private void saveEventStartTime(long startTime, List<EventResult> results){
+        EventResult result = new EventResult(startedEvent.getId());
+        result.setStartTime(startTime);
+        if(results.size() > 0){
+            result.setEventTime(results.get(0).getEventTime());
+        }
+        Log.d("Room", String.format("StartTime set to %d", startTime));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("StartTime saved for event %d", result.getId())));
+    }
+
+    /**
+     * Saves the result to room, if the new result is better than the previous result
+     */
+    private void saveEventResult(long eventTime, List<EventResult> results){
+        EventResult result = new EventResult(startedEvent.getId());
+        if(results.size() > 0){
+            if(results.get(0).getEventTime() == -1){
+                result.setEventTime(eventTime);
+            }
+            else if(eventTime < results.get(0).getEventTime()){
+                result.setEventTime(eventTime);
+            }
+            else{
+                result.setEventTime(results.get(0).getEventTime());
+            }
+        }
+        else{
+            result.setEventTime(eventTime);
+        }
+        Log.d("Room", String.format("StartTime : %d, ResultTime: %d", result.getStartTime(), result.getEventTime()));
+        resultViewModel.addResults(result).subscribe(longs -> Log.d("Room", String.format("ResultTime saved for event %d", result.getId())));
+    }
+
+    /**
      * Set all events in room to not active, set all points to not visited
+     *
      * @param activeEvent Event which should not be reset
      */
-    private void resetActiveEvents(Event activeEvent){
-        Log.d("Room","Started resetting active events");
+    private void resetActiveEvents(Event activeEvent) {
+        Log.d("Room", "Started resetting active events");
         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
             Log.d("Room",String.format("Found %d active events", roomOEvents.size()));
             for (RoomOEvent event : roomOEvents){
                 if(event.getId() != activeEvent.getId()){
-                    Log.d("Room",String.format("Resetting event %d", event.getId()));
+                    Log.d("Room",String.format("Setting event %d to not active", event.getId()));
                     joinViewModel.getJoinsForOEvent(event.getId()).subscribe(joins ->
                             resetEvent(new RoomOEvent(event.getId(), event.getProperties()), joins));
                 }
             }
         });
     }
+
     /**
      * Method for setting to inactive, and points to not visited
+     *
      * @param event Event we are resetting
      * @param joins All connections between event and its points
      */
-    private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins){
-        Log.d("Room",String.format("Event %d has %d points", event.getId(), joins.size()));
+    private void resetEvent(RoomOEvent event, List<PointOEventJoin> joins) {
+        Log.d("Room", String.format("Event %d has %d points", event.getId(), joins.size()));
         event.setActive(false);
+        Log.d("Room", String.format("Event: eID: %d, active: %b", event.getId(), event.isActive()));
         oEventViewModel.addOEvents(event).subscribe(longs -> {
-            for (PointOEventJoin join : joins){
-                PointOEventJoin newJoin = new PointOEventJoin(join.pointID, join.oEventID, join.isStart(), false);
-                joinViewModel.addJoins(newJoin);
+            PointOEventJoin[] joinArray = new PointOEventJoin[joins.size()];
+            for (int i = 0; i < joins.size(); i++) {
+                joinArray[i] = new PointOEventJoin(joins.get(i).pointID, joins.get(i).oEventID, joins.get(i).isStart(), false);
+                Log.d("Room", String.format("Join: pID: %d, eID %d, Start %b, Visited %b",
+                        joinArray[i].getPointID(), joinArray[i].getoEventID(), joinArray[i].isStart(), joinArray[i].isVisited()));
             }
+            joinViewModel.addJoins(joinArray).subscribe(longs1 -> Log.d("Room", String.format("%d points updated", longs1.length)));
             Log.d("Room",String.format("Event %d set to not active", event.getId()));
         });
     }
@@ -651,7 +714,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         return points;
     }
 
-    public double getEventTime() {
+    public long getEventTime() {
         if (this.eventTime == -1) {
             long difference = System.currentTimeMillis() - this.startTime;
             this.eventTime = (difference / 1000) ; //seconds
@@ -714,18 +777,27 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
 
         LatLng userLocationLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
-        if (distance < 20) {
-            this.startTime = System.currentTimeMillis();
-            this.eventTime = -1;
-            arrivedButton.setVisibility(View.VISIBLE);
-            showMyPosition.setVisibility(View.VISIBLE);
-            startButton.setVisibility(View.INVISIBLE);
-            onArrivedBtnPressed(new View(getApplicationContext()));
-            Toast.makeText(getApplicationContext(), "Event started", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Beveg deg til startpunktet for å starte løpet", Toast.LENGTH_SHORT).show();
 
+        if (startedEvent.getStartPoint() != null) {
+            float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
+            if (distance < 20) {
+                //addEventButton.setVisibility(View.GONE);
+                //TODO Ikke sett hvis startTime allerede er satt
+                if(startTime == -1){
+                    startTime = System.currentTimeMillis();
+                }
+                resultViewModel.getResult(startedEvent.getId()).subscribe(results -> {
+                    Log.d("Room",String.format("Found %d results for event %d", results.size(), startedEvent.getId()));
+                    saveEventStartTime(startTime, results);
+                });
+                this.eventTime = -1;
+                arrivedButton.setVisibility(View.VISIBLE);
+                showMyPosition.setVisibility(View.VISIBLE);
+                startButton.setVisibility(View.INVISIBLE);
+                onArrivedBtnPressed(new View(getApplicationContext()));
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.move_to_start, Toast.LENGTH_LONG).show();
+            }
         }
     }
 

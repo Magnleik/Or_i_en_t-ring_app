@@ -45,4 +45,5 @@ public class RoomOEvent {
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
     }
+
 }

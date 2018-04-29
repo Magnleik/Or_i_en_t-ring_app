@@ -38,40 +38,35 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
-import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
-import no.teacherspet.tring.Database.LocalDatabase;
-import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointViewModel;
 import no.teacherspet.tring.R;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
+import no.teacherspet.tring.util.RoomInteract;
 
-public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback {
+public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallback, RoomInteract {
 
     private GoogleMap mMap;
-    private ArrayList<Marker> arrayListWithCoords = new ArrayList<>();
-    private ArrayList<LatLng> latLngArrayList = new ArrayList<>();
+    private ArrayList<Point> arrayListWithCoords = new ArrayList<>();
+    private ArrayList<Point> latLngArrayList = new ArrayList<>();
     private NetworkManager networkManager;
     private LocationRequest locationRequest;
-    private LatLng clickedPosition;
-    private Marker startPoint;
+    private Point startPoint;
     private Location currentLocation;
-    private LocalDatabase localDatabase;
-    private PointViewModel pointViewModel;
-    private OEventViewModel oEventViewModel;
-    private PointOEventJoinViewModel pointOEventJoinViewModel;
+    private RoomSaveAndLoad roomSaveAndLoad;
+    private ClusterManager manager;
+    private int eventID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +82,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
 
         if (savedInstanceState != null) {
-            latLngArrayList = savedInstanceState.getParcelableArrayList("points");
+            latLngArrayList = (ArrayList<Point>) savedInstanceState.getSerializable("points");
         }
+        roomSaveAndLoad = new RoomSaveAndLoad(getApplicationContext(), this);
     }
 
 
@@ -105,6 +101,17 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        manager = new ClusterManager<Point>(this,mMap);
+        manager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener() {
+            @Override
+            public boolean onClusterItemClick(ClusterItem clusterItem) {
+                openEditDialog((Point) clusterItem);
+                return false;
+            }
+        });
+        mMap.setOnCameraIdleListener(manager);
+        mMap.setOnMarkerClickListener(manager);
+        mMap.setOnInfoWindowClickListener(manager);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -121,29 +128,22 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         });
 
         if ((latLngArrayList.size() > 0) && (arrayListWithCoords.size() == 0)) {
-            for (LatLng latlng : latLngArrayList) {
-                Marker Point = mMap.addMarker(new MarkerOptions().position(latlng).title(R.string.point + " " + (arrayListWithCoords.size() + 1)));
-                arrayListWithCoords.add(Point);
+            for (Point point : latLngArrayList) {
+                Point myPoint = point;
+                arrayListWithCoords.add(myPoint);
             }
         }
         Toast.makeText(getApplicationContext(), R.string.click_map_add_points_toast, Toast.LENGTH_SHORT).show();
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             public void onMapClick(LatLng latLng) {
-                clickedPosition = latLng;
                 openAddDialog(null, latLng);
             }
         });
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                openEditDialog(marker);
-                return false;
-            }
-        });
+        manager.cluster();
     }
 
-    public void openAddDialog(Marker marker, LatLng position) {
+    public void openAddDialog(Point marker, LatLng position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_new_point);
         EditText input = new EditText(this);
@@ -157,7 +157,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (marker != null) {
-                    marker.setTitle(input.getText().toString());
+                    //marker.setTitle(input.getText().toString());
+                    marker.addProperty("name", input.getText().toString());
                 } else {
                     if (!input.getText().toString().isEmpty()) {
                         addNewMarker(input.getText().toString(), position);
@@ -178,7 +179,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         alertDialog.show();
     }
 
-    public void openEditDialog(Marker marker) {
+    public void openEditDialog(Point marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(marker.getTitle());
         CharSequence[] elements = {getString(R.string.set_as_startpoint), getString(R.string.edit), getString(R.string.delete)};
@@ -188,9 +189,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 switch (which) {
                     case 0:
                         if (startPoint != null) {
-                            startPoint.setIcon(BitmapDescriptorFactory.defaultMarker());
+                            ((DefaultClusterRenderer)manager.getRenderer()).getMarker(startPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
                         }
-                        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        ((DefaultClusterRenderer)manager.getRenderer()).getMarker(marker).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         startPoint = marker;
                         dialog.dismiss();
                         break;
@@ -215,6 +216,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      */
     public void existingPointClicked(View v) {
         Intent intent = new Intent(CreateOEvent.this, AddExistingPoint.class);
+        intent.putExtra("map_center", mMap.getCameraPosition());
         startActivityForResult(intent, 2);
     }
 
@@ -231,14 +233,24 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addNewMarker(String name, LatLng location) {
-        Marker point;
+        Point point;
         if (name != null) {
-            point = mMap.addMarker(new MarkerOptions().position(location).title(name).draggable(true));
+            point = new Point(location.latitude,location.longitude,null,name);
+            manager.addItem(point);
+            manager.cluster();
             arrayListWithCoords.add(point);
         } else {
-            point = mMap.addMarker(new MarkerOptions().position(location).title(getString(R.string.point) + " " + (arrayListWithCoords.size() + 1)).draggable(true));
+            point = new Point(location.latitude,location.longitude,null,getString(R.string.point) + " " + (arrayListWithCoords.size() + 1));
+            manager.addItem(point);
+            manager.cluster();
             arrayListWithCoords.add(point);
         }
+    }
+
+    private void addNewMarker(Point point) {
+        manager.addItem(point);
+        manager.cluster();
+        arrayListWithCoords.add(point);
     }
 
 
@@ -248,11 +260,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param data
      */
     private void addExistingMarkers(Intent data) {
-        Serializable items = data.getSerializableExtra("selectedPositions");
-        ArrayList<LatLng> positions = (ArrayList<LatLng>) items;
-        for (LatLng position : positions) {
-            //TODO hent ut navn til ulike markers
-            addNewMarker(null, position);
+        Serializable items = data.getSerializableExtra("selectedPoints");
+        ArrayList<Point> positions = (ArrayList<Point>) items;
+        for (Point position : positions) {
+            addNewMarker(position);
         }
         Toast.makeText(getApplicationContext(), getString(R.string.added)+ " " + positions.size() + " " + getString(R.string.points) +".", Toast.LENGTH_SHORT).show();
     }
@@ -262,12 +273,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      *
      * @param marker to be removed
      */
-    public void deletePoint(Marker marker) {
+    public void deletePoint(Point marker) {
         if (marker.equals(startPoint)) {
             startPoint = null;
         }
         if (arrayListWithCoords.size() > 0) {
-            marker.remove();
+            manager.removeItem(marker);
+            manager.cluster();
             arrayListWithCoords.remove(marker);
         }
     }
@@ -318,7 +330,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         if(currentLocation!=null) {
             boolean shouldAdd = true;
             Location markerLocation;
-            for (Marker marker : arrayListWithCoords) {
+            for (Point marker : arrayListWithCoords) {
                 markerLocation = new Location("");
                 markerLocation.setLatitude(marker.getPosition().latitude);
                 markerLocation.setLongitude(marker.getPosition().longitude);
@@ -331,7 +343,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         else{
-            Toast.makeText(getApplicationContext(),"Position not yet found",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.pos_not_yet_found,Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -350,14 +362,14 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             Event event = new Event();
             String eventTitle = eventTitleField.getText().toString();
             event.addProperty("event_name", eventTitle);
-            Point sp = new Point(startPoint.getPosition().latitude,startPoint.getPosition().longitude,startPoint.getTitle());
+            Point sp = startPoint;
             event.setStartPoint(sp);
-            for (Marker marker : arrayListWithCoords) {
-                if(!marker.equals(startPoint)) {
+            for (Point marker : arrayListWithCoords) {
+                if (!marker.equals(startPoint)) {
                     if (event.getPoints() == null) {
-                        event.setStartPoint(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+                        event.setStartPoint(marker);
                     } else {
-                        event.addPost(new Point(marker.getPosition().latitude, marker.getPosition().longitude, marker.getTitle()));
+                        event.addPost(marker);
                     }
                 }
             }
@@ -383,8 +395,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                         Toast.makeText(getApplicationContext(), R.string.failed_create_event_toast, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getApplicationContext(), String.format(getString(R.string.event_added_formated), event.getProperty("event_name")), Toast.LENGTH_SHORT).show();
-                        saveEventToRoom(object);
-                        finish();
+                        eventID = object.getId();
+                        roomSaveAndLoad.saveRoomEvent(object);
+
                     }
                 }
 
@@ -393,6 +406,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(getApplicationContext(), R.string.couldnt_connect_to_net, Toast.LENGTH_SHORT).show();
                 }
             });
+
             //StartupMenu.addEvent(event);
             //Toast.makeText(getApplicationContext(), "Lagret ruten '" + eventTitle + "', " + arrayListWithCoords.size() + " punkt registrert", Toast.LENGTH_LONG).show();
             //LAGRE
@@ -400,70 +414,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /**
-     * Saves the Event and corresponding Points, and adds connections between them in the Room database
-     * Makes sure that events and points are saved before the connections are saved. The next step
-     * is only called after the previous is finished.
-     */
-    private void saveEventToRoom(Event event) {
-        localDatabase = LocalDatabase.getInstance(this);
-        pointViewModel = new PointViewModel(localDatabase.pointDAO());
-        oEventViewModel = new OEventViewModel(localDatabase.oEventDAO());
 
-        Log.d("Room", "Started saving event");
-        RoomOEvent newevent = new RoomOEvent(event.getId(), event._getAllProperties());
-        oEventViewModel.addOEvents(newevent).subscribe(longs -> {
-            Log.d("Room", String.format("Event %d saved", event.getId()));
-            savePoints(event);
-        });
-    }
-    private void savePoints(Event event) {
-        RoomPoint[] roomPoints = new RoomPoint[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            RoomPoint roomPoint = new RoomPoint(point.getId(), point._getAllProperties(), new LatLng(point.getLatitude(), point.getLongitude()));
-            roomPoints[i] = roomPoint;
-        }
-        pointViewModel.addPoints(roomPoints).subscribe(longs -> {
-            Log.d("Room", String.format("%d points saved", longs.length));
-            joinPointsToEvent(event);
-        });
-    }
-    private void joinPointsToEvent(Event event) {
-        pointOEventJoinViewModel = new PointOEventJoinViewModel(localDatabase.pointOEventJoinDAO());
-        PointOEventJoin[] joins = new PointOEventJoin[event.getPoints().size()];
-        for (int i = 0; i < event.getPoints().size(); i++) {
-            Point point = event.getPoints().get(i);
-            boolean start = i == 0;
-            joins[i] = new PointOEventJoin(point.getId(), event.getId(), start, false);
-
-            /*
-            if(point.equals(event.getStartPoint())){
-                joins[i] = new PointOEventJoin(point.getId(), event.getId(), true, false);
-            }
-            else{
-                joins[i] = new PointOEventJoin(point.getId(), event.getId(), false, false);
-            }
-            */
-
-
-        }
-        pointOEventJoinViewModel.addJoins(joins).subscribe(longs -> checkSave(longs));
-    }
-    private void checkSave(long[] longs) {
-        boolean savedAll = true;
-        for (long aLong : longs) {
-            if (aLong < 0) {
-                savedAll = false;
-            }
-        }
-        if (savedAll) {
-            Log.d("Room", String.format("%d joins saved", longs.length));
-            Toast.makeText(this, R.string.phone_save_success, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, R.string.phone_save_unsuccess, Toast.LENGTH_SHORT).show();
-        }
-    }
 
     /**
      * Saves the currently created points to an arraylist to be provided later when the state is restored. Used when phone is flipped and state is destroyed
@@ -475,12 +426,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         super.onSaveInstanceState(outState);
         if (latLngArrayList.size() != arrayListWithCoords.size()) {
             latLngArrayList.clear();
-            for (Marker marker : arrayListWithCoords) {
-                latLngArrayList.add(marker.getPosition());
+            for (Point marker : arrayListWithCoords) {
+                latLngArrayList.add(marker);
             }
         }
 
-        outState.putParcelableArrayList("points", latLngArrayList);
+        outState.putSerializable("points", latLngArrayList);
 
         // Save the state of item position
     }
@@ -528,4 +479,26 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    @Override
+    public void whenRoomFinished(Object savedAll) {
+        NetworkManager.getInstance().subscribeToEvent(eventID, new ICallbackAdapter<List<Event>>() {
+            @Override
+            public void onResponse(List<Event> object) {
+                if(object != null){
+                    Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
+                }
+                else {
+                    Log.d("Subscribe", "List<Event> is null");
+                }
+                finish();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("Subscribe", t.getMessage());
+                finish();
+            }
+        });
+
+    }
 }
