@@ -28,11 +28,7 @@ public class Point implements Serializable, ClusterItem {
      * @param description Description of the point (optional)
      */
     public Point(double latitude, double longitude, String description) {
-        geometry = new Geometry();
-        geometry.coordinates = new double[]{longitude, latitude};
-        properties = new HashMap<>();
-        properties.put("description", description);
-        isVisited = false;
+        this(latitude,longitude,description,null);
     }
 
     /**
@@ -50,9 +46,13 @@ public class Point implements Serializable, ClusterItem {
         properties = new HashMap<>();
         if (description != null) {
             properties.put("description", description);
+        }else{
+            properties.put("description", " ");
         }
         if (properties != null) {
             properties.put("name", name);
+        }else{
+            properties.put("name", " ");
         }
         isVisited = false;
     }
