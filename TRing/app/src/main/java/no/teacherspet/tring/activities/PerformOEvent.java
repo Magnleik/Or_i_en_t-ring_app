@@ -529,7 +529,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                 if (this.lastKnownLocation == null) {
                     posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
                 }
-                //Markor fjernes etter 5 sekund
 
 
                         if (getLastKnownLoction() != currentLocation) {
