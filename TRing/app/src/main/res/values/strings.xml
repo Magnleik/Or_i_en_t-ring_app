@@ -108,6 +108,9 @@
     <string name="sort_dist">Sort by distance</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_alpha">Sort by name</string>
+    <string name="events_avrage_time" >The events avrage time:</string>
+    <string name="your_time" >Your time:</string>
+    <string name="results_saved">Results saved. Here\'s how you did:</string>
     <string name="event_in_progress">You already have an event in progress!</string>
     <string name="proceed">Start new</string>
     <string name="cancel_last_event">Do you want to cancel this and start a new event?</string>

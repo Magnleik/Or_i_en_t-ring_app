@@ -2,12 +2,12 @@ package no.teacherspet.tring.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -64,14 +64,18 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Event startedEvent;
     long startTime;
     long eventTime;
-    boolean savedResults = false;
+    boolean savedToServer = false;
     private int eventDifficultyValue;
     private double seconds;
     private double minutes;
     private double hours;
-    private String timeTextToServer;
+    private String timeTextToServer = "";
     private Marker posisjonsmarkor;
-    private Location lastKnown;
+    public Location lastKnownLocation;
+    private String eventAvrageTime;
+    private String myTime;
+    private double eventScore =0;
+
 
 
     private OEventViewModel oEventViewModel;
@@ -89,6 +93,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Button showMyPosition;
     private Button arrivedButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +110,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         startButton = (Button) findViewById(R.id.start_event_btn);
         showMyPosition = (Button) findViewById(R.id.show_position_btn);
         arrivedButton = (Button) findViewById(R.id.test_position_btn);
-        lastKnown=null;
+        lastKnownLocation=null;
 
 
         visitedPoints = new ArrayList<>();
@@ -126,7 +131,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         eventDifficultyValue = getIntent().getIntExtra("Difficulty", -1);
 
 
-        if (startTime == -1) {
+        if (this.startTime == -1) {
             showMyPosition.setVisibility(View.INVISIBLE);
             arrivedButton.setVisibility(View.INVISIBLE);
             startButton.setVisibility(View.VISIBLE);
@@ -154,7 +159,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     super.onLocationResult(locationResult);
                     if (locationResult.getLastLocation().getAccuracy() <= 700 || currentLocation == null) {
                         currentLocation = locationResult.getLastLocation();
-                        if (startTime == -1) {
+                        if (getStartTime() == -1) {
                             showLocationUntilEventIsStarted();
                         }
                     }
@@ -378,30 +383,35 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             seconds = calculateRest(minutes);
         }
 
-        timeTextToServer = "";
+        if (timeTextToServer == "") {
 
+            TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
+            if ((seconds) >= 0) {
+                timeTextView.setText("Tid: " + (int) seconds + " sec");
+            }
+
+            if ((minutes) != 0) {
+                timeTextView.setText("Tid: " + (int) minutes + "min " + (int) seconds + " sec");
+            }
+
+
+            if ((hours) != 0) {
+                timeTextView.setText("Tid: " + (int) hours + "hour " + (int) minutes + "min " + (int) seconds + " sec");
+                //Fiks for timer
+            }
+
+            //Tid som skal sendes til server
+            setTimeTextToServer(String.format("%02d:%02d:%02d", hoursInt, minutesInt, secondsInt));
+
+
+            //Viser score oppnådd under eventet
+            setEventScore(Math.round(getEventScore()));
+            eventScore = Math.round(getEventScore());
+        }
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        if ((seconds) != 0) {
-            timeTextView.setText("Tid: " + (int) seconds + " sec");
-        }
+        timeTextView.setText("Time used: " + getTimeTextToServer());
 
-        if ((minutes) != 0) {
-            timeTextView.setText("Tid: " + (int) minutes + "min " + (int) seconds + " sec");
-        }
-
-
-        if ((hours) != 0) {
-            timeTextView.setText("Tid: " + (int) hours + "hour " + (int) minutes + "min " + (int) seconds + " sec");
-            //Fiks for timer
-        }
-
-        //Tid som skal sendes til server
-        timeTextToServer = String.format("%02d:%02d:%02d", hoursInt, minutesInt, secondsInt);
-
-
-        //Viser score oppnådd under eventet
-        double eventScore = Math.round(getEventScore());
-        String eventScoreString = Integer.toString((int) eventScore);
+        String eventScoreString = Integer.toString((int) getEventScore());
         eventScoreString += "/100";
         TextView scoreTextView = (TextView) inflator.findViewById(R.id.scoreTextView);
         scoreTextView.setText(String.format(getString(R.string.total_score_formatted), eventScoreString));
@@ -411,19 +421,26 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NetworkManager networkManager = NetworkManager.getInstance();
-                networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
-                    @Override
-                    public void onResponse(Event object) {
-                        Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
-                        openScoreDialog();
-                    }
+                if (getSavedToServer() == false ) {
+                    networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
+                        @Override
+                        public void onResponse(Event object) {
+                            Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
+                            eventAvrageTime = object.getAvgTime();
+                            openScoreDialog(eventAvrageTime, timeTextToServer);
+                            setSavedToServer(true);
 
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+                        }
 
-                    }
-                });
+                        @Override
+                        public void onFailure(Throwable t) {
+                            Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+                } else {
+                    openScoreDialog(geteventAvrageTime(), getTimeTextToServer());
+                }
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -438,16 +455,24 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     }
 
     //Shows the users score, compared to the avrage time
-    public void openScoreDialog() {
+    public void openScoreDialog(String avg, String myTime) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View inflator = inflater.inflate(R.layout.event_score_dialog, null);
         builder.setView(inflator);
+        TextView myTimeTextView = (TextView) inflator.findViewById(R.id.my_time_textview);
+        TextView avrageTimeTextView = (TextView) inflator.findViewById(R.id.avrage_time_textview);
+        avrageTimeTextView.setText(avg);
+        myTimeTextView.setText(myTime);
+
 
         builder.setPositiveButton(R.string.return_to_start_menu, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(PerformOEvent.this,OrientationSelector.class);
+                startActivity(intent);
+
 
             }
         });
@@ -499,33 +524,23 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
 
     public void showLocationUntilEventIsStarted() {
-        if (currentLocation != null) {
-            if (lastKnown == null) {
-                posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
+        if (this.startTime == -1) {
+            if (currentLocation != null) {
+                if (this.lastKnownLocation == null) {
+                    posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
+                }
+
+
+                        if (getLastKnownLoction() != currentLocation) {
+                            posisjonsmarkor.remove();
+                            posisjonsmarkor = mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
+                            setLastKnownLocation(currentLocation);
+
+                        }
+
             }
-            //Markor fjernes etter 5 sekund
-
-            CountDownTimer synlig = new CountDownTimer(5000, 1000) {
-                int sek = 5;
-
-                @Override
-                public void onTick(long l) {
-                    sek--;
-                }
-
-                @Override
-                public void onFinish() {
-                    if (lastKnown != currentLocation) {
-                        posisjonsmarkor.remove();
-                        posisjonsmarkor= mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).icon(BitmapDescriptorFactory.fromResource(R.drawable.my_location_icon)).title("Min posisjon"));
-                        lastKnown = currentLocation;
-                    }
-                }
-            }.start();
-
 
         }
-
     }
 
 
@@ -751,32 +766,34 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     public double getEventScore() {
         //TODO må lage ordentlig funksjon
-
-        double distance = 0;
-        // Kalkuler distanse
-        for (Point point : points) {
-            int index = points.indexOf(point);
-            if (index == points.size() - 1) {
-                break;
+        if (eventScore == 0) {
+            double distance = 0;
+            // Kalkuler distanse
+            for (Point point : points) {
+                int index = points.indexOf(point);
+                if (index == points.size() - 1) {
+                    break;
+                }
+                distance += point.getDistanceFromPoint(new LatLng(points.get(index + 1).getLatitude(), points.get(index + 1).getLongitude()));
             }
-            distance += point.getDistanceFromPoint(new LatLng(points.get(index + 1).getLatitude(), points.get(index + 1).getLongitude()));
-        }
-        distance = distance*1.2; // Multiplying because of the terrain (The route will most likely be longer than the air distance
-        //This must be changed based on the users level
-        //Now using avrg jogging spead (Mid-levelsish?) 8kmph
+            distance = distance * 1.2; // Multiplying because of the terrain (The route will most likely be longer than the air distance
+            //This must be changed based on the users level
+            //Now using avrg jogging spead (Mid-levelsish?) 8kmph
 
-        double avrageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000)/3600); //
+            double avrageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000) / 3600); //
 
-        double eventTime = getEventTime();
+            double eventTime = getEventTime();
 
-        double eventScore = avrageTimeBasedOnDistance *100 / eventTime;
-        if ( eventScore > 100) {
-            eventScore = 100;
-        }
-        eventScore -= positionViewed*5; // Fjerner poeng for å ha sjekket posisjonen.
+            double eventScore = avrageTimeBasedOnDistance * 100 / eventTime;
+            if (eventScore > 100) {
+                eventScore = 100;
+            }
+            eventScore -= positionViewed * 5; // Fjerner poeng for å ha sjekket posisjonen.
 
-        if(eventScore<1) {
-            eventScore =1;
+            if (eventScore < 1) {
+                eventScore = 1;
+            }
+            setEventScore( (long) eventScore);
         }
 
         return eventScore;
@@ -799,14 +816,13 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             if (distance < 20) {
                 //addEventButton.setVisibility(View.GONE);
                 //TODO Ikke sett hvis startTime allerede er satt
-                if(startTime == -1){
-                    startTime = System.currentTimeMillis();
+                if(this.startTime == -1){
+                    this.startTime = System.currentTimeMillis();
                 }
                 resultViewModel.getResult(startedEvent.getId()).subscribe(results -> {
                     Log.d("Room",String.format("Found %d results for event %d", results.size(), startedEvent.getId()));
                     saveEventStartTime(startTime, results);
                 });
-                this.eventTime = -1;
                 posisjonsmarkor.remove();
                 arrivedButton.setVisibility(View.VISIBLE);
                 showMyPosition.setVisibility(View.VISIBLE);
@@ -823,5 +839,40 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     }
 
 
+    public String geteventAvrageTime() {
+        return eventAvrageTime;
+    }
+
+    public String getTimeTextToServer() {
+        return timeTextToServer;
+    }
+
+    public void setTimeTextToServer(String timeTextToServer) {
+        this.timeTextToServer = timeTextToServer;
+    }
+
+    public void setEventScore(long eventScore) {
+        this.eventScore = eventScore;
+    }
+
+    public void setSavedToServer(boolean savedToServer) {
+        this.savedToServer = savedToServer;
+    }
+
+    public boolean getSavedToServer() {
+        return savedToServer;
+    }
+
+    public Location getLastKnownLoction() {
+        return lastKnownLocation;
+    }
+
+    public void setLastKnownLocation(Location lastKnownLocation) {
+        this.lastKnownLocation = lastKnownLocation;
+    }
+
+    public long getStartTime() {
+        return this.startTime;
+    }
 }
 
