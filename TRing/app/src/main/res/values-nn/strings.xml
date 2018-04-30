@@ -107,6 +107,6 @@
     <string name="sort_popularity">Sorter på popularitet</string>
     <string name="events_avrage_time" >Løpets gjennomsnittstid:</string>
     <string name="your_time" >Din tid:</string>
-    <string name="results_saved" />
+    <string name="results_saved" >"Resultat lagret. Her er en kjapp oversikt: "</string>
 
 </resources>
