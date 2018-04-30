@@ -158,16 +158,34 @@ public class MyEvents extends Fragment implements RoomInteract {
                         listItems.addAll(object);
                         eventAdapter.notifyDataSetChanged();
 
-                        oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
-                            for (Event event : object) {
-                                if (roomOEvents.isEmpty()) {
-                                    roomSaveAndLoad.saveRoomEvent(event);
-                                } else {
-                                    if (event.getId() != roomOEvents.get(0).getId()) {
+                        oEventViewModel.getActiveEvent().subscribe(activeEvents -> {
+                            oEventViewModel.getAllOEvents().subscribe(roomOEvents -> {
+                                ArrayList<Integer> ids = new ArrayList<>();
+                                for(RoomOEvent roomOEvent : roomOEvents){
+                                    ids.add(roomOEvent.getId());
+                                }
+                                int activeId;
+                                if(!activeEvents.isEmpty()){
+                                    activeId = activeEvents.get(0).getId();
+                                }
+                                else{
+                                    activeId = -1;
+                                }
+                                for (Event event : object) {
+                                    if(ids.contains(event.getId())){
+                                        ids.remove(ids.indexOf(event.getId()));
+                                    }
+                                    if(event.getId() != activeId){
                                         roomSaveAndLoad.saveRoomEvent(event);
                                     }
                                 }
-                            }
+                                for(Integer id : ids){
+                                    if(id != activeId){
+                                        oEventViewModel.deleteOEvent(id);
+                                    }
+                                }
+
+                            });
                         });
 
                     } else {
@@ -282,11 +300,6 @@ public class MyEvents extends Fragment implements RoomInteract {
         }
     }
 
-    private void updateList() {
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
-        mListView.setAdapter(eventAdapter);
-    }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -344,7 +357,7 @@ public class MyEvents extends Fragment implements RoomInteract {
     public void whenRoomFinished(Object object) {
         if (object instanceof Event) {
             listItems.add((Event) object);
-            updateList();
+            eventAdapter.notifyDataSetChanged();
         }
     }
 
