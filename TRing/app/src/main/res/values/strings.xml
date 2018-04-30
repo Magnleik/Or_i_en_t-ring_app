@@ -99,7 +99,7 @@
     <string name="medium_button_text" >Medium</string>
     <string name="hard_button_text" >Hard</string>
     <string name="start_dialog_positive_button_next">Next</string>
-    <string name="explain_event_when_started" >1. Get to the startpoint(the green marker) \n\n 2. Click the "Start Event"-button \n\n 3. Start running. Good luck!</string>
+    <string name="explain_event_when_started" >1. Get to the startpoint\n(the green marker) \n\n 2. Click the "Start Event"-button \n\n 3. Start running. Good luck!</string>
     <string name="no_known_points_in_area">There are no known points in this area</string>
     <string name="pos_not_yet_found">Position not yet found</string>
     <string name="my_position">My position</string>

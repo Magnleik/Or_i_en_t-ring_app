@@ -29,10 +29,10 @@ public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position == 0){
-            return MyEvents.newInstance("","");
+            return MyEvents.newInstance();
         }
         if(position == 1){
-            return NearbyEvents.newInstance("","");
+            return NearbyEvents.newInstance();
         }
         return null;
     }
