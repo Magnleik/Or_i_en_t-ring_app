@@ -1,5 +1,6 @@
 package no.teacherspet.tring.fragments;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,8 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -137,7 +140,7 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
         final Context context = this.getContext();
@@ -145,22 +148,42 @@ public class NearbyEvents extends Fragment implements RoomInteract {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position >= 0) {
-                    selectedEvent = listItems.get(position);
-                    roomSaveAndLoad.saveRoomEvent(selectedEvent);
-                }
+                LocalDatabase ld = LocalDatabase.getInstance(getContext());
+                OEventViewModel vm = new OEventViewModel(ld.oEventDAO());
+                vm.getActiveEvent().subscribe(roomOEvents -> {
+                    if (roomOEvents.isEmpty()) {
+                        if (position >= 0) {
+                            selectedEvent = listItems.get(position);
+                            roomSaveAndLoad.saveRoomEvent(selectedEvent);
+                        }
+                    } else {
+                        openOverrideDialog(position);
+                    }
+                });
             }
-
         });
+    }
 
-
+    private void openOverrideDialog(int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle(getString(R.string.event_in_progress));
+        CharSequence[] elements = {getString(R.string.cancel), getString(R.string.proceed)};
+        builder.setPositiveButton(getString(R.string.proceed), (dialog, which) -> {
+            selectedEvent = listItems.get(position);
+            roomSaveAndLoad.saveRoomEvent(selectedEvent);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void sortList(String property, boolean reversed) {
         Collections.sort(listItems, new EventComparator(property, reversed));
         eventAdapter.notifyDataSetChanged();
     }
-        @Override
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }

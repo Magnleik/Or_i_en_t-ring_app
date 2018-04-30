@@ -1,13 +1,16 @@
 package no.teacherspet.tring.fragments;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,22 +23,27 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import connection.Point;
+import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
+import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
+import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
 import no.teacherspet.tring.util.RoomSaveAndLoad;
 import no.teacherspet.tring.util.RoomInteract;
-
+import no.teacherspet.tring.util.EventComparator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,11 +55,18 @@ import no.teacherspet.tring.util.RoomInteract;
 public class MyEvents extends Fragment implements RoomInteract {
 
     private ListView mListView;
+    private Event selectedEvent;
     private boolean changeEvent;
-    private HashMap<Integer, Event> theEventReceived;
-    private NetworkManager networkManager;
-    private FusedLocationProviderClient lm;
-    private LatLng position;
+
+    private boolean reverseAlpha;
+    private boolean reversePop;
+    private boolean reverseScore;
+    private boolean reverseTime;
+
+    private BroadcastReceiver mReciever;
+    private EventAdapter eventAdapter;
+
+    private LocalDatabase database;
     private OEventViewModel oEventViewModel;
     private ArrayList<Event> listItems;
     private RoomSaveAndLoad roomSaveAndLoad;
@@ -80,7 +95,14 @@ public class MyEvents extends Fragment implements RoomInteract {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        reverseAlpha = false;
+        reversePop = false;
+        reverseScore = false;
+        reverseTime = false;
+
         listItems = new ArrayList<>();
+        eventAdapter = new EventAdapter(getContext(),listItems);
         roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
@@ -98,6 +120,34 @@ public class MyEvents extends Fragment implements RoomInteract {
 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
+
+        eventAdapter = new EventAdapter(this.getContext(), listItems);
+        mListView.setAdapter(eventAdapter);
+
+        mReciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (ListOfSavedEvents.ACTION_SORT_ALPHA.equals(intent.getAction())) {
+                    sortList("event_name", reverseAlpha);
+                    reverseAlpha = !reverseAlpha;
+                } else if (ListOfSavedEvents.ACTION_SORT_POPULARITY.equals(intent.getAction())) {
+                    sortList("popularity", reversePop);
+                    reversePop = !reversePop;
+                } else if (ListOfSavedEvents.ACTION_SORT_SCORE.equals(intent.getAction())) {
+                    sortList("avg_score", reverseScore);
+                    reverseScore = !reverseScore;
+                } else if (ListOfSavedEvents.ACTION_SORT_TIME.equals(intent.getAction())) {
+                    sortList("avg_time", reverseTime);
+                    reverseTime = !reverseTime;
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_ALPHA);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_POPULARITY);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_SCORE);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
         //Get subscribed events from server
@@ -108,7 +158,7 @@ public class MyEvents extends Fragment implements RoomInteract {
                     if(object.size()>0){
                         listItems.clear();
                         listItems.addAll(object);
-                        updateList();
+                        eventAdapter.notifyDataSetChanged();
 
                         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
                             for(Event event : object){
@@ -139,16 +189,13 @@ public class MyEvents extends Fragment implements RoomInteract {
             }
         });
 
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
-        mListView.setAdapter(eventAdapter);
-
         final Context context = this.getContext();
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(changeEvent) {
-                    Event selectedEvent = listItems.get(position);
+                    selectedEvent = listItems.get(position);
                     Intent detailIntent = new Intent(context, PerformOEvent.class);
                     detailIntent.putExtra("MyEvent", selectedEvent);
                     startActivity(detailIntent);
@@ -164,6 +211,25 @@ public class MyEvents extends Fragment implements RoomInteract {
                 return false;
             }
         });
+    }
+
+    private void openOverrideDialog(int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle(getString(R.string.event_in_progress));
+        CharSequence[] elements = {getString(R.string.cancel), getString(R.string.proceed)};
+        builder.setPositiveButton(getString(R.string.proceed), (dialog, which) -> {
+            selectedEvent = listItems.get(position);
+            roomSaveAndLoad.saveRoomEvent(selectedEvent);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void sortList(String property, boolean reversed) {
+        Collections.sort(listItems, new EventComparator(property, reversed));
+        eventAdapter.notifyDataSetChanged();
     }
 
     private void openSettingsDialog(Event selectedEvent){
@@ -228,7 +294,7 @@ public class MyEvents extends Fragment implements RoomInteract {
                 Log.d("Room",String.format("Event %d deleted", event.getId()));
                 Toast.makeText(this.getContext(), R.string.event_deleted, Toast.LENGTH_SHORT).show();
                 listItems.remove(event);
-                updateList();
+                eventAdapter.notifyDataSetChanged();
             }
             else{
                 Toast.makeText(this.getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();

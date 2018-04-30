@@ -108,6 +108,7 @@
     <string name="sort_score">Sort by average Score</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_alpha">Sort by name</string>
-
+    <string name="event_in_progress">You already have an event in progress!</string>
+    <string name="proceed">Continue</string>
 </resources>
 

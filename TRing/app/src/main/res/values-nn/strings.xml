@@ -105,5 +105,6 @@
     <string name="sort_score">Sorter på score</string>
     <string name="sort_alpha">"Sorter på navn "</string>
     <string name="sort_popularity">Sorter på popularitet</string>
-
+    <string name="event_in_progress">Du har allereie eit laup pågåande</string>
+    <string name="proceed">Fortsett</string>
 </resources>
