@@ -185,7 +185,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (!startedEvent.getPoints().isEmpty()) {
             return startedEvent.getPoints();
         } else {
-            Toast.makeText(getApplicationContext(), "The event does not have any points!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.event_as_no_points, Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -312,7 +312,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                             difficultyTextViewText.setVisibility(View.INVISIBLE);
                             difficultyTextViewValue.setVisibility(View.INVISIBLE);
                             explanationTextView.setVisibility(View.VISIBLE);
-                            button.setText("Got it!");
+                            button.setText(R.string.got_it);
                         } else {
                             //Dismiss once everything is OK.
                             //Lagre event (Tid, score og avstand?)
@@ -383,20 +383,20 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             seconds = calculateRest(minutes);
         }
 
-        if (timeTextToServer == "") {
+        if (timeTextToServer.equals("")) {
 
             TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
             if ((seconds) >= 0) {
-                timeTextView.setText("Tid: " + (int) seconds + " sec");
+                timeTextView.setText(String.format(getString(R.string.time_sec_formatted), seconds));
             }
 
             if ((minutes) != 0) {
-                timeTextView.setText("Tid: " + (int) minutes + "min " + (int) seconds + " sec");
+                timeTextView.setText(String.format(getString(R.string.time_min_sec_formatted), minutes, seconds));
             }
 
 
             if ((hours) != 0) {
-                timeTextView.setText("Tid: " + (int) hours + "hour " + (int) minutes + "min " + (int) seconds + " sec");
+                timeTextView.setText(String.format(getString(R.string.time_hour_min_sec_formatted), hours, minutes, seconds));
                 //Fiks for timer
             }
 
@@ -409,7 +409,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             eventScore = Math.round(getEventScore());
         }
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText("Time used: " + getTimeTextToServer());
+        timeTextView.setText(String.format(getString(R.string.time_used_formatted), getTimeTextToServer()));
 
         String eventScoreString = Integer.toString((int) getEventScore());
         eventScoreString += "/100";
@@ -425,7 +425,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     networkManager.postResults(startedEvent.getId(), timeTextToServer, (int) eventScore, new ICallbackAdapter<Event>() {
                         @Override
                         public void onResponse(Event object) {
-                            Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.save_complete, Toast.LENGTH_SHORT).show();
                             eventAvrageTime = object.getAvgTime();
                             openScoreDialog(eventAvrageTime, timeTextToServer);
                             setSavedToServer(true);
@@ -434,7 +434,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
                         @Override
                         public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Save failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.save_failed, Toast.LENGTH_SHORT).show();
 
                         }
                     });

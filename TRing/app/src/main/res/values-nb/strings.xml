@@ -96,7 +96,7 @@
     <string name="medium_button_text" >Medium</string>
     <string name="hard_button_text" >Vanskelig</string>
     <string name="start_dialog_positive_button_next">Neste</string>
-    <string name="explain_event_when_started" >1. Gå til startpunktet \n(den grønne markøren) \n\n 2. Trykk på "Start Event"-knappen \n\n 3. Spring. Lykke til!</string>
+    <string name="explain_event_when_started" >1. Gå til startpunktet \n(den grønne markøren) \n\n 2. Trykk på "Start løp"-knappen \n\n 3. Spring. Lykke til!</string>
     <string name="no_known_points_in_area">Det er ingen kjente punkt i dette området</string>
     <string name="pos_not_yet_found">Posisjon er enda ikke funnet</string>
     <string name="my_position">Min posisjon</string>
@@ -112,4 +112,13 @@
     <string name="cancel_last_event">Vil du avslutte dette og starte ett nytt løp?</string>
     <string name="proceed">Start nytt</string>
     <string name="abort">Avbryt</string>
+    <string name="length">"Lengde: "</string>
+    <string name="event_as_no_points">Dette løpet har ingen punkter!</string>
+    <string name="time_sec_formatted">Tid: %d sek</string>
+    <string name="time_min_sec_formatted">Tid: %d min %d sek</string>
+    <string name="time_hour_min_sec_formatted">Tid: %d time(r) %d min %d sek</string>
+    <string name="time_used_formatted">Tid brukt: %s</string>
+    <string name="save_complete">Lagring fullført</string>
+    <string name="save_failed">Lagring feilet</string>
+    <string name="got_it">Greit!</string>
 </resources>

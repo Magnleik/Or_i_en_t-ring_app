@@ -51,7 +51,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginEnd="12dp"
         android:layout_toStartOf="@+id/avg_time_title"
-        android:text="@string/distance"
+        android:text="@string/length"
         app:layout_constraintEnd_toStartOf="@+id/avg_time_title"
         tools:layout_editor_absoluteY="231dp" />
 

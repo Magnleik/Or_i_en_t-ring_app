@@ -103,7 +103,7 @@
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
                 android:gravity="center_horizontal"
-                android:text="Lett"
+                android:text="@string/easy_button_text"
                 android:textSize="18sp" />
         </LinearLayout>
     </LinearLayout>
