@@ -381,7 +381,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         timeTextToServer = "";
 
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        if ((seconds) != 0) {
+        if ((seconds) >= 0) {
             timeTextView.setText("Tid: " + (int) seconds + " sec");
         }
 
