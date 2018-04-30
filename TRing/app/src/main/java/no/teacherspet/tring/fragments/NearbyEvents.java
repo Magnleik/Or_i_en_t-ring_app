@@ -1,5 +1,6 @@
 package no.teacherspet.tring.fragments;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +25,8 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
+import no.teacherspet.tring.Database.LocalDatabase;
+import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
@@ -56,11 +56,8 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     private Event selectedEvent;
     private ListView mListView;
     private HashMap<Integer, Event> theEventReceived;
-    private NetworkManager networkManager;
-    private FusedLocationProviderClient lm;
-    private LatLng position;
     private ArrayList<Event> listItems;
-    BroadcastReceiver mReciever;
+    private BroadcastReceiver mReciever;
 
     private OnFragmentInteractionListener mListener;
     private RoomSaveAndLoad roomSaveAndLoad;
@@ -87,7 +84,6 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        networkManager = NetworkManager.getInstance();
 
         roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         reverseAlpha = false;
@@ -118,8 +114,8 @@ public class NearbyEvents extends Fragment implements RoomInteract {
                 } else if (ListOfSavedEvents.ACTION_SORT_POPULARITY.equals(intent.getAction())) {
                     sortList("popularity", reversePop);
                     reversePop = !reversePop;
-                } else if (ListOfSavedEvents.ACTION_SORT_SCORE.equals(intent.getAction())) {
-                    sortList("avg_score", reverseScore);
+                } else if (ListOfSavedEvents.ACTION_SORT_DIST.equals(intent.getAction())) {
+                    sortList("dist", reverseScore);
                     reverseScore = !reverseScore;
                 } else if (ListOfSavedEvents.ACTION_SORT_TIME.equals(intent.getAction())) {
                     sortList("avg_time", reverseTime);
@@ -131,13 +127,13 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         filter.addAction(ListOfSavedEvents.ACTION_LIST_LOADED);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_ALPHA);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_POPULARITY);
-        filter.addAction(ListOfSavedEvents.ACTION_SORT_SCORE);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_DIST);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
-        EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
+        eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
         final Context context = this.getContext();
@@ -145,22 +141,40 @@ public class NearbyEvents extends Fragment implements RoomInteract {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position >= 0) {
+                LocalDatabase ld = LocalDatabase.getInstance(getContext());
+                OEventViewModel vm = new OEventViewModel(ld.oEventDAO());
+                vm.getActiveEvent().subscribe(roomOEvents -> {
                     selectedEvent = listItems.get(position);
-                    roomSaveAndLoad.saveRoomEvent(selectedEvent);
-                }
+                    if (roomOEvents.isEmpty()) {
+                        roomSaveAndLoad.saveRoomEvent(selectedEvent);
+                    } else {
+                        openOverrideDialog();
+                    }
+                });
             }
-
         });
+    }
 
-
+    private void openOverrideDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+        builder.setTitle(getString(R.string.event_in_progress));
+        builder.setMessage(getString(R.string.cancel_last_event));
+        CharSequence[] elements = {getString(R.string.cancel), getString(R.string.proceed)};
+        builder.setPositiveButton(getString(R.string.proceed), (dialog, which) -> {
+            roomSaveAndLoad.saveRoomEvent(selectedEvent);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton(getString(R.string.abort), (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void sortList(String property, boolean reversed) {
         Collections.sort(listItems, new EventComparator(property, reversed));
         eventAdapter.notifyDataSetChanged();
     }
-        @Override
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }

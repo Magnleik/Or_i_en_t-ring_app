@@ -13,8 +13,8 @@
                 android:id="@+id/sort_popularity"
                 android:title="@string/sort_popularity" />
             <item
-                android:id="@+id/sort_score"
-                android:title="@string/sort_score" />
+                android:id="@+id/sort_dist"
+                android:title="@string/sort_dist" />
             <item
                 android:id="@+id/sort_time"
                 android:title="@string/sort_time" />
