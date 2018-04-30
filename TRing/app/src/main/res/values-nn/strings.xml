@@ -102,9 +102,11 @@
     <string name="my_position">Min posisjon</string>
     <string name="sort">Sorter</string>
     <string name="sort_time">Sorter på tid</string>
-    <string name="sort_score">Sorter på score</string>
+    <string name="sort_dist">Sorter på avstand</string>
     <string name="sort_alpha">"Sorter på navn "</string>
     <string name="sort_popularity">Sorter på popularitet</string>
     <string name="event_in_progress">Du har allereie eit laup pågåande</string>
-    <string name="proceed">Fortsett</string>
+    <string name="proceed">Start nytt</string>
+    <string name="cancel_last_event">Vil du avslutte dette og starte eit nytt laup?</string>
+    <string name="abort">Avbryt</string>
 </resources>

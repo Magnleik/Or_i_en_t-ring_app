@@ -66,7 +66,6 @@ public class MyEvents extends Fragment implements RoomInteract {
     private BroadcastReceiver mReciever;
     private EventAdapter eventAdapter;
 
-    private LocalDatabase database;
     private OEventViewModel oEventViewModel;
     private ArrayList<Event> listItems;
     private RoomSaveAndLoad roomSaveAndLoad;
@@ -81,7 +80,6 @@ public class MyEvents extends Fragment implements RoomInteract {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
      *
      * @return A new instance of fragment MyEvents.
      */
@@ -102,7 +100,7 @@ public class MyEvents extends Fragment implements RoomInteract {
         reverseTime = false;
 
         listItems = new ArrayList<>();
-        eventAdapter = new EventAdapter(getContext(),listItems);
+        eventAdapter = new EventAdapter(getContext(), listItems);
         roomSaveAndLoad = new RoomSaveAndLoad(getContext(), this);
         changeEvent = true;
         HashMap<Integer, Event> theEventReceived = new HashMap<>();
@@ -133,8 +131,8 @@ public class MyEvents extends Fragment implements RoomInteract {
                 } else if (ListOfSavedEvents.ACTION_SORT_POPULARITY.equals(intent.getAction())) {
                     sortList("popularity", reversePop);
                     reversePop = !reversePop;
-                } else if (ListOfSavedEvents.ACTION_SORT_SCORE.equals(intent.getAction())) {
-                    sortList("avg_score", reverseScore);
+                } else if (ListOfSavedEvents.ACTION_SORT_DIST.equals(intent.getAction())) {
+                    sortList("dist", reverseScore);
                     reverseScore = !reverseScore;
                 } else if (ListOfSavedEvents.ACTION_SORT_TIME.equals(intent.getAction())) {
                     sortList("avg_time", reverseTime);
@@ -145,7 +143,7 @@ public class MyEvents extends Fragment implements RoomInteract {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ListOfSavedEvents.ACTION_SORT_ALPHA);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_POPULARITY);
-        filter.addAction(ListOfSavedEvents.ACTION_SORT_SCORE);
+        filter.addAction(ListOfSavedEvents.ACTION_SORT_DIST);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
@@ -154,31 +152,28 @@ public class MyEvents extends Fragment implements RoomInteract {
         NetworkManager.getInstance().getSubscribedEvents(new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {
-                if(object != null){
-                    if(object.size()>0){
+                if (object != null) {
+                    if (object.size() > 0) {
                         listItems.clear();
                         listItems.addAll(object);
                         eventAdapter.notifyDataSetChanged();
 
                         oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
-                            for(Event event : object){
-                                if(roomOEvents.isEmpty()){
+                            for (Event event : object) {
+                                if (roomOEvents.isEmpty()) {
                                     roomSaveAndLoad.saveRoomEvent(event);
-                                }
-                                else{
-                                    if(event.getId() != roomOEvents.get(0).getId()){
+                                } else {
+                                    if (event.getId() != roomOEvents.get(0).getId()) {
                                         roomSaveAndLoad.saveRoomEvent(event);
                                     }
                                 }
                             }
                         });
 
-                    }
-                    else{
+                    } else {
                         loadData();
                     }
-                }
-                else{
+                } else {
                     loadData();
                 }
             }
@@ -194,11 +189,16 @@ public class MyEvents extends Fragment implements RoomInteract {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(changeEvent) {
-                    selectedEvent = listItems.get(position);
-                    Intent detailIntent = new Intent(context, PerformOEvent.class);
-                    detailIntent.putExtra("MyEvent", selectedEvent);
-                    startActivity(detailIntent);
+                if (changeEvent) {
+                    oEventViewModel.getActiveEvent().subscribe(roomOEvents -> {
+                        selectedEvent = listItems.get(position);
+                        if (roomOEvents.isEmpty()) {
+                            startEvent();
+                        }
+                        else {
+                            openOverrideDialog();
+                        }
+                    });
                 }
             }
         });
@@ -206,20 +206,26 @@ public class MyEvents extends Fragment implements RoomInteract {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 changeEvent = false;
-                Event selectedEvent = listItems.get(position);
-                openSettingsDialog(selectedEvent);
+                selectedEvent = listItems.get(position);
+                openSettingsDialog();
                 return false;
             }
         });
     }
 
-    private void openOverrideDialog(int position){
+    private void startEvent() {
+        Intent detailIntent = new Intent(getContext(), PerformOEvent.class);
+        detailIntent.putExtra("MyEvent", selectedEvent);
+        startActivity(detailIntent);
+    }
+
+    private void openOverrideDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(getString(R.string.event_in_progress));
+        builder.setMessage(getString(R.string.cancel_last_event));
         CharSequence[] elements = {getString(R.string.cancel), getString(R.string.proceed)};
         builder.setPositiveButton(getString(R.string.proceed), (dialog, which) -> {
-            selectedEvent = listItems.get(position);
-            roomSaveAndLoad.saveRoomEvent(selectedEvent);
+            startEvent();
             dialog.dismiss();
         });
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.dismiss());
@@ -232,10 +238,10 @@ public class MyEvents extends Fragment implements RoomInteract {
         eventAdapter.notifyDataSetChanged();
     }
 
-    private void openSettingsDialog(Event selectedEvent){
+    private void openSettingsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(selectedEvent.getProperty("Title"));
-        CharSequence[] elements = {getString(R.string.delete),getString(R.string.cancel)};
+        CharSequence[] elements = {getString(R.string.delete), getString(R.string.cancel)};
         builder.setItems(elements, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -260,56 +266,55 @@ public class MyEvents extends Fragment implements RoomInteract {
      * room database and create a new event from it
      */
     private void loadData() {
-        Log.d("Room","Started loading events");
+        Log.d("Room", "Started loading events");
         oEventViewModel.getAllOEvents().subscribe(oEvents -> createEvents(oEvents));
     }
 
-    private void createEvents(List<RoomOEvent> oEvents){
-        Log.d("Room",String.format("%d events found", oEvents.size()));
-        if(oEvents.size()>0) {
+    private void createEvents(List<RoomOEvent> oEvents) {
+        Log.d("Room", String.format("%d events found", oEvents.size()));
+        if (oEvents.size() > 0) {
             for (RoomOEvent event : oEvents) {
                 roomSaveAndLoad.reconstructEvent(event);
             }
-        }
-        else{
+        } else {
             listItems = null;
             Toast.makeText(this.getContext(), R.string.found_no_locally_saved_events, Toast.LENGTH_SHORT).show();
         }
     }
+
     private void updateList() {
         EventAdapter eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
     }
 
-        // TODO: Rename method, update argument and hook method into UI event
+    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
     }
 
-    private void deleteEvent(Event event){
+    private void deleteEvent(Event event) {
         oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
-            if(integer != -1){
-                Log.d("Room",String.format("Event %d deleted", event.getId()));
+            if (integer != -1) {
+                Log.d("Room", String.format("Event %d deleted", event.getId()));
                 Toast.makeText(this.getContext(), R.string.event_deleted, Toast.LENGTH_SHORT).show();
                 listItems.remove(event);
                 eventAdapter.notifyDataSetChanged();
-            }
-            else{
+            } else {
                 Toast.makeText(this.getContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
             }
         });
         NetworkManager.getInstance().unsubscribeFromEvent(event.getId(), new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {
-                if(object != null){
+                if (object != null) {
                     Log.d("Subscribe", String.format("Unsubscribed from event %d", event.getId()));
-                }
-                else{
+                } else {
                     Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
                 }
             }
+
             @Override
             public void onFailure(Throwable t) {
                 Log.d("Subscribe", String.format("Couldn't unsubscribe from event %d", event.getId()));
@@ -337,7 +342,7 @@ public class MyEvents extends Fragment implements RoomInteract {
 
     @Override
     public void whenRoomFinished(Object object) {
-        if(object instanceof Event){
+        if (object instanceof Event) {
             listItems.add((Event) object);
             updateList();
         }

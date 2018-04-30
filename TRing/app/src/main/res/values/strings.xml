@@ -105,10 +105,12 @@
     <string name="my_position">My position</string>
     <string name="sort">Sort</string>
     <string name="sort_time">Sort by average time</string>
-    <string name="sort_score">Sort by average Score</string>
+    <string name="sort_dist">Sort by distance</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_alpha">Sort by name</string>
     <string name="event_in_progress">You already have an event in progress!</string>
-    <string name="proceed">Continue</string>
+    <string name="proceed">Start new</string>
+    <string name="cancel_last_event">Do you want to cancel this and start a new event?</string>
+    <string name="abort">Abort</string>
 </resources>
 
