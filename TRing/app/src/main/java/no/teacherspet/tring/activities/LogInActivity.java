@@ -129,11 +129,12 @@ public class LogInActivity extends AppCompatActivity {
     }
     private void checkResult(long[] longs){
         if(longs[0] < 0){
-            Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
+            Log.d("Room", "Something went wrong when saving the user locally");
+            //Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
         }
         else{
             Log.d("Room","User token saved");
-            Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
         }
     }
 

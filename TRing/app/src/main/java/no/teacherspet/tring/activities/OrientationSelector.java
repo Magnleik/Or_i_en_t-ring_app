@@ -99,7 +99,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                 roomSaveAndLoad.reconstructEvent(activeEvents.get(0));
             });
         }
-        Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
     private void setStartTime(List<EventResult> results){
         if(results.size() > 0){
@@ -199,7 +199,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                 }
                 userViewModel.deleteUsers(users).subscribe(integer ->{
                     Log.d("Room",String.format("%d users deleted", users.length));
-                    Toast.makeText(this, R.string.local_user_deleted, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, R.string.local_user_deleted, Toast.LENGTH_SHORT).show();
                 });
             });
         }
