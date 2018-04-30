@@ -105,5 +105,8 @@
     <string name="sort_score">Sorter på score</string>
     <string name="sort_alpha">"Sorter på navn "</string>
     <string name="sort_popularity">Sorter på popularitet</string>
+    <string name="events_avrage_time" >Løpets gjennomsnittstid:</string>
+    <string name="your_time" >Din tid:</string>
+    <string name="results_saved" />
 
 </resources>

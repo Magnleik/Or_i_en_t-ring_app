@@ -108,6 +108,9 @@
     <string name="sort_score">Sort by average Score</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_alpha">Sort by name</string>
+    <string name="events_avrage_time" >The events avrage time:</string>
+    <string name="your_time" >Your time:</string>
+    <string name="results_saved">Results saved. Here\'s how you did:</string>
 
 </resources>
 

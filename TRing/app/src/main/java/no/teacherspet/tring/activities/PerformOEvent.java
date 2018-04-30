@@ -2,6 +2,7 @@ package no.teacherspet.tring.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -415,7 +416,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     @Override
                     public void onResponse(Event object) {
                         Toast.makeText(getApplicationContext(), "Save complete", Toast.LENGTH_SHORT).show();
-                        openScoreDialog();
+                        openScoreDialog((object.getAvgTime()), timeTextToServer);
                     }
 
                     @Override
@@ -438,16 +439,23 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     }
 
     //Shows the users score, compared to the avrage time
-    public void openScoreDialog() {
+    public void openScoreDialog(String avg, String myTime) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View inflator = inflater.inflate(R.layout.event_score_dialog, null);
         builder.setView(inflator);
+        TextView myTimeTextView = (TextView) inflator.findViewById(R.id.my_time_textview);
+        TextView avrageTimeTextView = (TextView) inflator.findViewById(R.id.avrage_time_textview);
+        avrageTimeTextView.setText(avg);
+        myTimeTextView.setText(myTime);
 
         builder.setPositiveButton(R.string.return_to_start_menu, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(PerformOEvent.this,OrientationSelector.class);
+                startActivity(intent);
+
 
             }
         });
