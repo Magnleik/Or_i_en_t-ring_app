@@ -364,9 +364,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         //Viser tiden brukt under eventet
         seconds = 0;
         seconds = getEventTime();
-        int secondsInt = (int) seconds;
-        int minutesInt = (int) minutes;
-        int hoursInt = (int) hours;
 
         if (seconds > 60) {
             //Regn om til minutter
@@ -383,22 +380,28 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             seconds = calculateRest(minutes);
         }
 
+        int secondsInt = (int) seconds;
+        int minutesInt = (int) minutes;
+        int hoursInt = (int) hours;
+
         if (timeTextToServer.equals("")) {
 
             TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
             if ((seconds) >= 0) {
-                timeTextView.setText(String.format(getString(R.string.time_sec_formatted), seconds));
+                timeTextView.setText(String.format(getString(R.string.time_sec_formatted), secondsInt));
             }
 
             if ((minutes) != 0) {
-                timeTextView.setText(String.format(getString(R.string.time_min_sec_formatted), minutes, seconds));
+                timeTextView.setText(String.format(getString(R.string.time_min_sec_formatted), minutesInt, secondsInt));
             }
 
 
             if ((hours) != 0) {
-                timeTextView.setText(String.format(getString(R.string.time_hour_min_sec_formatted), hours, minutes, seconds));
+                timeTextView.setText(String.format(getString(R.string.time_hour_min_sec_formatted), hoursInt, minutesInt, secondsInt));
                 //Fiks for timer
             }
+
+
 
             //Tid som skal sendes til server
             setTimeTextToServer(String.format("%02d:%02d:%02d", hoursInt, minutesInt, secondsInt));
