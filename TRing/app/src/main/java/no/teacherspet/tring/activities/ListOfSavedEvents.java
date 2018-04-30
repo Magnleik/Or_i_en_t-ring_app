@@ -43,7 +43,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     public static final String ACTION_LIST_LOADED = "action_list_loaded";
     public static final String ACTION_SORT_ALPHA = "action_sort_alpha";
     public static final String ACTION_SORT_POPULARITY = "action_sort_popularity";
-    public static final String ACTION_SORT_SCORE = "action_sort_score";
+    public static final String ACTION_SORT_DIST = "action_sort_dist";
     public static final String ACTION_SORT_TIME = "action_sort_time";
 
     private boolean reverseAlpha;
@@ -156,8 +156,8 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
             case (R.id.sort_popularity):
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_POPULARITY));
                 break;
-            case (R.id.sort_score):
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_SCORE));
+            case (R.id.sort_dist):
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_DIST));
                 break;
             case (R.id.sort_time):
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(ACTION_SORT_TIME));

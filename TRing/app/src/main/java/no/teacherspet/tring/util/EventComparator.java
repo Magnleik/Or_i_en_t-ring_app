@@ -31,11 +31,23 @@ public class EventComparator implements Comparator<Event> {
                     return Integer.parseInt(e1.getProperty(PROPERTY_TYPE)) - Integer.parseInt(e2.getProperty(PROPERTY_TYPE));
                 else
                     return Integer.parseInt(e2.getProperty(PROPERTY_TYPE)) - Integer.parseInt(e1.getProperty(PROPERTY_TYPE));
-            case "avg_score":
+            case "dist":
+                Float dist1, dist2;
+                if(e1.getProperty(PROPERTY_TYPE) == null){
+                    dist1 = 0f;
+                } else{
+                    dist1 = Float.parseFloat(e1.getProperty(PROPERTY_TYPE));
+                }
+                if(e2.getProperty(PROPERTY_TYPE) == null){
+                    dist2 = 0f;
+                } else{
+                    dist2 = Float.parseFloat(e2.getProperty(PROPERTY_TYPE));
+                }
                 if (!reverse)
-                    return Float.compare(Float.parseFloat(e1.getProperty(PROPERTY_TYPE)), Float.parseFloat(e2.getProperty(PROPERTY_TYPE)));
+                    return Float.compare(dist1, dist2);
                 else
-                    return Float.compare(Float.parseFloat(e1.getProperty(PROPERTY_TYPE)), Float.parseFloat(e2.getProperty(PROPERTY_TYPE)));
+                    return Float.compare(dist2, dist1);
+
             case "avg_time":
                 String[] data1 = e1.getProperty(PROPERTY_TYPE).split(":");
                 String[] data2 = e2.getProperty(PROPERTY_TYPE).split(":");
