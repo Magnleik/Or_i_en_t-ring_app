@@ -45,6 +45,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     public static final String ACTION_SORT_POPULARITY = "action_sort_popularity";
     public static final String ACTION_SORT_DIST = "action_sort_dist";
     public static final String ACTION_SORT_TIME = "action_sort_time";
+    private static int distance = 1000;
 
     private boolean reverseAlpha;
     private boolean reversePop;
@@ -205,7 +206,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                             progressDialog.hide();
                         }
                     };
-                    networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), 200, adapter);
+                    networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), distance, adapter);
                 }
             };
             lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
