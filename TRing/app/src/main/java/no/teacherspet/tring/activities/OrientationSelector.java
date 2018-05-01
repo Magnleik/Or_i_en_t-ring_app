@@ -80,6 +80,10 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
             });
         }
     }
+
+    /**
+     * Sends the user to the PerformOEvent class and sends the currently active event into the class
+     */
     private void continueEvent(){
         Intent intent = new Intent(OrientationSelector.this, PerformOEvent.class);
         intent.putExtra("MyEvent", activeEvent);
@@ -88,6 +92,10 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         startActivity(intent);
     }
 
+    /**
+     * Checks whether there exists any active events
+     * @param activeEvents The list of active events
+     */
     private void checkActiveEvent(List<RoomOEvent> activeEvents){
         Log.d("Room",String.format("%d active events found", activeEvents.size()));
         if(activeEvents.size() > 0){
@@ -101,6 +109,11 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         }
         //Toast.makeText(this, String.format(getString(R.string.active_events_formatted), activeEvents.size()), Toast.LENGTH_SHORT).show();
     }
+
+    /**
+     * Defines the start time of the event if there is a start time
+     * @param results the start time and difficulty of the event
+     */
     private void setStartTime(List<EventResult> results){
         if(results.size() > 0){
             startTime = results.get(0).getStartTime();
@@ -113,7 +126,10 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         Log.d("Room", String.format("StartTime set to: %d", startTime));
     }
 
-    //Changes to createUserActivity if a roomUser has not been created
+    /**
+     * Checks whether the user has any login information saved in the room database and attempts to log in if there exists
+     * @param roomUsers The user information
+     */
     private void checkUser(List<RoomUser> roomUsers){
         progressDialog.show();
         Log.d("Room",String.format("%d users found",roomUsers.size()));
@@ -146,9 +162,6 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
                 @Override
                 public void onFailure(Throwable t) {
                     progressDialog.hide();
-                    userViewModel.deleteUsers(users).subscribe(integers ->{
-                        Log.d("Room",String.format("%d users deleted", users.length));
-                    });
                 }
             });
         } else {
@@ -182,11 +195,18 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         }
     }
 
+    /**
+     * Takes the user to the login activity. gets called when the login button is pressed
+     * @param v the button pressed
+     */
     public void logInButton(View v){
         Intent intent = new Intent(OrientationSelector.this,LogInActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * removes all login information from the room database and sets the state of the app to logged out
+     */
     private void logout(){
         NetworkManager.getInstance().logOut();
 
@@ -263,6 +283,10 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Asks the user for permission to use the location services of the phone if it has not yet given permission.
+     * @return
+     */
     private boolean requestAccess(){
         if(ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS_ACCESS_FINE_LOCATION);
@@ -272,7 +296,11 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
             return false;
         }
     }
+
     @Override
+    /*
+    handles the response from the access request.
+     */
     public void onRequestPermissionsResult(int requestCode,String permissions[],int[] grantResults){
         switch (requestCode){
             case MY_PERMISSIONS_ACCESS_FINE_LOCATION:
