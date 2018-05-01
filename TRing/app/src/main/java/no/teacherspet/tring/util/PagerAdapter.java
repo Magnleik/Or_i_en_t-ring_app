@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 
@@ -23,18 +22,15 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        switch(position) {
+        switch (position) {
             case 0:
                 MyEvents myEvents = new MyEvents();
                 return myEvents;
             case 1:
                 NearbyEvents nearbyEvents = new NearbyEvents();
                 return nearbyEvents;
-            case 2:
-                MostPopularEvents mostPopularEvents = new MostPopularEvents();
-                return mostPopularEvents;
-                default:
-                    return null;
+            default:
+                return null;
 
 
         }

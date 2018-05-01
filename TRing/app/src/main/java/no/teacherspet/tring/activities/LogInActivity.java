@@ -2,7 +2,6 @@ package no.teacherspet.tring.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -10,8 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import connection.ICallbackAdapter;
@@ -23,7 +20,7 @@ import no.teacherspet.tring.R;
 import no.teacherspet.tring.util.GeneralProgressDialog;
 
 /**
- * Created by Eirik on 24-Apr-18.
+ * The activity for logging in
  */
 
 public class LogInActivity extends AppCompatActivity {
@@ -46,7 +43,7 @@ public class LogInActivity extends AppCompatActivity {
         logInBtn = (Button) findViewById(R.id.login_btn);
         createUserBtn = (Button) findViewById(R.id.login_create_btn);
 
-        progressDialog = new GeneralProgressDialog(this,this, true);
+        progressDialog = new GeneralProgressDialog(this, this, true);
 
     }
 
@@ -56,7 +53,10 @@ public class LogInActivity extends AppCompatActivity {
         return true;
     }
 
-    public void logInBtn(View v){
+    /**
+     * The method to be called when pressing the "Log In" button. Sends call to the server to attempt logging in, and handles responses.
+     */
+    public void logInBtn(View v) {
         progressDialog.show();
         logInBtn.setEnabled(false);
 
@@ -67,26 +67,26 @@ public class LogInActivity extends AppCompatActivity {
 
                 progressDialog.hide();
 
-                if (object!=null && object){
+                if (object != null && object) {
 
-                    if(NetworkManager.getInstance().isAuthenticated()) {
+                    if (NetworkManager.getInstance().isAuthenticated()) {
                         Toast.makeText(LogInActivity.this, R.string.successfully_logged_in, Toast.LENGTH_SHORT).show();
 
                         saveCredentialsToLocal();
 
                         finish();
 
-                    }else{
+                    } else {
                         Toast.makeText(LogInActivity.this, R.string.user_verified_login_failed, Toast.LENGTH_SHORT).show();
 
                         logInBtn.setEnabled(true);
                     }
 
-                }else if(object==null){
+                } else if (object == null) {
                     Toast.makeText(LogInActivity.this, R.string.something_wrong_on_server_try_again, Toast.LENGTH_SHORT).show();
 
                     logInBtn.setEnabled(true);
-                }else{
+                } else {
                     Toast.makeText(LogInActivity.this, R.string.wrong_login_credentials, Toast.LENGTH_SHORT).show();
 
                     logInBtn.setEnabled(true);
@@ -106,8 +106,11 @@ public class LogInActivity extends AppCompatActivity {
         });
     }
 
-    private void saveCredentialsToLocal(){
-        String token =  NetworkManager.getInstance().getToken();
+    /**
+     * Save the user data to the local database, and delete any other use that might be saved.
+     */
+    private void saveCredentialsToLocal() {
+        String token = NetworkManager.getInstance().getToken();
         LocalDatabase database = LocalDatabase.getInstance(this);
         UserViewModel userViewModel = new UserViewModel(database.userDAO());
         userViewModel.getAllUsers().subscribe(roomUsers -> {
@@ -116,30 +119,35 @@ public class LogInActivity extends AppCompatActivity {
                 for (int i = 0; i < roomUsers.size(); i++) {
                     users[i] = roomUsers.get(i);
                 }
-                userViewModel.deleteUsers(users).subscribe(longs->{
-                    Log.d("Room",String.format("%d users deleted",users.length));
+                userViewModel.deleteUsers(users).subscribe(longs -> {
+                    Log.d("Room", String.format("%d users deleted", users.length));
                     userViewModel.addUsers(new RoomUser(token)).subscribe(longs1 -> checkResult(longs1));
                 });
-            }
-            else{
+            } else {
                 userViewModel.addUsers(new RoomUser(token)).subscribe(longs -> checkResult(longs));
-                }
+            }
         });
 
     }
-    private void checkResult(long[] longs){
-        if(longs[0] < 0){
+
+    /**
+     * Check to see if the save to the local database was successful
+     */
+    private void checkResult(long[] longs) {
+        if (longs[0] < 0) {
             Log.d("Room", "Something went wrong when saving the user locally");
             //Toast.makeText(this, R.string.something_wrong_saving_user_locally, Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Log.d("Room","User token saved");
+        } else {
+            Log.d("Room", "User token saved");
             //Toast.makeText(this, R.string.user_saved_locally, Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void createUserClick(View v){
-        Intent intent = new Intent(LogInActivity.this,CreateUserActivity.class);
+    /**
+     * Method to be called when clicking the "Create New" button. Changes to CreateUserActivity
+     */
+    public void createUserClick(View v) {
+        Intent intent = new Intent(LogInActivity.this, CreateUserActivity.class);
         startActivity(intent);
     }
 

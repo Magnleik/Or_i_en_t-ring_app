@@ -22,7 +22,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,30 +30,24 @@ import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.R;
-import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 import no.teacherspet.tring.util.EventFragmentPagerAdapter;
 import no.teacherspet.tring.util.GeneralProgressDialog;
 import no.teacherspet.tring.util.PagerAdapter;
 
-public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
+public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener {
 
     public static final String ACTION_LIST_LOADED = "action_list_loaded";
     public static final String ACTION_SORT_ALPHA = "action_sort_alpha";
     public static final String ACTION_SORT_POPULARITY = "action_sort_popularity";
     public static final String ACTION_SORT_DIST = "action_sort_dist";
     public static final String ACTION_SORT_TIME = "action_sort_time";
-
-    private boolean reverseAlpha;
-    private boolean reversePop;
-    private boolean reverseScore;
-    private boolean reverseTime;
+    private static int distance = 1000;
 
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
-    private LatLng position;
     private LocationCallback mLocationCallback;
     private Location currentLocation;
 
@@ -76,10 +69,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        reverseAlpha = false;
-        reversePop = false;
-        reverseScore = false;
-        reverseTime = false;
         setContentView(R.layout.activity_list_of_saved_events);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -88,6 +77,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
         setSupportActionBar((Toolbar) findViewById(R.id.saved_events_toolbar));
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.my_events));
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Set up the ViewPager with the sections adapter.
@@ -108,11 +98,10 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         super.onResume();
     }
 
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
     @Override
+    /*
+     * Defines the menu elements to be present in the activity
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.general_menu, menu);
@@ -132,6 +121,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     }
 
     @Override
+    /*
+     * Handles commands if any element in the toolbar gets pressed. If necessary, it sends a broadcast to the fragments of the activity
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -167,6 +159,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Creates a location request and asks for points nearby to the point recieved. After the events have been recieved, a message gets broadcasted to the fragments of this activity.
+     */
     public void initList() {
         theEventReceived = new HashMap<>();
         GeneralProgressDialog progressDialog = new GeneralProgressDialog(getApplicationContext(), this, true);
@@ -189,7 +184,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                         @Override
                         public void onResponse(ArrayList<Event> object) {
                             if (object == null) {
-                                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
                             } else {
                                 for (int i = 0; i < object.size(); i++) {
                                     theEventReceived.put(object.get(i).getId(), object.get(i));
@@ -201,25 +196,29 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
                         @Override
                         public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.could_not_connect_server, Toast.LENGTH_SHORT).show();
                             progressDialog.hide();
                         }
                     };
-                    networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), 200, adapter);
+                    networkManager.getNearbyEvents(currentLocation.getLatitude(), currentLocation.getLongitude(), distance, adapter);
                 }
             };
             lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
-        //theEventReceived = new StartupMenu().getTestEvents();
-
     }
 
+    /**
+     * Stops the location request if possible
+     */
     public void stopLocationRequest() {
         if (mLocationCallback != null) {
             lm.removeLocationUpdates(mLocationCallback);
         }
     }
 
+    /**
+     * @return The events nearby
+     */
     public HashMap<Integer, Event> getEvents() {
         return theEventReceived;
     }

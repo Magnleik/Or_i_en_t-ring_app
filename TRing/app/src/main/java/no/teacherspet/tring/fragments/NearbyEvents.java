@@ -100,9 +100,13 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     }
 
 
+    /**
+     * gets run when the view is created. Sets up the lists to receive data. Also defines the BroadCastReceiver to act when its activity broadcasts messages. If possible gets updates from server to update local database
+     * @param view
+     * @param savedInstanceState
+     */
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle("Løp i nærheten");
         mReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -130,15 +134,12 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         filter.addAction(ListOfSavedEvents.ACTION_SORT_DIST);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
+        listItems = new ArrayList<>();
         eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
-
-        final Context context = this.getContext();
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LocalDatabase ld = LocalDatabase.getInstance(getContext());
@@ -155,6 +156,9 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         });
     }
 
+    /**
+     * Opens a dialog to notify user that there exist an active event
+     */
     private void openOverrideDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(getString(R.string.event_in_progress));
@@ -169,6 +173,11 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         alertDialog.show();
     }
 
+    /**
+     * Sorts the list based on properties and whether the order is to be reversed
+     * @param property to sort by
+     * @param reversed whether it is to be reversed
+     */
     private void sortList(String property, boolean reversed) {
         Collections.sort(listItems, new EventComparator(property, reversed));
         eventAdapter.notifyDataSetChanged();
@@ -179,7 +188,6 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         super.onActivityCreated(savedInstanceState);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -204,25 +212,17 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         mListener = null;
     }
 
+    /**
+     * sets the list items to be the events gotten from the parent activity if they exist
+     */
     public void initList() {
-        ArrayList<Event> listItems = new ArrayList<>();
         theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);
             }
         }
-        if (!listItems.equals(this.listItems)) {
-            this.listItems = listItems;
-            updateList();
-        }
-        //theEventReceived = new StartupMenu().getTestEvents();
-
-    }
-
-    private void updateList() {
-        eventAdapter = new EventAdapter(this.getContext(), listItems);
-        mListView.setAdapter(eventAdapter);
+            eventAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -231,6 +231,9 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     }
 
     @Override
+    /*
+     * Stops the fragment from listening to updates when view gets destroyed.
+     */
     public void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(mReciever);
@@ -257,6 +260,10 @@ public class NearbyEvents extends Fragment implements RoomInteract {
             }
         });
     }
+
+    /**
+     * Starts the event saved as selectedEvent and sends the event to the PerformOEvent class
+     */
     private void startEvent(){
         Log.d("Room", String.format("Event %d saved", selectedEvent.getId()));
         Intent detailIntent = new Intent(this.getContext(), PerformOEvent.class);
@@ -275,7 +282,6 @@ public class NearbyEvents extends Fragment implements RoomInteract {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

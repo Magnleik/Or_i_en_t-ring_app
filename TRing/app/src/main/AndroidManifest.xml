@@ -32,13 +32,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_KEY}" />
 
-        <activity
-            android:name=".activities.MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".activities.StartupMenu"
-            android:screenOrientation="portrait">
-        </activity>
         <activity android:name=".activities.OrientationSelector"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -68,7 +61,7 @@
         <activity
             android:name=".activities.ListOfSavedEvents"
             android:label="@string/title_activity_list_of_saved_events"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">
         </activity>
 
