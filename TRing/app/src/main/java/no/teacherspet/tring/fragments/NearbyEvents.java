@@ -214,15 +214,10 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         }
         if (!listItems.equals(this.listItems)) {
             this.listItems = listItems;
-            updateList();
+            eventAdapter.notifyDataSetChanged();
         }
         //theEventReceived = new StartupMenu().getTestEvents();
 
-    }
-
-    private void updateList() {
-        eventAdapter = new EventAdapter(this.getContext(), listItems);
-        mListView.setAdapter(eventAdapter);
     }
 
     @Override

@@ -225,8 +225,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     builder.include(new LatLng(point.getLatitude(), point.getLongitude()));
                 }
             }
-            resetActiveEvents(startedEvent);
-            updateEvent(true);
             LatLngBounds bounds = builder.build();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(avgPosition));
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -817,6 +815,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         if (startedEvent.getStartPoint() != null) {
             float distance = startedEvent.getStartPoint().getDistanceFromPoint(userLocationLatLng);
             if (distance < 20) {
+                resetActiveEvents(startedEvent);
+                updateEvent(true);
                 //addEventButton.setVisibility(View.GONE);
                 //TODO Ikke sett hvis startTime allerede er satt
                 if(this.startTime == -1){
