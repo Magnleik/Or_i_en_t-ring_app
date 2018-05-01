@@ -133,6 +133,7 @@ public class NearbyEvents extends Fragment implements RoomInteract {
         ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
 
+        listItems = new ArrayList<>();
         eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
 
@@ -205,19 +206,13 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     }
 
     public void initList() {
-        ArrayList<Event> listItems = new ArrayList<>();
         theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);
             }
         }
-        if (!listItems.equals(this.listItems)) {
-            this.listItems = listItems;
             eventAdapter.notifyDataSetChanged();
-        }
-        //theEventReceived = new StartupMenu().getTestEvents();
-
     }
 
     @Override

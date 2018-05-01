@@ -75,8 +75,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private String eventAvrageTime;
     private String myTime;
     private double eventScore =0;
-
-
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationCallback mLocationCallback;
 
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
@@ -149,11 +149,19 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(fusedLocationProviderClient!=null&&mLocationCallback!=null) {
+            fusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+        }
+    }
+
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            LocationCallback mLocationCallback = new LocationCallback() {
+            mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
@@ -165,7 +173,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             };
-            FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
     }

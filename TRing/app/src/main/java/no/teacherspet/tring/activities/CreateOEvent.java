@@ -61,6 +61,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Point> arrayListWithCoords = new ArrayList<>();
     private ArrayList<Point> latLngArrayList = new ArrayList<>();
     private NetworkManager networkManager;
+    private FusedLocationProviderClient lm;
+    LocationCallback mLocationCallback;
     private LocationRequest locationRequest;
     private Point startPoint;
     private Location currentLocation;
@@ -87,6 +89,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         roomSaveAndLoad = new RoomSaveAndLoad(getApplicationContext(), this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(lm!=null&&mLocationCallback!=null) {
+            lm.removeLocationUpdates(mLocationCallback);
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -293,12 +302,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
         final Boolean[] hasFocused = {true};
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            FusedLocationProviderClient lm = LocationServices.getFusedLocationProviderClient(this);
+            lm = LocationServices.getFusedLocationProviderClient(this);
             locationRequest = new LocationRequest();
 
             locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-            LocationCallback mLocationCallback = new LocationCallback() {
+            mLocationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
