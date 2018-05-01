@@ -31,14 +31,13 @@ import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.R;
-import no.teacherspet.tring.fragments.MostPopularEvents;
 import no.teacherspet.tring.fragments.MyEvents;
 import no.teacherspet.tring.fragments.NearbyEvents;
 import no.teacherspet.tring.util.EventFragmentPagerAdapter;
 import no.teacherspet.tring.util.GeneralProgressDialog;
 import no.teacherspet.tring.util.PagerAdapter;
 
-public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener, MostPopularEvents.OnFragmentInteractionListener {
+public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnFragmentInteractionListener, NearbyEvents.OnFragmentInteractionListener {
 
     public static final String ACTION_LIST_LOADED = "action_list_loaded";
     public static final String ACTION_SORT_ALPHA = "action_sort_alpha";
@@ -46,11 +45,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     public static final String ACTION_SORT_DIST = "action_sort_dist";
     public static final String ACTION_SORT_TIME = "action_sort_time";
     private static int distance = 1000;
-
-    private boolean reverseAlpha;
-    private boolean reversePop;
-    private boolean reverseScore;
-    private boolean reverseTime;
 
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
@@ -77,10 +71,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        reverseAlpha = false;
-        reversePop = false;
-        reverseScore = false;
-        reverseTime = false;
         setContentView(R.layout.activity_list_of_saved_events);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -211,8 +201,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
             };
             lm.requestLocationUpdates(locationRequest, mLocationCallback, null);
         }
-        //theEventReceived = new StartupMenu().getTestEvents();
-
     }
 
     public void stopLocationRequest() {

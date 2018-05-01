@@ -4,18 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.List;
 
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
@@ -102,18 +96,6 @@ public class CreateUserActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    //FIXME: Change this to work for new implementation
-    private void changeActivity(long[] longs){
-        if(longs[0] >= 0){
-            Toast.makeText(this, R.string.user_successfully_saved, Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, MapsActivity.class));
-        }
-        else{
-            Toast.makeText(this, R.string.something_wrong_try_again, Toast.LENGTH_SHORT).show();
-            saveButton.setEnabled(true);
-        }
     }
 
     private void saveCredentialsToLocal(){
