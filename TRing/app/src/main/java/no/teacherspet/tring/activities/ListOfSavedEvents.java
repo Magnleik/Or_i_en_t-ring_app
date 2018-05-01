@@ -184,7 +184,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
                         @Override
                         public void onResponse(ArrayList<Event> object) {
                             if (object == null) {
-                                Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.something_wrong_toast, Toast.LENGTH_SHORT).show();
                             } else {
                                 for (int i = 0; i < object.size(); i++) {
                                     theEventReceived.put(object.get(i).getId(), object.get(i));
@@ -196,7 +196,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
                         @Override
                         public void onFailure(Throwable t) {
-                            Toast.makeText(getApplicationContext(), "Could not connect to server.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), R.string.could_not_connect_server, Toast.LENGTH_SHORT).show();
                             progressDialog.hide();
                         }
                     };
