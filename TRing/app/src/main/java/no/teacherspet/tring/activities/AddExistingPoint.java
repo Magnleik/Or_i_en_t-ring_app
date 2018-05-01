@@ -105,10 +105,10 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         mMap.setOnCameraIdleListener(manager);
         mMap.setOnMarkerClickListener(manager);
         mMap.setOnInfoWindowClickListener(manager);
-        mMap.setMaxZoomPreference(20);
+        //mMap.setMaxZoomPreference(20);
 
         CameraPosition camPos = getIntent().getParcelableExtra("map_center");
-        networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, 1000, new ICallbackAdapter<ArrayList<Point>>() {
+        networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, getIntent().getFloatExtra("map_radius",1000), new ICallbackAdapter<ArrayList<Point>>() {
             @Override
             public void onResponse(ArrayList<Point> object) {
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();

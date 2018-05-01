@@ -27,6 +27,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -231,7 +234,15 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     public void existingPointClicked(View v) {
         Intent intent = new Intent(CreateOEvent.this, AddExistingPoint.class);
         intent.putExtra("map_center", mMap.getCameraPosition());
+        intent.putExtra("map_radius", getMapRadius());
         startActivityForResult(intent, 2);
+    }
+
+    private float getMapRadius(){
+        LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+        float[] dist = new float[1];
+        Location.distanceBetween(bounds.northeast.latitude,bounds.northeast.longitude,bounds.southwest.latitude,bounds.southwest.longitude,dist);
+        return dist[0];
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
