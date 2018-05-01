@@ -669,7 +669,7 @@ public class NetworkManager {
      */
     private void addCredentialsWithToken(String authToken) {
 
-        if (!TextUtils.isEmpty(authToken)) { //FIXME: Does this handle null?
+        if (!TextUtils.isEmpty(authToken)) {
             AuthenticationInterceptor interceptor =
                     new AuthenticationInterceptor(authToken);
 
