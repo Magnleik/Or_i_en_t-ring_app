@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
 import no.teacherspet.tring.Database.Entities.RoomUser;
@@ -128,6 +129,7 @@ public class CreateUserActivity extends AppCompatActivity {
 
     /**
      * Method to be called when pressing the "Save" button
+     *
      * @param v
      */
     public void saveButtonClick(View v) {
