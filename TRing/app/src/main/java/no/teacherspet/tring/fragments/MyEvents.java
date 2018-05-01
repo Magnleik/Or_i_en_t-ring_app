@@ -307,13 +307,6 @@ public class MyEvents extends Fragment implements RoomInteract {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     /**
      * removes an element from the list of events. Also removes the event from local database
      * @param event to be deleted
@@ -392,7 +385,6 @@ public class MyEvents extends Fragment implements RoomInteract {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

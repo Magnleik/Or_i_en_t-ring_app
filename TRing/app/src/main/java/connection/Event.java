@@ -34,8 +34,6 @@ public class Event implements Serializable {
 
     private ArrayList<Point> points;
 
-    //TODO: Need to make starting point as its own point, as this will be necessary for the database (because of ordering on server)
-
     private Map<String, String> properties;
 
     private int id = -1;

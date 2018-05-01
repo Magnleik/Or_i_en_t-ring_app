@@ -302,7 +302,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
 
                     @Override
                     public void onClick(View view) {
-                        // TODO Do something
                         if (easyButton.getVisibility() == View.VISIBLE) {
                             easyButton.setVisibility(View.INVISIBLE);
                             mediumButton.setVisibility(View.INVISIBLE);
