@@ -96,7 +96,7 @@
     <string name="medium_button_text" >Medium</string>
     <string name="hard_button_text" >Vanskelig</string>
     <string name="start_dialog_positive_button_next">Neste</string>
-    <string name="explain_event_when_started" >1. Gå til startpunktet \n(den grønne markøren) \n\n 2. Trykk på "Start Event"-knappen \n\n 3. Spring. Lykke til!</string>
+    <string name="explain_event_when_started" >1. Gå til startpunktet \n(den grønne markøren) \n\n 2. Trykk på "Start Løp"-knappen \n\n 3. Spring. Lykke til!</string>
     <string name="no_known_points_in_area">Det er ingen kjende punkt i dette området</string>
     <string name="pos_not_yet_found">Posisjon er endå ikkje funnen</string>
     <string name="my_position">Min posisjon</string>
@@ -105,11 +105,13 @@
     <string name="sort_dist">Sorter på avstand</string>
     <string name="sort_alpha">"Sorter på navn "</string>
     <string name="sort_popularity">Sorter på popularitet</string>
-    <string name="events_avrage_time" >Løpets gjennomsnittstid:</string>
+    <string name="events_average_time">Løpets gjennomsnittstid:</string>
     <string name="your_time" >Din tid:</string>
     <string name="results_saved" >"Resultat lagret. Her er en kjapp oversikt: "</string>
     <string name="event_in_progress">Du har allereie eit laup pågåande</string>
     <string name="proceed">Start nytt</string>
     <string name="cancel_last_event">Vil du avslutte dette og starte eit nytt laup?</string>
     <string name="abort">Avbryt</string>
+    <string name="timeUsed">Tid brukt: </string>
+    <string name="startEventButtonText">Start løp</string>
 </resources>

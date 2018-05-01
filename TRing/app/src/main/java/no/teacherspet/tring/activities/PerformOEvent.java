@@ -409,7 +409,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             eventScore = Math.round(getEventScore());
         }
         TextView timeTextView = (TextView) inflator.findViewById(R.id.timeTextView);
-        timeTextView.setText("Time used: " + getTimeTextToServer());
+        timeTextView.setText(getString(R.string.timeUsed) + " " + getTimeTextToServer());
 
         String eventScoreString = Integer.toString((int) getEventScore());
         eventScoreString += "/100";

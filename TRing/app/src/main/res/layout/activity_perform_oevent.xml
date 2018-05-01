@@ -63,7 +63,7 @@
         android:layout_marginTop="8dp"
         android:background="#80228B22"
         android:onClick="startEventBtnPressed"
-        android:text="Start Event"
+        android:text="@string/startEventButtonText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
