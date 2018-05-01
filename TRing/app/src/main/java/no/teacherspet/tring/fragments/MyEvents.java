@@ -19,9 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,20 +27,16 @@ import java.util.List;
 import connection.Event;
 import connection.ICallbackAdapter;
 import connection.NetworkManager;
-import connection.Point;
-import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomOEvent;
-import no.teacherspet.tring.Database.Entities.RoomPoint;
 import no.teacherspet.tring.Database.LocalDatabase;
 import no.teacherspet.tring.Database.ViewModels.OEventViewModel;
-import no.teacherspet.tring.Database.ViewModels.PointOEventJoinViewModel;
 import no.teacherspet.tring.R;
 import no.teacherspet.tring.activities.ListOfSavedEvents;
 import no.teacherspet.tring.activities.PerformOEvent;
 import no.teacherspet.tring.util.EventAdapter;
-import no.teacherspet.tring.util.RoomSaveAndLoad;
-import no.teacherspet.tring.util.RoomInteract;
 import no.teacherspet.tring.util.EventComparator;
+import no.teacherspet.tring.util.RoomInteract;
+import no.teacherspet.tring.util.RoomSaveAndLoad;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -116,6 +109,11 @@ public class MyEvents extends Fragment implements RoomInteract {
         return view;
     }
 
+    /**
+     * gets run when the view is created. Sets up the lists to receive data. Also defines the BroadCastReceiver to act when its activity broadcasts messages. If possible gets updates from server to update local database
+     * @param view
+     * @param savedInstanceState
+     */
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mListView = (ListView) getView().findViewById(R.id.my_events_list);
 
@@ -146,7 +144,6 @@ public class MyEvents extends Fragment implements RoomInteract {
         filter.addAction(ListOfSavedEvents.ACTION_SORT_DIST);
         filter.addAction(ListOfSavedEvents.ACTION_SORT_TIME);
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(mReciever, filter);
-        ((ListOfSavedEvents) getActivity()).setActionBarTitle(getString(R.string.my_events));
 
         //Get subscribed events from server
         NetworkManager.getInstance().getSubscribedEvents(new ICallbackAdapter<List<Event>>() {
@@ -161,26 +158,25 @@ public class MyEvents extends Fragment implements RoomInteract {
                         oEventViewModel.getActiveEvent().subscribe(activeEvents -> {
                             oEventViewModel.getAllOEvents().subscribe(roomOEvents -> {
                                 ArrayList<Integer> ids = new ArrayList<>();
-                                for(RoomOEvent roomOEvent : roomOEvents){
+                                for (RoomOEvent roomOEvent : roomOEvents) {
                                     ids.add(roomOEvent.getId());
                                 }
                                 int activeId;
-                                if(!activeEvents.isEmpty()){
+                                if (!activeEvents.isEmpty()) {
                                     activeId = activeEvents.get(0).getId();
-                                }
-                                else{
+                                } else {
                                     activeId = -1;
                                 }
                                 for (Event event : object) {
-                                    if(ids.contains(event.getId())){
+                                    if (ids.contains(event.getId())) {
                                         ids.remove(ids.indexOf(event.getId()));
                                     }
-                                    if(event.getId() != activeId){
+                                    if (event.getId() != activeId) {
                                         roomSaveAndLoad.saveRoomEvent(event);
                                     }
                                 }
-                                for(Integer id : ids){
-                                    if(id != activeId){
+                                for (Integer id : ids) {
+                                    if (id != activeId) {
                                         oEventViewModel.deleteOEvent(id);
                                     }
                                 }
@@ -202,8 +198,6 @@ public class MyEvents extends Fragment implements RoomInteract {
             }
         });
 
-        final Context context = this.getContext();
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -212,8 +206,7 @@ public class MyEvents extends Fragment implements RoomInteract {
                         selectedEvent = listItems.get(position);
                         if (roomOEvents.isEmpty()) {
                             startEvent();
-                        }
-                        else {
+                        } else {
                             openOverrideDialog();
                         }
                     });
@@ -231,12 +224,18 @@ public class MyEvents extends Fragment implements RoomInteract {
         });
     }
 
+    /**
+     * Starts the event saved in selectedEvent. Also sends the event to the PerformOEvent class to process the object.
+     */
     private void startEvent() {
         Intent detailIntent = new Intent(getContext(), PerformOEvent.class);
         detailIntent.putExtra("MyEvent", selectedEvent);
         startActivity(detailIntent);
     }
 
+    /**
+     * Opens a dialog to notify user that there exist an active event
+     */
     private void openOverrideDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(getString(R.string.event_in_progress));
@@ -251,11 +250,19 @@ public class MyEvents extends Fragment implements RoomInteract {
         alertDialog.show();
     }
 
+    /**
+     * Sorts the list based on properties and whether the order is to be reversed
+     * @param property to sort by
+     * @param reversed whether it is to be reversed
+     */
     private void sortList(String property, boolean reversed) {
         Collections.sort(listItems, new EventComparator(property, reversed));
         eventAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Opens a dialog to give user options regarding the events present in the list.
+     */
     private void openSettingsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
         builder.setTitle(selectedEvent.getProperty("Title"));
@@ -307,6 +314,10 @@ public class MyEvents extends Fragment implements RoomInteract {
         }
     }
 
+    /**
+     * removes an element from the list of events. Also removes the event from local database
+     * @param event to be deleted
+     */
     private void deleteEvent(Event event) {
         oEventViewModel.deleteOEvent(event.getId()).subscribe(integer -> {
             if (integer != -1) {
@@ -351,6 +362,15 @@ public class MyEvents extends Fragment implements RoomInteract {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    /*
+     * Stops the fragment from listening to updates when view gets destroyed.
+     */
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(mReciever);
     }
 
     @Override

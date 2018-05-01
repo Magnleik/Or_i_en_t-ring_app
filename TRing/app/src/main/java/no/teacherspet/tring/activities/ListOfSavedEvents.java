@@ -22,7 +22,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +48,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     private HashMap<Integer, Event> theEventReceived;
     private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
-    private LatLng position;
     private LocationCallback mLocationCallback;
     private Location currentLocation;
 
@@ -79,6 +77,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
 
         setSupportActionBar((Toolbar) findViewById(R.id.saved_events_toolbar));
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.my_events));
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Set up the ViewPager with the sections adapter.
@@ -99,11 +98,10 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         super.onResume();
     }
 
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
     @Override
+    /*
+     * Defines the menu elements to be present in the activity
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.general_menu, menu);
@@ -123,6 +121,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     }
 
     @Override
+    /*
+     * Handles commands if any element in the toolbar gets pressed. If necessary, it sends a broadcast to the fragments of the activity
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -158,6 +159,9 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Creates a location request and asks for points nearby to the point recieved. After the events have been recieved, a message gets broadcasted to the fragments of this activity.
+     */
     public void initList() {
         theEventReceived = new HashMap<>();
         GeneralProgressDialog progressDialog = new GeneralProgressDialog(getApplicationContext(), this, true);
@@ -203,12 +207,18 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         }
     }
 
+    /**
+     * Stops the location request if possible
+     */
     public void stopLocationRequest() {
         if (mLocationCallback != null) {
             lm.removeLocationUpdates(mLocationCallback);
         }
     }
 
+    /**
+     * @return The events nearby
+     */
     public HashMap<Integer, Event> getEvents() {
         return theEventReceived;
     }

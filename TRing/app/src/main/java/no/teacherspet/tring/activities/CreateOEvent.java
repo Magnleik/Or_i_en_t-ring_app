@@ -78,9 +78,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    /*
+    Removes the location request if there is one present
+     */
     protected void onDestroy() {
         super.onDestroy();
-        if(lm!=null&&mLocationCallback!=null) {
+        if (lm != null && mLocationCallback != null) {
             lm.removeLocationUpdates(mLocationCallback);
         }
     }
@@ -95,10 +98,13 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
     @Override
+    /*
+    moves and focuses the map once it is ready to.
+     */
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        manager = new ClusterManager<Point>(this,mMap);
+        manager = new ClusterManager<Point>(this, mMap);
         manager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener() {
             @Override
             public boolean onClusterItemClick(ClusterItem clusterItem) {
@@ -140,6 +146,12 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         manager.cluster();
     }
 
+    /**
+     * Opens a dialog to set and define a point on the map to be added to the list of points in the event
+     *
+     * @param marker   the marker that is being edited. If adding a new point, this can be null
+     * @param position the Latitude and Longitude of the point pressed on the map
+     */
     public void openAddDialog(Point marker, LatLng position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_new_point);
@@ -176,6 +188,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         alertDialog.show();
     }
 
+    /**
+     * Opens a dialog with editing options of a marker. Can be to set as starting point, edit the attributes of the marker and delete it from the list of points.
+     *
+     * @param marker
+     */
     public void openEditDialog(Point marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(marker.getTitle());
@@ -186,9 +203,9 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 switch (which) {
                     case 0:
                         if (startPoint != null) {
-                            ((DefaultClusterRenderer)manager.getRenderer()).getMarker(startPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
+                            ((DefaultClusterRenderer) manager.getRenderer()).getMarker(startPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
                         }
-                        ((DefaultClusterRenderer)manager.getRenderer()).getMarker(marker).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        ((DefaultClusterRenderer) manager.getRenderer()).getMarker(marker).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         startPoint = marker;
                         dialog.dismiss();
                         break;
@@ -229,21 +246,32 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Adds a marker to the map.
+     *
+     * @param name     Title of the marker
+     * @param location Latitude and Longitude where the marker is to be placed
+     */
     private void addNewMarker(String name, LatLng location) {
         Point point;
         if (name != null) {
-            point = new Point(location.latitude,location.longitude,null,name);
+            point = new Point(location.latitude, location.longitude, null, name);
             manager.addItem(point);
             manager.cluster();
             arrayListWithCoords.add(point);
         } else {
-            point = new Point(location.latitude,location.longitude,null,getString(R.string.point) + " " + (arrayListWithCoords.size() + 1));
+            point = new Point(location.latitude, location.longitude, null, getString(R.string.point) + " " + (arrayListWithCoords.size() + 1));
             manager.addItem(point);
             manager.cluster();
             arrayListWithCoords.add(point);
         }
     }
 
+    /**
+     * Adds a marker to the map.
+     *
+     * @param point The point to be added
+     */
     private void addNewMarker(Point point) {
         manager.addItem(point);
         manager.cluster();
@@ -262,7 +290,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         for (Point position : positions) {
             addNewMarker(position);
         }
-        Toast.makeText(getApplicationContext(), getString(R.string.added)+ " " + positions.size() + " " + getString(R.string.points) +".", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.added) + " " + positions.size() + " " + getString(R.string.points) + ".", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -280,8 +308,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
             arrayListWithCoords.remove(marker);
         }
     }
-
-    //Adds marker on the users location
 
     /**
      * creates a locationRequest to update the CurrentLocation variable as often as possible. If a reading is to inaccurate, it will discard it
@@ -324,7 +350,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param v Button that fires the method
      */
     public void addMarkerMyPosition(View v) {
-        if(currentLocation!=null) {
+        if (currentLocation != null) {
             boolean shouldAdd = true;
             Location markerLocation;
             for (Point marker : arrayListWithCoords) {
@@ -336,11 +362,10 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
             if (shouldAdd) {
-                addNewMarker(null, new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+                addNewMarker(null, new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
             }
-        }
-        else{
-            Toast.makeText(getApplicationContext(), R.string.pos_not_yet_found,Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), R.string.pos_not_yet_found, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -406,8 +431,6 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
-
     /**
      * Saves the currently created points to an arraylist to be provided later when the state is restored. Used when phone is flipped and state is destroyed
      *
@@ -422,15 +445,11 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
                 latLngArrayList.add(marker);
             }
         }
-
         outState.putSerializable("points", latLngArrayList);
-
-        // Save the state of item position
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.general_menu, menu);
 
         MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
@@ -438,24 +457,20 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         if (NetworkManager.getInstance().isAuthenticated()) {
             logInMenu.setVisible(false);
         }
-
         MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
         if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
-
-
         return true;
     }
 
     @Override
+    /*
+     * Handles commands if any element in the toolbar gets pressed. If necessary, it sends a broadcast to the fragments of the activity
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case (android.R.id.home):
                 finish();
@@ -470,16 +485,14 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void whenRoomFinished(Object savedAll) {
         NetworkManager.getInstance().subscribeToEvent(eventID, new ICallbackAdapter<List<Event>>() {
             @Override
             public void onResponse(List<Event> object) {
-                if(object != null){
+                if (object != null) {
                     Log.d("Subscribe", String.format("List<Event> has events: %d", object.size()));
-                }
-                else {
+                } else {
                     Log.d("Subscribe", "List<Event> is null");
                 }
                 finish();

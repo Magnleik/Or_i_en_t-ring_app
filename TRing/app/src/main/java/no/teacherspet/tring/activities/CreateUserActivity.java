@@ -98,6 +98,7 @@ public class CreateUserActivity extends AppCompatActivity {
         });
     }
 
+
     private void saveCredentialsToLocal(){
         String token =  NetworkManager.getInstance().getToken();
         LocalDatabase database = LocalDatabase.getInstance(this);

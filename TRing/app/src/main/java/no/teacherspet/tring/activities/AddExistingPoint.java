@@ -21,9 +21,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
@@ -66,37 +63,39 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
+    /*
+    Gets called when the map is set up. Sets up the clustermanager and sets the map to focus on the correct place. Also defines the clickListeners
+     */
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        manager = new ClusterManager<Point>(this,mMap);
+        manager = new ClusterManager<Point>(this, mMap);
         manager.setAnimation(false);
         manager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<Point>() {
             @Override
             public boolean onClusterItemClick(Point point) {
                 //Toast.makeText(AddExistingPoint.this,"ClusterItem clicked", Toast.LENGTH_SHORT).show();
 
-                ((DefaultClusterRenderer)manager.getRenderer()).getMarker(point).showInfoWindow();
+                ((DefaultClusterRenderer) manager.getRenderer()).getMarker(point).showInfoWindow();
 
                 if (selectedPoints.contains(point)) {
                     selectedPoints.remove(point);
-                    ((DefaultClusterRenderer)manager.getRenderer()).getMarker(point).setIcon(BitmapDescriptorFactory.defaultMarker());
+                    ((DefaultClusterRenderer) manager.getRenderer()).getMarker(point).setIcon(BitmapDescriptorFactory.defaultMarker());
                     return false;
                 } else {
                     if (selectedPoint != null) {
-                        ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
+                        ((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
                     }
                     selectedPoint = point;
-                    ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    ((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
                     return true;
                 }
             }
-
         });
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if(selectedPoint!=null) {
-                    if(((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint)!=null) {
+                if (selectedPoint != null) {
+                    if (((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint) != null) {
                         ((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker());
                     }
                 }
@@ -109,7 +108,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         mMap.setMaxZoomPreference(20);
 
         CameraPosition camPos = getIntent().getParcelableExtra("map_center");
-            networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, 1000, new ICallbackAdapter<ArrayList<Point>>() {
+        networkManager.getNearbyPoints(camPos.target.latitude, camPos.target.longitude, 1000, new ICallbackAdapter<ArrayList<Point>>() {
             @Override
             public void onResponse(ArrayList<Point> object) {
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -127,7 +126,7 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                             mMap.setLatLngBoundsForCameraTarget(bounds);
                             mMap.moveCamera(CameraUpdateFactory.zoomOut());
                         });
-                    }else{
+                    } else {
                         Toast.makeText(getApplicationContext(), R.string.no_known_points_in_area, Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -142,14 +141,24 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
+    /**
+     * Gets called when a user presses the add button. Adds the currently selected point to a list of selevted points if there is any
+     *
+     * @param v the button pressed
+     */
     public void addButtonClick(View v) {
         if (selectedPoint != null) {
             selectedPoints.add(selectedPoint);
-            ((DefaultClusterRenderer)manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            ((DefaultClusterRenderer) manager.getRenderer()).getMarker(selectedPoint).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             selectedPoint = null;
         }
     }
 
+    /**
+     * Gets called when a user presses the done button. Finishes the activity and sends the list of selected points back to the parent activity.
+     *
+     * @param v the button pressed
+     */
     public void doneAddingClick(View v) {
         Intent intent = new Intent();
         intent.putExtra("selectedPoints", selectedPoints);
@@ -158,8 +167,10 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
+    /*
+     * Defines the menu elements to be present in the activity
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.general_menu, menu);
 
         MenuItem logInMenu = menu.findItem(R.id.log_in_menu);
@@ -167,24 +178,19 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
         if (NetworkManager.getInstance().isAuthenticated()) {
             logInMenu.setVisible(false);
         }
-
         MenuItem logOutMenu = menu.findItem(R.id.log_out_menu);
-        if(!NetworkManager.getInstance().isAuthenticated()){
+        if (!NetworkManager.getInstance().isAuthenticated()) {
             logOutMenu.setVisible(false);
         }
-
-
         return true;
     }
 
     @Override
+    /*
+     * Handles commands if any element in the toolbar gets pressed. If necessary, it sends a broadcast to the fragments of the activity
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         switch (id) {
             case (android.R.id.home):
                 setResult(RESULT_CANCELED, null);
@@ -198,7 +204,6 @@ public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCal
                 finish();
                 break;
         }
-
         supportInvalidateOptionsMenu();
         return super.onOptionsItemSelected(item);
     }
