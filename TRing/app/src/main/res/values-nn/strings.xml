@@ -114,7 +114,7 @@
     <string name="abort">Avbryt</string>
     <string name="timeUsed">Tid brukt: </string>
     <string name="start_event_button_text">Start laup</string>
-    <string name="length">"Lengd: "</string>
+    <string name="length">Lengd: </string>
     <string name="event_as_no_points">Dette laupet har ingen punkt!</string>
     <string name="time_sec_formatted">Tid: %d sek</string>
     <string name="time_min_sec_formatted">Tid: %d min %d sek</string>
