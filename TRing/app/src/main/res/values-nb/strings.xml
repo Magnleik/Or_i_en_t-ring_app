@@ -113,7 +113,7 @@
     <string name="proceed">Start nytt</string>
     <string name="abort">Avbryt</string>
     <string name="timeUsed">Tid brukt: </string>
-    <string name="startEventButtonText">Start løp</string>
+    <string name="start_event_button_text">Start løp</string>
     <string name="length">"Lengde: "</string>
     <string name="event_as_no_points">Dette løpet har ingen punkter!</string>
     <string name="time_sec_formatted">Tid: %d sek</string>
