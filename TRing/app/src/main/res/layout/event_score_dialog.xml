@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="The events avrage time:" />
+                android:text="@string/events_average_time" />
 
             <TextView
                 android:id="@+id/avrage_time_textview"
@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Your time: " />
+                android:text="@string/your_time" />
 
             <TextView
                 android:id="@+id/my_time_textview"
