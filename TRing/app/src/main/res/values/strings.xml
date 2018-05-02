@@ -105,7 +105,7 @@
     <string name="my_position">My position</string>
     <string name="sort">Sort</string>
     <string name="sort_time">Sort by average time</string>
-    <string name="sort_dist">Sort by distance</string>
+    <string name="sort_dist">Sort by length</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_alpha">Sort by name</string>
     <string name="events_average_time" >The events average time:</string>

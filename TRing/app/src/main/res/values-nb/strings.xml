@@ -100,11 +100,11 @@
     <string name="no_known_points_in_area">Det er ingen kjente punkt i dette området</string>
     <string name="pos_not_yet_found">Posisjon er enda ikke funnet</string>
     <string name="my_position">Min posisjon</string>
-    <string name="sort">Sorter</string>
-    <string name="sort_time">Sorter på tid</string>
-    <string name="sort_dist">Sorter på avstand</string>
-    <string name="sort_popularity">Sorter på popularitet</string>
-    <string name="sort_alpha">"Sorter på navn "</string>
+    <string name="sort">Sortér</string>
+    <string name="sort_time">Sortér på tid</string>
+    <string name="sort_dist">Sortér på lengde</string>
+    <string name="sort_popularity">Sortér på popularitet</string>
+    <string name="sort_alpha">"Sortér på navn "</string>
     <string name="events_average_time" >Løpets gjennomsnittstid:</string>
     <string name="your_time" >Din tid:</string>
     <string name="results_saved" >"Resultat lagret. Her er en kjapp oversikt: "</string>
