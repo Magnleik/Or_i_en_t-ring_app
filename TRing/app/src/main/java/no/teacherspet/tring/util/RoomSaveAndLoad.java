@@ -28,7 +28,7 @@ public class RoomSaveAndLoad {
     private RoomInteract returnClass;
 
     /**
-     * Needs context to create database, returnClass to return callback
+     * Uses context to create database, returnClass to return callback
      */
     public RoomSaveAndLoad(Context context, RoomInteract returnClass){
         localDatabase = LocalDatabase.getInstance(context);

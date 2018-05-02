@@ -16,11 +16,10 @@ import no.teacherspet.tring.fragments.NearbyEvents;
 public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
     private static final int PAGE_COUNT = 2;
     private static final String[] titles = new String[]{"0","1",}; //Initialize with dummy values for localization.
-    private Context context;
 
     public EventFragmentPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
-        this.context = context;
+        Context context1 = context;
 
         titles[0] = context.getString(R.string.my_events);
         titles[1] = context.getString(R.string.nearby_events);

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Class for converting different data types to something which is possible to save in Room
  * Created by Hermann on 20.02.2018.
  */
 

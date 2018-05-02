@@ -54,8 +54,6 @@ public class NearbyEvents extends Fragment implements RoomInteract {
 
     private ListOfSavedEvents parent;
     private Event selectedEvent;
-    private ListView mListView;
-    private HashMap<Integer, Event> theEventReceived;
     private ArrayList<Event> listItems;
     private BroadcastReceiver mReciever;
 
@@ -106,7 +104,7 @@ public class NearbyEvents extends Fragment implements RoomInteract {
      * @param savedInstanceState
      */
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
+        ListView mListView = (ListView) getView().findViewById(R.id.nearby_events_list);
         mReciever = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -215,8 +213,8 @@ public class NearbyEvents extends Fragment implements RoomInteract {
     /**
      * sets the list items to be the events gotten from the parent activity if they exist
      */
-    public void initList() {
-        theEventReceived = parent.getEvents();
+    private void initList() {
+        HashMap<Integer, Event> theEventReceived = parent.getEvents();
         if (theEventReceived != null) {
             for (Event ev : theEventReceived.values()) {
                 listItems.add(ev);

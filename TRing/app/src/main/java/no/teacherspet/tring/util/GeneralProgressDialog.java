@@ -21,18 +21,15 @@ import no.teacherspet.tring.R;
 
 public class GeneralProgressDialog {
 
-    private ProgressBar progressBar;
-    private Context context;
-    private Activity activity;
     private FragmentManager fm;
     private MyDialogFragment dialogFragment;
-    boolean blocking = false;
+    private boolean blocking = false;
 
     public GeneralProgressDialog(Context context, Activity activity, boolean blocking) {
-        this.context = context;
-        this.activity = activity;
+        Context context1 = context;
+        Activity activity1 = activity;
         this.blocking = blocking;
-        progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleLarge);
+        ProgressBar progressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleLarge);
         fm = activity.getFragmentManager();
         dialogFragment = new MyDialogFragment();
         Bundle bundle = new Bundle();

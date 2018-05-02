@@ -6,7 +6,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
@@ -51,21 +50,6 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     private LocationCallback mLocationCallback;
     private Location currentLocation;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private PagerAdapter mPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +57,15 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         initList();
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 2);
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        PagerAdapter mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), 2);
 
         setSupportActionBar((Toolbar) findViewById(R.id.saved_events_toolbar));
         ActionBar actionBar = getSupportActionBar();
@@ -81,7 +73,10 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        /*
+      The {@link ViewPager} that will host the section contents.
+     */
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(new EventFragmentPagerAdapter(getSupportFragmentManager(),
                 ListOfSavedEvents.this));
 
@@ -162,7 +157,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     /**
      * Creates a location request and asks for points nearby to the point recieved. After the events have been recieved, a message gets broadcasted to the fragments of this activity.
      */
-    public void initList() {
+    private void initList() {
         theEventReceived = new HashMap<>();
         GeneralProgressDialog progressDialog = new GeneralProgressDialog(getApplicationContext(), this, true);
         networkManager = NetworkManager.getInstance();
@@ -210,7 +205,7 @@ public class ListOfSavedEvents extends AppCompatActivity implements MyEvents.OnF
     /**
      * Stops the location request if possible
      */
-    public void stopLocationRequest() {
+    private void stopLocationRequest() {
         if (mLocationCallback != null) {
             lm.removeLocationUpdates(mLocationCallback);
         }

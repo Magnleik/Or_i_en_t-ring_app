@@ -15,6 +15,7 @@ import no.teacherspet.tring.Database.Entities.RoomPoint;
 
 /**
  * Created by Hermann on 13.02.2018.
+ * Class for accessing points. Can get all, or by a specific id
  */
 @Dao
 public interface PointDao {

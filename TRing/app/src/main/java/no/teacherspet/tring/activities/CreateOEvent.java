@@ -28,8 +28,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -51,10 +49,8 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private ArrayList<Point> arrayListWithCoords = new ArrayList<>();
     private ArrayList<Point> latLngArrayList = new ArrayList<>();
-    private NetworkManager networkManager;
     private FusedLocationProviderClient lm;
-    LocationCallback mLocationCallback;
-    private LocationRequest locationRequest;
+    private LocationCallback mLocationCallback;
     private Point startPoint;
     private Location currentLocation;
     private RoomSaveAndLoad roomSaveAndLoad;
@@ -155,7 +151,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      * @param marker   the marker that is being edited. If adding a new point, this can be null
      * @param position the Latitude and Longitude of the point pressed on the map
      */
-    public void openAddDialog(Point marker, LatLng position) {
+    private void openAddDialog(Point marker, LatLng position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.add_new_point);
         EditText input = new EditText(this);
@@ -196,7 +192,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      *
      * @param marker
      */
-    public void openEditDialog(Point marker) {
+    private void openEditDialog(Point marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(marker.getTitle());
         CharSequence[] elements = {getString(R.string.set_as_startpoint), getString(R.string.edit), getString(R.string.delete)};
@@ -310,7 +306,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
      *
      * @param marker to be removed
      */
-    public void deletePoint(Point marker) {
+    private void deletePoint(Point marker) {
         if (marker.equals(startPoint)) {
             startPoint = null;
         }
@@ -329,7 +325,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
         final Boolean[] hasFocused = {true};
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             lm = LocationServices.getFusedLocationProviderClient(this);
-            locationRequest = new LocationRequest();
+            LocationRequest locationRequest = new LocationRequest();
 
             locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -421,8 +417,7 @@ public class CreateOEvent extends AppCompatActivity implements OnMapReadyCallbac
 
             event.addProperty("dist", distance + "");
 
-            networkManager = NetworkManager.getInstance();
-            networkManager.addEvent(event, new ICallbackAdapter<Event>() {
+            NetworkManager.getInstance().addEvent(event, new ICallbackAdapter<Event>() {
                 @Override
                 public void onResponse(Event object) {
                     if (object == null) {
