@@ -11,6 +11,7 @@ import java.util.Map;
 
 /**
  * Created by Hermann on 13.02.2018.
+ * Class for the points in the events. Contains position and a hashmap with name and description
  */
 @Entity(tableName = "point", indices = @Index(value = "id", unique = true))
 public class RoomPoint {

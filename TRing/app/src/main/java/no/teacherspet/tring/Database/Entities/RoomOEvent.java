@@ -7,6 +7,8 @@ import java.util.Map;
 
 /**
  * Created by Hermann on 13.02.2018.
+ * Class for the events. Contains hashmap of name and description, as well as if
+ * the event is currently active
  */
 @Entity(tableName = "o_event")
 public class RoomOEvent {

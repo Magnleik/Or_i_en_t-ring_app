@@ -21,11 +21,11 @@ import no.teacherspet.tring.util.GeneralProgressDialog;
 
 public class CreateUserActivity extends AppCompatActivity {
 
-    EditText createUsername;
-    EditText createPassword;
-    EditText passwordCheck;
-    Button saveButton;
-    GeneralProgressDialog progressDialog;
+    private EditText createUsername;
+    private EditText createPassword;
+    private EditText passwordCheck;
+    private Button saveButton;
+    private GeneralProgressDialog progressDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

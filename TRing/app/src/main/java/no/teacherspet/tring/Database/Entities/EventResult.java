@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Created by Hermann on 29.04.2018.
+ * Class for keeping track of the start time, best time yet and difficulty og events
  */
 
 @Entity(tableName = "event_result")

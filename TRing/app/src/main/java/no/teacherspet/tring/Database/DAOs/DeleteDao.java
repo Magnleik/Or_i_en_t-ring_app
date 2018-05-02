@@ -6,6 +6,7 @@ import android.arch.persistence.room.Query;
 
 /**
  * Created by Hermann on 20.02.2018.
+ * Class for cleaning the database
  */
 @Dao
 public interface DeleteDao {

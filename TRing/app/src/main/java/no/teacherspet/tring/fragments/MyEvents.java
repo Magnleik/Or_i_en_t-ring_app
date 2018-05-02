@@ -47,7 +47,6 @@ import no.teacherspet.tring.util.RoomSaveAndLoad;
  */
 public class MyEvents extends Fragment implements RoomInteract {
 
-    private ListView mListView;
     private Event selectedEvent;
     private boolean changeEvent;
 
@@ -115,7 +114,7 @@ public class MyEvents extends Fragment implements RoomInteract {
      * @param savedInstanceState
      */
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        mListView = (ListView) getView().findViewById(R.id.my_events_list);
+        ListView mListView = (ListView) getView().findViewById(R.id.my_events_list);
 
         eventAdapter = new EventAdapter(this.getContext(), listItems);
         mListView.setAdapter(eventAdapter);
@@ -150,43 +149,37 @@ public class MyEvents extends Fragment implements RoomInteract {
             @Override
             public void onResponse(List<Event> object) {
                 if (object != null) {
-                    if (object.size() > 0) {
-                        listItems.clear();
-                        listItems.addAll(object);
-                        eventAdapter.notifyDataSetChanged();
+                    listItems.clear();
+                    listItems.addAll(object);
+                    eventAdapter.notifyDataSetChanged();
 
-                        oEventViewModel.getActiveEvent().subscribe(activeEvents -> {
-                            oEventViewModel.getAllOEvents().subscribe(roomOEvents -> {
-                                ArrayList<Integer> ids = new ArrayList<>();
-                                for (RoomOEvent roomOEvent : roomOEvents) {
-                                    ids.add(roomOEvent.getId());
+                    oEventViewModel.getActiveEvent().subscribe(activeEvents -> {
+                        oEventViewModel.getAllOEvents().subscribe(roomOEvents -> {
+                            ArrayList<Integer> ids = new ArrayList<>();
+                            for (RoomOEvent roomOEvent : roomOEvents) {
+                                ids.add(roomOEvent.getId());
+                            }
+                            int activeId;
+                            if (!activeEvents.isEmpty()) {
+                                activeId = activeEvents.get(0).getId();
+                            } else {
+                                activeId = -1;
+                            }
+                            for (Event event : object) {
+                                if (ids.contains(event.getId())) {
+                                    ids.remove(ids.indexOf(event.getId()));
                                 }
-                                int activeId;
-                                if (!activeEvents.isEmpty()) {
-                                    activeId = activeEvents.get(0).getId();
-                                } else {
-                                    activeId = -1;
+                                if (event.getId() != activeId) {
+                                    roomSaveAndLoad.saveRoomEvent(event);
                                 }
-                                for (Event event : object) {
-                                    if (ids.contains(event.getId())) {
-                                        ids.remove(ids.indexOf(event.getId()));
-                                    }
-                                    if (event.getId() != activeId) {
-                                        roomSaveAndLoad.saveRoomEvent(event);
-                                    }
+                            }
+                            for (Integer id : ids) {
+                                if (id != activeId) {
+                                    oEventViewModel.deleteOEvent(id);
                                 }
-                                for (Integer id : ids) {
-                                    if (id != activeId) {
-                                        oEventViewModel.deleteOEvent(id);
-                                    }
-                                }
-
-                            });
+                            }
                         });
-
-                    } else {
-                        loadData();
-                    }
+                    });
                 } else {
                     loadData();
                 }

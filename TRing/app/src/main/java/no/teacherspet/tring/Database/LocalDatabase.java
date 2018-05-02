@@ -19,6 +19,8 @@ import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 import no.teacherspet.tring.Database.Entities.RoomUser;
 
 /**
+ * The local database. Is a Singleton which ensures all database queries
+ * are done to the same instance of the database
  * Created by Hermann on 13.02.2018.
  */
 

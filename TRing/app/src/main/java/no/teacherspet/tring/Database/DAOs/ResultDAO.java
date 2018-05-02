@@ -14,6 +14,7 @@ import no.teacherspet.tring.Database.Entities.EventResult;
 
 /**
  * Created by Hermann on 29.04.2018.
+ * Class for accessing results for events. Can get all results, or for a specific event
  */
 @Dao
 public interface ResultDAO {

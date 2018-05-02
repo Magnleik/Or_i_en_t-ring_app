@@ -13,7 +13,7 @@ import no.teacherspet.tring.fragments.NearbyEvents;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
-    int numberOfTabs;
+    private int numberOfTabs;
 
     public PagerAdapter(FragmentManager fm, int numberOfTabs) {
         super(fm);

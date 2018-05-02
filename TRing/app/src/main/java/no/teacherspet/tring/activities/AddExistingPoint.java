@@ -37,12 +37,12 @@ import no.teacherspet.tring.R;
 
 public class AddExistingPoint extends AppCompatActivity implements OnMapReadyCallback {
 
-    GoogleMap mMap;
-    FusedLocationProviderClient lm;
-    NetworkManager networkManager;
-    ArrayList<Point> selectedPoints;
-    Point selectedPoint;
-    ClusterManager<Point> manager;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient lm;
+    private NetworkManager networkManager;
+    private ArrayList<Point> selectedPoints;
+    private Point selectedPoint;
+    private ClusterManager<Point> manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

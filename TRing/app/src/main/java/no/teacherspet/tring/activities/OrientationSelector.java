@@ -232,6 +232,7 @@ public class OrientationSelector extends AppCompatActivity implements RoomIntera
         logInButton.setEnabled(!NetworkManager.getInstance().isAuthenticated());
 
         if(getIntent().getBooleanExtra("Logout", false)){
+            getIntent().removeExtra("Logout");
             logout();
         }
         eventViewModel.getActiveEvent().subscribe(roomOEvents -> {

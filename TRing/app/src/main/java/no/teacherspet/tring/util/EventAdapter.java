@@ -17,14 +17,12 @@ import no.teacherspet.tring.R;
  */
 
 public class EventAdapter extends BaseAdapter {
-    private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<Event> mDataSource;
 
     public EventAdapter(Context context, ArrayList<Event> events) {
-        mContext = context;
         mDataSource = events;
-        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     //1
@@ -55,8 +53,8 @@ public class EventAdapter extends BaseAdapter {
         View rowView = mInflater.inflate(R.layout.list_item_event, parent, false);
 
         TextView titleTextView = (TextView) rowView.findViewById(R.id.list_item_event_title);
-        TextView avrageDistanceValue = (TextView) rowView.findViewById(R.id.avg_dist);
-        TextView avrageTimeTextView = (TextView) rowView.findViewById(R.id.avg_time);
+        TextView averageDistanceValue = (TextView) rowView.findViewById(R.id.avg_dist);
+        TextView averageTimeTextView = (TextView) rowView.findViewById(R.id.avg_time);
 
 
 
@@ -74,18 +72,18 @@ public class EventAdapter extends BaseAdapter {
                 m = (distance%1000)/1000;
 
                 String numberAsString = String.format("%.1f", km);
-                avrageDistanceValue.setText(numberAsString + "km");
+                averageDistanceValue.setText(numberAsString + "km");
 
             } else {
                 m=distance;
-                avrageDistanceValue.setText((m + "m"));
+                averageDistanceValue.setText((m + "m"));
             }
 
         };
 
         if ((event.getProperty("avg_time") != null)) {
 
-            avrageTimeTextView.setText(event.getProperty("avg_time"));
+            averageTimeTextView.setText(event.getProperty("avg_time"));
         }
 
         titleTextView.setText(event.getProperty("event_name"));

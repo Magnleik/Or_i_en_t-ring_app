@@ -25,11 +25,10 @@ import no.teacherspet.tring.util.GeneralProgressDialog;
 
 public class LogInActivity extends AppCompatActivity {
 
-    EditText username;
-    EditText password;
-    Button logInBtn;
-    Button createUserBtn;
-    GeneralProgressDialog progressDialog;
+    private EditText username;
+    private EditText password;
+    private Button logInBtn;
+    private GeneralProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,6 @@ public class LogInActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.login_username);
         password = (EditText) findViewById(R.id.login_password);
         logInBtn = (Button) findViewById(R.id.login_btn);
-        createUserBtn = (Button) findViewById(R.id.login_create_btn);
 
         progressDialog = new GeneralProgressDialog(this, this, true);
 

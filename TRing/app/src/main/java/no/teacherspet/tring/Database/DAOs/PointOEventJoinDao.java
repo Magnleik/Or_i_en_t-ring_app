@@ -16,6 +16,8 @@ import no.teacherspet.tring.Database.Entities.PointOEventJoin;
 
 /**
  * Created by Hermann on 15.02.2018.
+ * Class for accessing the connection between points and events. Is mostly used for
+ * getting all connections for a specific event, or the points
  */
 @Dao
 public interface PointOEventJoinDao {

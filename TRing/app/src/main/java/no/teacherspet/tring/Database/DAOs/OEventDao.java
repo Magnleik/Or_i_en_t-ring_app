@@ -14,6 +14,7 @@ import no.teacherspet.tring.Database.Entities.RoomOEvent;
 
 /**
  * Created by Hermann on 13.02.2018.
+ * Class for getting events. Can choose to only get events which are set to active
  */
 @Dao
 public interface OEventDao {

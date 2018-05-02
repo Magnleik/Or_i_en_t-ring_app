@@ -15,6 +15,7 @@ import no.teacherspet.tring.Database.Entities.RoomUser;
 
 /**
  * Created by Hermann on 13.02.2018.
+ * Class for accessing users
  */
 @Dao
 public interface UserDao {

@@ -55,27 +55,26 @@ import no.teacherspet.tring.R;
 public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LocationRequest locationRequest;
     private Location currentLocation;
     private int positionViewed = 0;
     private HashMap<Point, Marker> markers;
     private ArrayList<Point> points;
     private ArrayList<Point> visitedPoints;
     private Event startedEvent;
-    long startTime;
-    long eventTime;
-    boolean savedToServer = false;
+    private long startTime;
+    private long eventTime;
+    private boolean savedToServer = false;
     private int eventDifficultyValue;
     private double seconds;
     private double minutes;
     private double hours;
     private String timeTextToServer = "";
     private Marker posisjonsmarkor;
-    public Location lastKnownLocation;
-    private String eventAvrageTime;
+    private Location lastKnownLocation;
+    private String eventAverageTime;
     private double eventScore =0;
-    FusedLocationProviderClient fusedLocationProviderClient;
-    LocationCallback mLocationCallback;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationCallback mLocationCallback;
 
     private OEventViewModel oEventViewModel;
     private PointOEventJoinViewModel joinViewModel;
@@ -85,7 +84,6 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     private Button mediumButton;
     private Button hardButton;
     private TextView difficultyTextViewValue;
-    private TextView eventTitle;
     private TextView difficultyTextViewText;
     private TextView explanationTextView;
     private Button startButton;
@@ -149,7 +147,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Creates a location request to receive location updates.
      */
     private void createLocationRequest() {
-        locationRequest = new LocationRequest();
+        LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(1000).setFastestInterval(500).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mLocationCallback = new LocationCallback() {
@@ -180,7 +178,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      *
      * @return The list of points to be included
      */
-    public ArrayList<Point> readPoints() {
+    private ArrayList<Point> readPoints() {
         if (!startedEvent.getPoints().isEmpty()) {
             return startedEvent.getPoints();
         } else {
@@ -249,7 +247,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     /**
      * Opens a dialog when entering an event which is not yet started.
      */
-    public void openStartDialog() {
+    private void openStartDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -260,7 +258,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         mediumButton = (Button) inflator.findViewById(R.id.medium_btn);
         hardButton = (Button) inflator.findViewById(R.id.hard_btn);
         difficultyTextViewValue = (TextView) inflator.findViewById(R.id.difficulty_textview);
-        eventTitle = (TextView) inflator.findViewById(R.id.eventStartedTitle);
+        TextView eventTitle = (TextView) inflator.findViewById(R.id.eventStartedTitle);
         difficultyTextViewText = inflator.findViewById(R.id.difficulty_textView_Text);
         explanationTextView = inflator.findViewById(R.id.explanation_textview);
         eventTitle.setText(startedEvent.getProperty("event_name"));
@@ -325,7 +323,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      *
      * @param difficulty The difficulty of the event
      */
-    public void setEventDifficulty(String difficulty) {
+    private void setEventDifficulty(String difficulty) {
         switch (difficulty) {
             case "easy":
                 this.eventDifficultyValue = 8;
@@ -351,7 +349,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     /**
      * Opens a dialog when the event is finished
      */
-    public void openFinishDialog() {
+    private void openFinishDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View inflator = inflater.inflate(R.layout.event_finished_dialog, null);
@@ -408,8 +406,8 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         @Override
                         public void onResponse(Event object) {
                             Toast.makeText(getApplicationContext(), R.string.save_complete, Toast.LENGTH_SHORT).show();
-                            eventAvrageTime = object.getAvgTime();
-                            openScoreDialog(eventAvrageTime, timeTextToServer);
+                            eventAverageTime = object.getAvgTime();
+                            openScoreDialog(eventAverageTime, timeTextToServer);
                             setSavedToServer(true);
                         }
 
@@ -419,7 +417,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
                         }
                     });
                 } else {
-                    openScoreDialog(geteventAvrageTime(), getTimeTextToServer());
+                    openScoreDialog(geteventAverageTime(), getTimeTextToServer());
                 }
             }
         });
@@ -439,15 +437,15 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param avg average time of event
      * @param myTime time of the user
      */
-    public void openScoreDialog(String avg, String myTime) {
+    private void openScoreDialog(String avg, String myTime) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View inflator = inflater.inflate(R.layout.event_score_dialog, null);
         builder.setView(inflator);
         TextView myTimeTextView = (TextView) inflator.findViewById(R.id.my_time_textview);
-        TextView avrageTimeTextView = (TextView) inflator.findViewById(R.id.avrage_time_textview);
-        avrageTimeTextView.setText(avg);
+        TextView averageTimeTextView = (TextView) inflator.findViewById(R.id.average_time_textview);
+        averageTimeTextView.setText(avg);
         myTimeTextView.setText(myTime);
 
 
@@ -505,7 +503,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     /**
      * Shows the location of the user as long as the event is not started
      */
-    public void showLocationUntilEventIsStarted() {
+    private void showLocationUntilEventIsStarted() {
         if (this.startTime == -1) {
             if (currentLocation != null) {
                 if (this.lastKnownLocation == null) {
@@ -719,11 +717,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
     /**
      * @return The points of the event to be performed
      */
-    public ArrayList<Point> getPoints() {
+    private ArrayList<Point> getPoints() {
         return points;
     }
 
-    public long getEventTime() {
+    private long getEventTime() {
         if (this.startTime != -1) {
             long difference = System.currentTimeMillis() - this.startTime;
             this.eventTime = (difference / 1000) ; //seconds
@@ -736,7 +734,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param eventTime The time to be converted
      * @return
      */
-    public double calculate(double eventTime) {
+    private double calculate(double eventTime) {
         return Math.floor(eventTime/60);
     }
 
@@ -745,7 +743,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * @param eventTime
      * @return the rest of the division from calculate
      */
-    public double calculateRest(double eventTime) {
+    private double calculateRest(double eventTime) {
         return Math.floor(eventTime%60);
     }
 
@@ -753,7 +751,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      *
      * @return the score of the event
      */
-    public double getEventScore() {
+    private double getEventScore() {
         if (eventScore == 0) {
             double distance = 0;
             // Kalkuler distanse
@@ -768,11 +766,11 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
             //This must be changed based on the users level
             //Now using avrg jogging spead (Mid-levelsish?) 8kmph
 
-            double avrageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000) / 3600); //
+            double averageTimeBasedOnDistance = (distance) / ((this.eventDifficultyValue * 1000) / 3600); //
 
             double eventTime = getEventTime();
 
-            double eventScore = avrageTimeBasedOnDistance * 100 / eventTime;
+            double eventScore = averageTimeBasedOnDistance * 100 / eventTime;
             if (eventScore > 100) {
                 eventScore = 100;
             }
@@ -791,7 +789,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Starts the event if the user is close enough to the starting point. Gets called when the start event button gets pressed
      * @param v the button pressed
      */
-    public void startEventBtnPressed(View v) {
+    private void startEventBtnPressed(View v) {
         if (currentLocation == null) {
             Toast.makeText(getApplicationContext(), R.string.try_again_in_5_sec, Toast.LENGTH_SHORT).show();
             return;
@@ -820,39 +818,39 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    public String geteventAvrageTime() {
-        return eventAvrageTime;
+    private String geteventAverageTime() {
+        return eventAverageTime;
     }
 
-    public String getTimeTextToServer() {
+    private String getTimeTextToServer() {
         return timeTextToServer;
     }
 
-    public void setTimeTextToServer(String timeTextToServer) {
+    private void setTimeTextToServer(String timeTextToServer) {
         this.timeTextToServer = timeTextToServer;
     }
 
-    public void setEventScore(long eventScore) {
+    private void setEventScore(long eventScore) {
         this.eventScore = eventScore;
     }
 
-    public void setSavedToServer(boolean savedToServer) {
+    private void setSavedToServer(boolean savedToServer) {
         this.savedToServer = savedToServer;
     }
 
-    public boolean getSavedToServer() {
+    private boolean getSavedToServer() {
         return savedToServer;
     }
 
-    public Location getLastKnownLoction() {
+    private Location getLastKnownLoction() {
         return lastKnownLocation;
     }
 
-    public void setLastKnownLocation(Location lastKnownLocation) {
+    private void setLastKnownLocation(Location lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
     }
 
-    public long getStartTime() {
+    private long getStartTime() {
         return this.startTime;
     }
 }
