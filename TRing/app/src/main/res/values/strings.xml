@@ -116,8 +116,8 @@
     <string name="cancel_last_event">Do you want to cancel this and start a new event?</string>
     <string name="abort">Abort</string>
     <string name="timeUsed">Time used:</string>
-    <string name="startEventButtonText" />
-    <string name="length">"Length: "</string>
+    <string name="start_event_button_text">Start Event</string>
+    <string name="length">Length: </string>
     <string name="event_as_no_points">The event does not have any points!</string>
     <string name="time_sec_formatted">Time: %d sec</string>
     <string name="time_min_sec_formatted">Tid: %dmin %d sec</string>
