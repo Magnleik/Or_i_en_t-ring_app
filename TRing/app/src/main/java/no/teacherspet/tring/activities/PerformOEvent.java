@@ -789,7 +789,7 @@ public class PerformOEvent extends AppCompatActivity implements OnMapReadyCallba
      * Starts the event if the user is close enough to the starting point. Gets called when the start event button gets pressed
      * @param v the button pressed
      */
-    private void startEventBtnPressed(View v) {
+    public void startEventBtnPressed(View v) {
         if (currentLocation == null) {
             Toast.makeText(getApplicationContext(), R.string.try_again_in_5_sec, Toast.LENGTH_SHORT).show();
             return;
