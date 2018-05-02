@@ -1,67 +1,108 @@
 package connection;
 
+
+
 import java.util.List;
 
+import java.util.Map;
+
+
+
 import retrofit2.Call;
+
 import retrofit2.http.Body;
+
+import retrofit2.http.DELETE;
+
 import retrofit2.http.GET;
+
 import retrofit2.http.POST;
+
 import retrofit2.http.PUT;
+
 import retrofit2.http.Path;
 
+import retrofit2.http.Query;
+
+
+
 /**
+
  * Created by Eirik on 20-Feb-18.
+
  */
+
+
 
 public interface Client {
 
-    @GET("/api/test/point/{ID}")
-    Call<Point> testGetPointByID(
-            @Path("ID") int pointID
+
+    @POST("/api/points")
+    Call<List<Point>> addPoints(@Body Point... points);
+
+    @POST("/api/events")
+    Call<Event> addEvent(@Body Event events);
+
+
+    @PUT("/api/events")
+    Call<Event> updateEvent(
+            @Body Event event
     );
 
-    @GET("/")
-    Call<List<String>> getTestStrings(
-            /*@Path("FILLINPLS") int testStringID*/
+
+    @POST("/api/user")
+    Call<Boolean> createNewUser(
+            @Body User user
     );
 
-    @GET("/api/test/event/{ID}")
-    Call<Event> testGetEventByID(
-            @Path("ID") int eventID
+    @POST("/api/events/{eventID}/finish")
+    Call<Event> postResults(
+            @Path("eventID") int eventID,
+            @Query("time") String time,
+            @Query("score") int score
     );
 
-    @POST("/api/test/point")
-    Call<Point> testCreatePoint(@Body Point point);
+    @POST("/api/login")
+    Call<Boolean> logIn();
 
-    @POST("/api/test/event")
-    Call<Event> testCreateEvent(@Body Event event);
+    @PUT ("/api/points")
+    Call<Point> updatePoint(
+            @Body Point point
+    );
 
-    @POST
-    Call<Point> addPoint(@Body Point point);
-
-    @POST
-    Call<Event> addEvent(@Body Event event);
-
-    @PUT
-    Call<Event> updateEvent(@Body Event event);
-
-    @GET
+    @GET("/api/points/nearby")
     Call<List<Point>> getNearbyPoints (
-            @Path("latitude") double latitude,
-            @Path("longitude") double longitude,
-            @Path("radius") double radius
+            @Query("lat") double latitude,
+            @Query("lng") double longitude,
+            @Query("dist") double radius
     );
 
-    @GET
+
+
+    @GET("/api/events/nearby")
     Call<List<Event>> getNearbyEvents (
-            @Path("latitude") double latitude,
-            @Path("longitude") double longitude,
-            @Path("radius") double radius
+            @Query("lat") double latitude,
+            @Query("lng") double longitude,
+            @Query("dist") double radius
     );
 
-    @GET
+    @GET("/api/events/{ID}/points")
     Call<Event> getEventById(
             @Path("ID") int ID
     );
 
+    @GET("/api/user/events")
+    Call<List<Event>> getSubscribedEvents();
+
+    @POST("/api/user/events/{ID}")
+    Call<List<Event>> subscribeToEvent(
+            @Path("ID") int ID
+    );
+
+    @DELETE("/api/user/events/{ID}")
+    Call<List<Event>> unsubscribeFromEvent(
+            @Path("ID") int ID
+    );
+
 }
+

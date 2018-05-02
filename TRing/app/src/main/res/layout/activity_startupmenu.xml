@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/startup_layout">
 
     <Button
         android:id="@+id/orientering_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Orientering"
-        android:onClick="orientering"/>
+        android:onClick="orientering"
+        android:text="@string/orienteering" />
+
+    <Button
+        android:id="@+id/log_in_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="logInButton"
+        android:text="@string/log_in" />
+
+    <Button
+        android:id="@+id/log_out_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="logOutButton"
+        android:text="@string/log_out" />
+
 </LinearLayout>

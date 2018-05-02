@@ -4,21 +4,21 @@
 
     <Button
         android:id="@+id/create_point_btn"
-        android:onClick="onOkClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/set_point_name"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/set_point_name"
-        android:layout_marginBottom="17dp"
+        android:layout_marginBottom="15dp"
+        android:onClick="onOkClick"
         android:text="@string/create" />
 
     <Button
         android:id="@+id/cancel_point_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onCancelClick"
-        android:layout_alignEnd="@+id/set_point_name"
+        android:layout_alignStart="@+id/set_point_name"
         android:layout_alignTop="@+id/create_point_btn"
+        android:onClick="onCancelClick"
         android:text="@android:string/cancel" />
 
     <EditText
@@ -29,6 +29,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="38dp"
         android:ems="10"
-        android:hint="Name"
+        android:hint="@string/name"
         android:inputType="textPersonName" />
 </RelativeLayout>
